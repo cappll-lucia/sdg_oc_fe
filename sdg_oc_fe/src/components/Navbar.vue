@@ -78,7 +78,7 @@ const productosItems: { title: string, href: string, description: string; }[] = 
             <NavigationMenuItem>
                 <NavigationMenuTrigger>Recetas</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                    <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[300px] ">
+                    <ul class="grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw] ">
                         <li v-for="item in recetasItems" :key="item.title">
                             <NavigationMenuLink as-child>
                                 <a :href="item.href"
@@ -124,7 +124,7 @@ const productosItems: { title: string, href: string, description: string; }[] = 
             <NavigationMenuItem>
                 <NavigationMenuTrigger>Productos</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                    <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[300px] ">
+                    <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
                         <li v-for="item in productosItems" :key="item.title">
                             <NavigationMenuLink as-child>
                                 <a :href="item.href"

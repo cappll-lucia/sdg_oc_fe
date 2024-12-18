@@ -48,3 +48,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.page{
+  padding: 1.5rem;
+}
+
+.page nav{
+  margin-bottom: 0.5rem;
+}
+
+.page .page-title{
+  font-size: x-large;
+  font-weight: 800;
+}
