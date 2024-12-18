@@ -24,8 +24,11 @@
 
     --secondary: 210 100% 50%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 78 66% 47%;
+    
+    --green: 162 100% 88%;
+    --green-foreground: 0 0% 0%;
+    
+    --accent:160 100% 90%; 
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -44,4 +47,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.page{
+  padding: 1.5rem;
+}
+
+.page nav{
+  margin-bottom: 0.5rem;
+}
+
+.page .page-title{
+  font-size: x-large;
+  font-weight: 800;
 }
