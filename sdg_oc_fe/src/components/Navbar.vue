@@ -19,7 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
 
-const recetasItems: { title: string, href: string, description: string; }[] = [
+const recetasItems: { title: string, href: string}[] = [
     {
         title: 'Anteojos Recetados',
         href: '/docs/components/alert-dialog'
@@ -55,7 +55,7 @@ const ventasItems: { title: string, href: string, description: string; }[] = [
     }
 ];
 
-const productosItems: { title: string, href: string, description: string; }[] = [
+const productosItems: { title: string, href: string}[] = [
     {
         title: 'Inventarios',
         href: '/docs/components/alert-dialog'
@@ -84,9 +84,6 @@ const productosItems: { title: string, href: string, description: string; }[] = 
                                 <a :href="item.href"
                                     class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                                     <div class="text-sm font-medium leading-none">{{ item.title }}</div>
-                                    <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                        {{ item.description }}
-                                    </p>
                                 </a>
                             </NavigationMenuLink>
                         </li>
