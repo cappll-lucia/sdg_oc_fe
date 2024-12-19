@@ -45,6 +45,9 @@ onMounted(async()=>{
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title">Clientes</h1>
+        <div class="pt-2 flex flex-row justify-between">
+            
+        </div>
         <div class="pt-2">
             <DataTable :columns="columns" :data="data" />
         </div>

@@ -22,11 +22,11 @@ export const ClientesExample: Cliente[] = [
     fechaNac: new Date( "1985-10-20"),
     sexo: "M",
     dni: "87654321",
-    nombre: "Juan",
+    nombre: "Juaan",
     apellido: "Pérez",
     observaciones: "Prefiere pagos con tarjeta",
     email: "juan.perez@example.com",
-        createdAt: "*",
+    createdAt: "*",
     updatedAt:"*"
   },
   {

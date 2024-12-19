@@ -7,18 +7,27 @@ export const columns: ColumnDef<Cliente>[] = [
   {
     accessorKey: 'id',
     header: () => h('div', 'ID'),
+    cell: info=> info.getValue()
   },
-    {
-    accessorKey: 'email',
-    header: () => h('div', 'Email'),
-  },
-      {
+  {
     accessorKey: 'nombre',
     header: () => h('div', 'Nombre'),
+    cell: info=> info.getValue(),
   },
-    {
+  {
     accessorKey: 'apellido',
     header: () => h('div', 'Apellido'),
+    cell: info=> info.getValue(),
+  },
+  {
+    accessorKey: 'email',
+    header: () => h('div', 'Email'),
+    cell: info=> info.getValue()
+  },
+    {
+    accessorKey: 'telefono',
+    header: () => h('div', 'Telefono'),
+    cell: info=> info.getValue()
   },
   {
     id: 'actions',

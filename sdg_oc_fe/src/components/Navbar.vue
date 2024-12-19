@@ -109,7 +109,7 @@ const productosItems: { title: string, href: string}[] = [
                 </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
-                <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">
+                <NavigationMenuLink href="/clientes" :class="navigationMenuTriggerStyle()">
                     Clientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
