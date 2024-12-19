@@ -22,15 +22,15 @@ import{Button} from '@/components/ui/button'
 const recetasItems: { title: string, href: string}[] = [
     {
         title: 'Anteojos Recetados',
-        href: '/docs/components/alert-dialog'
+        href: '/recetas/recetados'
     },
     {
         title: 'Lentes de Contacto',
-        href: '/docs/components/hover-card'
+        href: '/recetas/contacto'
     },
     {
         title: 'Audiometrías',
-        href: '/docs/components/progress'
+        href: '/recetas/audiometrias'
     }
 ];
 

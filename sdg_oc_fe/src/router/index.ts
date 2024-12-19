@@ -17,6 +17,25 @@ export const router = createRouter({
             path: '/clientes',
             name: 'clientes',
             component: () => import('../views/Clientes.vue')
-        }
+        },
+        {
+            path: '/recetas',
+            name: 'recetas',
+            component: () => import('../views/Recetas.vue')
+        },
+        {
+            path: '/recetas/recetados',
+            name: 'recetas_recetados',
+            component: () => import('../views/RecetasRecetados.vue')
+        },
+                {
+            path: '/recetas/contacto',
+            name: 'recetas_contacto',
+            component: () => import('../views/RecetasContacto.vue')
+        },        {
+            path: '/recetas/audiometrias',
+            name: 'recetas_audiometria',
+            component: () => import('../views/RecetasAudiometrias.vue')
+        },
     ]
 })

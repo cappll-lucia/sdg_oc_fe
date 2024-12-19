@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TData, TValue">
-import { ref } from 'vue'
+import {ref} from 'vue';
 import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
 import {
     Table,
@@ -19,11 +19,12 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button';
 import { valueUpdater } from '@/lib/utils'
 
-
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
 }>();
+
+console.log(props.columns)
 
 const columnFilters = ref<ColumnFiltersState>([])
 
@@ -42,9 +43,9 @@ const table = useVueTable({
 <template>
         <div class="flex flex-row justify-between items-center py-4">
             <Input class="max-w-sm" placeholder="Buscar Cliente"
-                :model-value="table.getColumn('telefono')?.getFilterValue() as string"
-                @update:model-value=" table.getColumn('telefono')?.setFilterValue($event)" />
-            <Button class="text-xs">Registrar Nuevo cliente</Button>
+                :model-value="table.getColumn('nombre')?.getFilterValue() as string"
+                @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
+            <Button class="text-xs">Registrar Nueva Receta</Button>
         </div>
     <div class="border rounded-md">
         <Table>
