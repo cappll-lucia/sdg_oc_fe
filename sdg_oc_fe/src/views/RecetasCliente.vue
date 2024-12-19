@@ -1,0 +1,70 @@
+<script setup lang="ts">
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { SlashIcon } from '@radix-icons/vue';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ClientesConRecetaRec } from '@/api/data/clientesConRecetados';
+import type { ClienteConRecetaRecetados } from '@/api/entities';
+import { onMounted, ref} from 'vue';
+import { useRoute } from 'vue-router';
+import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'
+
+const route = useRoute()
+const cliente = ref<undefined | ClienteConRecetaRecetados>(undefined);
+
+onMounted(()=>{
+    cliente.value = ClientesConRecetaRec.find((cliente)=>cliente.id==Number(route.params.id))
+})
+
+
+</script>
+
+
+<template>
+    <div class="page">
+        <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                        Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Recetas</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        <h1 class="page-title ">Recetas: {{ cliente?.apellido }}, {{ cliente?.nombre }}</h1>
+        <div class="pt-2">
+            <Tabs default-value="recetados" class="w-[100%]">
+                <TabsList class="w-[100%]">
+                    <TabsTrigger class="w-[50%]" value="recetados">
+                        Anteojos Recetados
+                    </TabsTrigger>
+                    <TabsTrigger class="w-[50%]" value="contacto">
+                        Lentes De Contacto
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent class="bg-secondary h-[40rem] px-2 py-6 rounded" value="recetados">
+                    <ListadoRecetasRecetados v-if="cliente" :recetas="cliente.recetasRecetados" />
+                    <h2 v-else>El cliente no tiene recetas registradas para lentes recetados </h2>
+                </TabsContent>
+                <TabsContent class="bg-secondary h-[60rem] px-2 py-6 rounded" value="contacto">
+                    TODO
+                </TabsContent>
+            </Tabs>
+        </div>
+    </div>
+
+
+
+</template>

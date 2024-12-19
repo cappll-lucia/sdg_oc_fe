@@ -37,5 +37,10 @@ export const router = createRouter({
             name: 'recetas_audiometria',
             component: () => import('../views/RecetasAudiometrias.vue')
         },
+        {
+            path: '/recetas/:id',
+            name: 'recetas_cliente',
+            component: () => import('../views/RecetasCliente.vue')
+        },
     ]
 })
