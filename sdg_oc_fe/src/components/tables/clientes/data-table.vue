@@ -16,6 +16,7 @@ import {
     getFilteredRowModel, 
 } from '@tanstack/vue-table'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button';
 import { valueUpdater } from '@/lib/utils'
 
 
@@ -39,10 +40,11 @@ const table = useVueTable({
 </script>
 
 <template>
-        <div class="flex items-center py-4">
+        <div class="flex flex-row justify-between items-center py-4">
             <Input class="max-w-sm" placeholder="Buscar Cliente"
                 :model-value="table.getColumn('telefono')?.getFilterValue() as string"
                 @update:model-value=" table.getColumn('telefono')?.setFilterValue($event)" />
+            <Button class="text-xs">Registrar Nuevo cliente</Button>
         </div>
     <div class="border rounded-md">
         <Table>

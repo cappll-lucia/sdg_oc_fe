@@ -14,6 +14,7 @@ import {columns} from '@/components/tables/clientes/columns'
 import {ClientesExample} from '@/api/data/clientes.ts'
 import DataTable from '@/components/tables/clientes/data-table.vue';
 
+
 const data = ref<Cliente[]>([]);
 
 async function getData() : Promise<Cliente[]> {
@@ -44,10 +45,7 @@ onMounted(async()=>{
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title">Clientes</h1>
-        <div class="pt-2 flex flex-row justify-between">
-            
-        </div>
+        <h1 class="page-title ">Clientes</h1>
         <div class="pt-2">
             <DataTable :columns="columns" :data="data" />
         </div>

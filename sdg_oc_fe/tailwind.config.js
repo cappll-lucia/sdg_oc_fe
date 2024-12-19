@@ -48,6 +48,10 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        secondary_green:{
+            DEFAULT: "hsl(var(--secondary-green))",
+          foreground: "hsl(var(--secondary-green-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
