@@ -28,17 +28,23 @@ export const router = createRouter({
             name: 'recetas_recetados',
             component: () => import('../views/RecetasRecetados.vue')
         },
-                {
+        {
             path: '/recetas/contacto',
             name: 'recetas_contacto',
             component: () => import('../views/RecetasContacto.vue')
-        },        {
-            path: '/recetas/audiometrias',
+        },        
+        {
+            path: '/audiometrias',
             name: 'recetas_audiometria',
             component: () => import('../views/RecetasAudiometrias.vue')
         },
         {
-            path: '/recetas/:id',
+            path: '/audiometrias/:idCliente',
+            name: 'audiometria',
+            component: () => import('../views/AudiometriasCliente.vue')
+        },
+        {
+            path: '/recetas/:idCliente',
             name: 'recetas_cliente',
             component: () => import('../views/RecetasCliente.vue')
         },

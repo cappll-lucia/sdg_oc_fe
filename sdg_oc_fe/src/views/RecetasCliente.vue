@@ -19,7 +19,7 @@ const route = useRoute()
 const cliente = ref<undefined | ClienteConRecetaRecetados>(undefined);
 
 onMounted(()=>{
-    cliente.value = ClientesConRecetaRec.find((cliente)=>cliente.id==Number(route.params.id))
+    cliente.value = ClientesConRecetaRec.find((cliente) => cliente.id == Number(route.params.idCliente))
 })
 
 

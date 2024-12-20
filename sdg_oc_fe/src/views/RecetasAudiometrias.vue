@@ -8,6 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
+
 </script>
 
 <template>
@@ -39,8 +40,7 @@ import { SlashIcon } from '@radix-icons/vue';
         <div class="pt-2">
 
         </div>
-
-
-
     </div>
 </template>
+
+

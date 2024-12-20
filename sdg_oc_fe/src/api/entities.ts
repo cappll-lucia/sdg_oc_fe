@@ -50,3 +50,24 @@ export interface ClienteConRecetaRecetados extends BaseEntity{
     observaciones: string ,
     recetasRecetados: RecetaRecetados[] 
 }
+
+
+export interface Audiometria extends BaseEntity{
+    pdfUrl: string,
+    observaciones: string,
+    fechaInforme: Date
+}
+
+
+export interface ClienteConAudiometria extends BaseEntity{
+    dni: string , 
+    nombre: string , 
+    apellido: string , 
+    email: string , 
+    sexo:  string, 
+    telefono: string , 
+    domicilio: string , 
+    fechaNac: Date , 
+    observaciones: string ,
+    audiometrias: Audiometria[] 
+}
