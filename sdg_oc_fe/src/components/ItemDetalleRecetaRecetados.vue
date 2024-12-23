@@ -18,7 +18,7 @@ defineProps<{
         <h1 class="mr-12 text-2xl font-extrabold ">{{ title }}</h1>
         <div class="flex flex-col ">
             <div class="flex  h-10 items-center">
-                <p class="font-bold w-20 text-lg">O.D.</p>+
+                <p class="font-bold w-20 text-lg">O.D.</p>
 
                 <p class="font-bold w-12 text-right pr-4">Esf.: </p>
                 <p class="w-10">{{receta.odEsf.toFixed(2)}}</p>
