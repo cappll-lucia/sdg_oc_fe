@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="TData, TValue">
-import {ref} from 'vue';
+
+import { ref } from 'vue';
 import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
 import {
     Table,
@@ -13,39 +14,39 @@ import {
     FlexRender,
     getCoreRowModel,
     useVueTable,
-    getFilteredRowModel, 
-} from '@tanstack/vue-table'
-import { Input } from '@/components/ui/input'
+    getFilteredRowModel,
+} from '@tanstack/vue-table';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { valueUpdater } from '@/lib/utils'
+import { valueUpdater } from '@/lib/utils';
+
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];
-    data: TData[];
+    data: TData[],
 }>();
 
-
-const columnFilters = ref<ColumnFiltersState>([])
-
+const columnFilters = ref<ColumnFiltersState>([]);
 const table = useVueTable({
     get data() { return props.data; },
     get columns() { return props.columns; },
     getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: updaterOrValue =>valueUpdater(updaterOrValue, columnFilters),
+    onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
-    state:{
-        get columnFilters() {return columnFilters.value}
+    state: {
+        get columnFilters() { return columnFilters.value; }
     }
 })
+
 </script>
 
 <template>
-        <div class="flex flex-row justify-between items-center py-4">
-            <Input class="max-w-sm" placeholder="Buscar Cliente"
-                :model-value="table.getColumn('nombre')?.getFilterValue() as string"
-                @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
-            <Button class="text-xs">Registrar Nueva Receta</Button>
-        </div>
+    <div class="flex flex-row justify-between items-center py-4">
+        <Input class="max-w-sm" placeholder="Buscar Cliente"
+            :model-value="table.getColumn('nombre')?.getFilterValue() as string"
+            @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
+        <Button class="text-xs">Registrar Nueva Audiometría</Button>
+    </div>
     <div class="border rounded-md">
         <Table>
             <TableHeader>

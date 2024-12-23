@@ -9,8 +9,6 @@ defineProps<{
     title: string
 }>();
 
-
-
 </script>
 
 <template>

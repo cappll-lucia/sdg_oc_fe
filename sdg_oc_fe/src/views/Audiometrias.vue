@@ -8,7 +8,22 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
+import type { ClienteConAudiometria } from '@/api/entities';
+import { clientesConAudiometria } from '@/api/data/clientesConAudiometria';
+import DataTable from '@/components/tables/audiometrias/data-table.vue';
+import {columns} from '@/components/tables/audiometrias/columns'
+import { onMounted, ref } from 'vue';
 
+const data = ref<ClienteConAudiometria[]>([]);
+
+async function getData(): Promise<ClienteConAudiometria[]>{
+    return clientesConAudiometria as ClienteConAudiometria[]
+}
+
+
+onMounted(async () => {
+    data.value = await getData();
+});
 </script>
 
 <template>
@@ -38,7 +53,7 @@ import { SlashIcon } from '@radix-icons/vue';
         </Breadcrumb>
         <h1 class="page-title ">Informes de Audiometría</h1>
         <div class="pt-2">
-
+            <DataTable :columns="columns" :data="data"/>
         </div>
     </div>
 </template>

@@ -58,7 +58,6 @@ onMounted(() => {
         </Breadcrumb>
         <h1 class="page-title ">Informes de Audiometría: {{cliente?.apellido}}, {{ cliente?.nombre }}</h1>
         <div class="pt-2">
-            {{ JSON.stringify(selectedAudiom) }}
             <div class="panel w-[100%] flex flew-row h-[100%] rounded bg-secondary p-4"
                 v-if="cliente && cliente.audiometrias && cliente.audiometrias.length > 0">
                 <div class="panel-index w-[23%] h-[100%] p-4">
