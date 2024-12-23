@@ -9,17 +9,17 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ClientesConRecetaRec } from '@/api/data/clientesConRecetados';
-import type { ClienteConRecetaRecetados } from '@/api/entities';
+import { clientesConReceta } from '@/api/data/clientesConRecetas'
+import type { ClienteConReceta } from '@/api/entities';
 import { onMounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'
 
 const route = useRoute()
-const cliente = ref<undefined | ClienteConRecetaRecetados>(undefined);
+const cliente = ref<undefined | ClienteConReceta>(undefined);
 
 onMounted(()=>{
-    cliente.value = ClientesConRecetaRec.find((cliente) => cliente.id == Number(route.params.idCliente))
+    cliente.value = clientesConReceta.find((cliente) => cliente.id == Number(route.params.idCliente))
 })
 
 

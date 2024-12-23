@@ -1,6 +1,6 @@
-import {  ClienteConRecetaRecetados } from "../entities";
+import {  ClienteConReceta } from "../entities";
 
-export const ClientesConRecetaRec: ClienteConRecetaRecetados[]=[
+export const clientesConReceta: ClienteConReceta[]=[
     {
       id: 3,
       telefono: "3415678901",
@@ -39,7 +39,8 @@ export const ClientesConRecetaRec: ClienteConRecetaRecetados[]=[
         tratamiento: "Endurecido",
         observaciones: "Uso exclusivo para lectura."
       }
-      ]
+      ],
+      recetasContacto:[]
     } ,
     {
       id: 7,
@@ -103,7 +104,8 @@ export const ClientesConRecetaRec: ClienteConRecetaRecetados[]=[
         tratamiento: "Fotocromático",
         observaciones: "Usar al conducir o en actividades al aire libre."
       }
-    ]
+    ],
+          recetasContacto:[]
     },
     {
       id: 11,
@@ -191,7 +193,8 @@ export const ClientesConRecetaRec: ClienteConRecetaRecetados[]=[
       tratamiento: "UV400",
       observaciones: "Visión cercana y lejana."
     }
-      ]
+      ],
+      recetasContacto:[]
     },
 
 ]

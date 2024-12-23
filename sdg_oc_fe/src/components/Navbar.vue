@@ -19,21 +19,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
 
-const recetasItems: { title: string, href: string}[] = [
-    {
-        title: 'Anteojos Recetados',
-        href: '/recetas/recetados'
-    },
-    {
-        title: 'Lentes de Contacto',
-        href: '/recetas/contacto'
-    },
-    {
-        title: 'Audiometrías',
-        href: '/recetas/audiometrias'
-    }
-];
-
 const ventasItems: { title: string, href: string, description: string; }[] = [
     {
         title: 'Nueva Venta',
@@ -76,19 +61,9 @@ const productosItems: { title: string, href: string}[] = [
     <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
         <NavigationMenuList>
             <NavigationMenuItem>
-                <NavigationMenuTrigger>Recetas</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                    <ul class="grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw] ">
-                        <li v-for="item in recetasItems" :key="item.title">
-                            <NavigationMenuLink as-child>
-                                <a :href="item.href"
-                                    class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                                    <div class="text-sm font-medium leading-none">{{ item.title }}</div>
-                                </a>
-                            </NavigationMenuLink>
-                        </li>
-                    </ul>
-                </NavigationMenuContent>
+                <NavigationMenuLink href="/recetas" :class="navigationMenuTriggerStyle()">
+                    Recetas
+                </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuTrigger>Ventas</NavigationMenuTrigger>
@@ -132,6 +107,11 @@ const productosItems: { title: string, href: string}[] = [
                         </li>
                     </ul>
                 </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink href="/audiometrias" :class="navigationMenuTriggerStyle()">
+                    Audiometrías
+                </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">

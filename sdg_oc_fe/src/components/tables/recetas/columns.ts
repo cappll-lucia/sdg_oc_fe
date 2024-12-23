@@ -41,7 +41,7 @@ export const columns: ColumnDef<ClienteConRecetaRecetados>[] = [
         variant: 'outline',
         size: 'icon',
         onClick: () => {
-         router.replace( `/recetas/recetados/${row.original.id}`)
+         router.replace( `/recetas/${row.original.id}`)
         }
       }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }

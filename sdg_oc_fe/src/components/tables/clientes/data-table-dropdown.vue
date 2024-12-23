@@ -2,6 +2,8 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-vue-next';
+import { router } from '@/router'
+
 
 defineProps<{
     cliente: {
@@ -21,7 +23,7 @@ defineProps<{
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Recetas</DropdownMenuItem>
+            <DropdownMenuItem @click="()=>router.replace(`/recetas/${cliente.id}`)">Recetas</DropdownMenuItem>
             <DropdownMenuItem>Cuenta Corriente</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>

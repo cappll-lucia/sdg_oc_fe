@@ -49,7 +49,7 @@ export const clientesConAudiometria: ClienteConAudiometria[] =  [
     audiometrias: [
       {
         id: 3,
-        pdfUrl: "/pdf/ej_audiometria.pddf",
+        pdfUrl: "/pdf/ej_audiometria.pdf",
         observaciones: "Audiometría realizada en 2023. Sin anomalías detectadas.",
         fechaInforme: new Date("2023-03-01"),
         createdAt: "2023-03-01T00:00:00.000Z",
@@ -73,7 +73,7 @@ export const clientesConAudiometria: ClienteConAudiometria[] =  [
     audiometrias: [
       {
         id: 4,
-        pdfUrl: "/pdf/ej_audiometria.pdpdf",
+        pdfUrl: undefined,
         observaciones: "Audiometría realizada en 2023. Confirmación de tinnitus en ambos oídos.",
         fechaInforme: new Date("2023-04-01"),
         createdAt: "2023-04-01T00:00:00.000Z",
@@ -81,7 +81,7 @@ export const clientesConAudiometria: ClienteConAudiometria[] =  [
       },
       {
         id: 5,
-        pdfUrl: "/pdf/ej_audiometria.pdpdf",
+        pdfUrl: "/pdf/ej_audiometria.pdf",
         observaciones: "Audiometría realizada en 2021. Resultados dentro de lo normal, pero con quejas de tinnitus.",
         fechaInforme: new Date("2021-03-01"),
         createdAt: "2021-03-01T00:00:00.000Z",

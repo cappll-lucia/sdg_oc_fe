@@ -22,21 +22,11 @@ export const router = createRouter({
             path: '/recetas',
             name: 'recetas',
             component: () => import('../views/Recetas.vue')
-        },
-        {
-            path: '/recetas/recetados',
-            name: 'recetas_recetados',
-            component: () => import('../views/RecetasRecetados.vue')
-        },
-        {
-            path: '/recetas/contacto',
-            name: 'recetas_contacto',
-            component: () => import('../views/RecetasContacto.vue')
         },        
         {
             path: '/audiometrias',
             name: 'recetas_audiometria',
-            component: () => import('../views/RecetasAudiometrias.vue')
+            component: () => import('../views/Audiometrias.vue')
         },
         {
             path: '/audiometrias/:idCliente',

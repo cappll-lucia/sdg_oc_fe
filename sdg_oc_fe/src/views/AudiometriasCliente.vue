@@ -58,6 +58,7 @@ onMounted(() => {
         </Breadcrumb>
         <h1 class="page-title ">Informes de Audiometría: {{cliente?.apellido}}, {{ cliente?.nombre }}</h1>
         <div class="pt-2">
+            {{ JSON.stringify(selectedAudiom) }}
             <div class="panel w-[100%] flex flew-row h-[100%] rounded bg-secondary p-4"
                 v-if="cliente && cliente.audiometrias && cliente.audiometrias.length > 0">
                 <div class="panel-index w-[23%] h-[100%] p-4">
@@ -95,11 +96,11 @@ onMounted(() => {
                         <Separator class="my-8" />
 
                         <div class="w-[100%] h-[calc(100%-5rem)] flex justify-center items-center">
-                            <div v-if="selectedAudiom" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
+                            <div v-if="selectedAudiom?.pdfUrl" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
                                 <iframe :src="selectedAudiom.pdfUrl" class="w-full h-full border-none" frameborder="0"
                                     allowfullscreen></iframe>
                             </div>
-                            <p v-else class="text-gray-500">No hay PDF Registrado.</p>
+                            <p v-else class="text-gray-500 mb-[20rem] ">No hay PDF Registrado.</p>
                         </div>
                     </div>
                 </div>
