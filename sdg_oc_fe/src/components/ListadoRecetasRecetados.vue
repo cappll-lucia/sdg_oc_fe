@@ -4,17 +4,13 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon } from '@radix-icons/vue'
 import {ref} from 'vue';
-import ItemDetalleReceta from '@/components/ItemDetalleReceta.vue'
+import ItemDetalleReceta from '@/components/ItemDetalleRecetaRecetados.vue'
 
 
 const props = defineProps<{
     recetas: RecetaRecetados[]
 }>();
 const selectedRec = ref(props.recetas[0]);
-
-
-
-
 
 
 </script>

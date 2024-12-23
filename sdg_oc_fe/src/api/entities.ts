@@ -38,6 +38,11 @@ export interface RecetaRecetados extends BaseEntity{
     observaciones: string,
 }
 
+export interface RecetaContacto extends BaseEntity{
+    fecha: Date,
+    observaciones: string,
+}
+
 export interface ClienteConReceta extends BaseEntity{
     dni: string , 
     nombre: string , 
@@ -49,7 +54,7 @@ export interface ClienteConReceta extends BaseEntity{
     fechaNac: Date , 
     observaciones: string ,
     recetasRecetados: RecetaRecetados[],
-    recetasContacto: [] 
+    recetasContacto: RecetaContacto[] 
 }
 
 

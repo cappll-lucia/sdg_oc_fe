@@ -14,6 +14,7 @@ import type { ClienteConReceta } from '@/api/entities';
 import { onMounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'
+import ListadoRecetasContacto from '@/components/ListadoRecetasContacto.vue';
 
 const route = useRoute()
 const cliente = ref<undefined | ClienteConReceta>(undefined);
@@ -55,11 +56,12 @@ onMounted(()=>{
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent class="bg-secondary h-[40rem] px-2 py-6 rounded" value="recetados">
-                    <ListadoRecetasRecetados v-if="cliente" :recetas="cliente.recetasRecetados" />
-                    <h2 v-else>El cliente no tiene recetas registradas para lentes recetados </h2>
+                    <ListadoRecetasRecetados v-if="cliente?.recetasRecetados" :recetas="cliente.recetasRecetados" />
+                    <h2 v-else>El cliente no tiene recetas registradas para anteojos recetados </h2>
                 </TabsContent>
                 <TabsContent class="bg-secondary h-[60rem] px-2 py-6 rounded" value="contacto">
-                    TODO
+                    <ListadoRecetasContacto v-if="cliente?.recetasContacto && cliente.recetasContacto.length > 0" :recetas="cliente.recetasContacto" />
+                    <h2 v-else>El cliente no tiene recetas registradas para lentes de contato </h2>
                 </TabsContent>
             </Tabs>
         </div>

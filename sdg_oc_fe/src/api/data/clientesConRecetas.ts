@@ -2,18 +2,18 @@ import {  ClienteConReceta } from "../entities";
 
 export const clientesConReceta: ClienteConReceta[]=[
     {
-      id: 3,
-      telefono: "3415678901",
-      domicilio: "Bv. Oroño 789",
-      fechaNac: new Date( "2000-07-22"),
-      sexo: "F",
-      dni: "11223344",
-      nombre: "Lucía",
-      apellido: "Martínez",
-      email: "lucia.martinez@example.com",
-      createdAt: "*",
-      updatedAt:"*",
-      observaciones: "Cliente con miopía moderada.",
+    id: 3,
+    dni: "45678912",
+    nombre: "Carlos",
+    apellido: "Ramírez",
+    email: "carlos.ramirez@example.com",
+    sexo: "Masculino",
+    telefono: "1134567890",
+    domicilio: "Las Heras 456",
+    fechaNac: new Date("1978-03-20"),
+    observaciones: "Cliente con historial de tinnitus y miopía moderada",
+    createdAt: "2022-05-01T00:00:00.000Z",
+    updatedAt: "2023-10-01T00:00:00.000Z",
       recetasRecetados:[
       {
         id: 103,
@@ -40,7 +40,15 @@ export const clientesConReceta: ClienteConReceta[]=[
         observaciones: "Uso exclusivo para lectura."
       }
       ],
-      recetasContacto:[]
+      recetasContacto:[
+        {
+          id: 202,
+          createdAt: "2024-12-22T08:30:00Z",
+          updatedAt: "2024-12-22T09:00:00Z",
+          fecha: new Date("2024-12-22T00:00:00-03:00"),
+          observaciones: "***"
+        }
+      ]
     } ,
     {
       id: 7,
@@ -116,9 +124,9 @@ export const clientesConReceta: ClienteConReceta[]=[
       dni: "44556677",
       nombre: "Santiago",
       apellido: "Méndez",
-    observaciones: "Cliente con prescripción múltiple para actividades específicas.",
+      observaciones: "Cliente con prescripción múltiple para actividades específicas.",
       email: "santiago.mendez@example.com",
-          createdAt: "*",
+      createdAt: "*",
       updatedAt:"*",
       recetasRecetados:[
         {

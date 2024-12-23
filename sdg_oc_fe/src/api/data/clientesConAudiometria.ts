@@ -67,7 +67,7 @@ export const clientesConAudiometria: ClienteConAudiometria[] =  [
     telefono: "1134567890",
     domicilio: "Las Heras 456",
     fechaNac: new Date("1978-03-20"),
-    observaciones: "Cliente con historial de tinnitus.",
+    observaciones: "Cliente con historial de tinnitus y miopía moderada",
     createdAt: "2022-05-01T00:00:00.000Z",
     updatedAt: "2023-10-01T00:00:00.000Z",
     audiometrias: [
