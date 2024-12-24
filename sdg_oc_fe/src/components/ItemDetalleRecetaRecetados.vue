@@ -35,17 +35,17 @@ defineProps<{
             <div class="flex  h-10 items-center">
                 <p class="font-bold w-20 text-lg">O.I.</p>
 
-                <p class="font-bold w-12 text-right pr-4">Esf.</p>
+                <p class="font-bold w-12 text-right pr-4">Esf.:</p>
                 <p class="w-10">{{receta.oiEsf.toFixed(2)}}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
 
-                <p class="font-bold w-12 text-right pr-4">Cil.</p>
+                <p class="font-bold w-12 text-right pr-4">Cil.:</p>
                 <p class="w-10">{{receta.oiCil.toFixed(2)}}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
-                <p class="font-bold w-12 text-right pr-4">A</p>
-                <p class="w-10">{{receta.oiA}}</p>
+                <p class="font-bold w-12 text-right pr-4">A:</p>
+                <p class="w-10">{{receta.oiA}} °</p>
             </div>
         </div>
         <Separator orientation="vertical" class="w-20" />

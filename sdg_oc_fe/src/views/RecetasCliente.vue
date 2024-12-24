@@ -11,7 +11,7 @@ import { SlashIcon } from '@radix-icons/vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { clientesConReceta } from '@/api/data/clientesConRecetas'
 import type { ClienteConReceta } from '@/api/entities';
-import { onMounted, ref} from 'vue';
+import { computed, onMounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'
 import ListadoRecetasContacto from '@/components/ListadoRecetasContacto.vue';
@@ -23,6 +23,7 @@ onMounted(()=>{
     cliente.value = clientesConReceta.find((cliente) => cliente.id == Number(route.params.idCliente))
 })
 
+const nombreCliente = computed(()=> cliente.value?.apellido +", "+cliente.value?.nombre)
 
 </script>
 
@@ -44,7 +45,7 @@ onMounted(()=>{
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title ">Recetas: {{ cliente?.apellido }}, {{ cliente?.nombre }}</h1>
+        <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
         <div class="pt-2">
             <Tabs default-value="recetados" class="w-[100%]">
                 <TabsList class="w-[100%]">
@@ -56,7 +57,7 @@ onMounted(()=>{
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent class="bg-secondary h-[40rem] px-2 py-6 rounded" value="recetados">
-                    <ListadoRecetasRecetados v-if="cliente?.recetasRecetados" :recetas="cliente.recetasRecetados" />
+                    <ListadoRecetasRecetados v-if="cliente?.recetasRecetados" :recetas="cliente.recetasRecetados" :nombreCliente="nombreCliente" />
                     <h2 v-else>El cliente no tiene recetas registradas para anteojos recetados </h2>
                 </TabsContent>
                 <TabsContent class="bg-secondary h-[60rem] px-2 py-6 rounded" value="contacto">
