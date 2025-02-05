@@ -13,7 +13,7 @@ defineProps<{
 
 <template>
     <div class="flex flex-row justify-start items-center">
-        <h1 class="mr-12 text-2xl font-extrabold ">{{ title }}</h1>
+        <h1 class="mr-12 text-2xl font-extrabold w-20 ">{{ title }}</h1>
         <div class="flex flex-col ">
             <div class="flex  h-10 items-center">
                 <p class="font-bold w-20 text-lg">O.D.</p>

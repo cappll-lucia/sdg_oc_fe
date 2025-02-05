@@ -34,7 +34,7 @@ export const columns: ColumnDef<Cliente>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const cliente = row.original
-      return h('div', { class: 'relative' }, h(DropdownAction, {
+      return h('div', { class: 'relative text-right right-10  ' }, h(DropdownAction, {
         cliente: { ...cliente, id: cliente.id.toString() },
       }))
     },

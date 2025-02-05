@@ -2,11 +2,11 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-vue-next';
-import { router } from '@/router'
+import { router } from '@/router';
 
 
 defineProps<{
-    cliente: {
+    marca: {
         id: string;
     };
 }>();
@@ -22,9 +22,9 @@ defineProps<{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="()=>router.replace(`/recetas/${cliente.id}`)">Recetas</DropdownMenuItem>
+            <DropdownMenuItem @click="() => {}">Editar</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Cuenta Corriente</DropdownMenuItem>
+            <DropdownMenuItem>Eliminar</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

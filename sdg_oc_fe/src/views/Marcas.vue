@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,24 +8,21 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type {Cliente} from '@/api/entities'
+import type { Marca } from '@/api/entities';
 import { onMounted, ref } from 'vue';
-import {columns} from '@/components/tables/clientes/columns'
-import {ClientesExample} from '@/api/data/clientes.ts'
-import DataTable from '@/components/tables/clientes/data-table.vue';
+import { columns } from '@/components/tables/marcas/columns';
+import { marcas } from '@/api/data/marcas';
+import DataTable from '@/components/tables/marcas/data-table.vue';
 
+const data = ref<Marca[]>([]);
 
-const data = ref<Cliente[]>([]);
-
-async function getData() : Promise<Cliente[]> {
-    return ClientesExample as Cliente[]
+async function getData(): Promise<Marca[]> {
+    return marcas as Marca[];
 }
 
-onMounted(async()=>{
-    data.value=await getData()
-})
-
-
+onMounted(async () => {
+    data.value = await getData();
+});
 </script>
 
 <template>
@@ -41,11 +38,11 @@ onMounted(async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Clientes</BreadcrumbPage>
+                    <BreadcrumbPage>Marcas</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title ">Clientes</h1>
+        <h1 class="page-title ">Marcas</h1>
         <div class="pt-2">
             <DataTable :columns="columns" :data="data" />
         </div>

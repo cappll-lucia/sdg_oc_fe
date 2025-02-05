@@ -47,7 +47,7 @@ const productosItems: { title: string, href: string}[] = [
     },
     {
         title: 'Marcas',
-        href: '/docs/components/hover-card'
+        href: '/marcas'
     },
     {
         title: 'Proveedores',

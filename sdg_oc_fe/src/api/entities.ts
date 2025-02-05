@@ -77,3 +77,24 @@ export interface ClienteConAudiometria extends BaseEntity{
     observaciones: string ,
     audiometrias: Audiometria[] 
 }
+
+export interface Marca extends BaseEntity {
+    nombre: string;
+}
+
+export interface Proveedor extends BaseEntity {
+    cuit: string;
+    razonSocial: string;
+    email: string;
+    telefono: string;
+}
+
+export interface Producto extends BaseEntity {
+    nombre: string;
+    descripcion: string;
+    categoria: string; 
+    precio: number;
+    stock: number;
+    marca: Marca;
+    proveedor: Proveedor; 
+}
