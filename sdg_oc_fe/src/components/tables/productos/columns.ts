@@ -22,17 +22,19 @@ export const columns: ColumnDef<Producto>[] = [
     {
         accessorKey: 'marca',
         header: () => h('div', 'Marca'),
-        cell: info=> info.getValue(),
+        cell: ({row})=>row.original.marca.nombre
+
     },
     {
         accessorKey: 'proveedor',
         header: () => h('div', 'Proveedor'),
-        cell: info=> info.getValue(),
+        cell: ({row})=>row.original.proveedor.razonSocial
     },
     {
         accessorKey: 'precio',
         header: () => h('div', 'Precio'),
-        cell: info=> info.getValue(),
+        cell: ({row})=>`$ ${row.original.precio.toFixed(2)}`
+
     },
     {
         id: 'actions',
