@@ -27,11 +27,19 @@ onMounted(async () => {
 
 <template>
     <div class="page">
-        <Breadcrumb>
+       <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
                         Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                        Parámetros
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>

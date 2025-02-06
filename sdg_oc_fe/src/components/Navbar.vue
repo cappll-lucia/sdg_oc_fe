@@ -40,18 +40,14 @@ const ventasItems: { title: string, href: string, description: string; }[] = [
     }
 ];
 
-const productosItems: { title: string, href: string}[] = [
-    {
-        title: 'Inventarios',
-        href: '/docs/components/alert-dialog'
-    },
+const parametrosItems: { title: string, href: string}[] = [
     {
         title: 'Marcas',
         href: '/marcas'
     },
     {
         title: 'Proveedores',
-        href: '/docs/components/progress'
+        href: '/proveedores'
     }
 ];
 
@@ -94,10 +90,20 @@ const productosItems: { title: string, href: string}[] = [
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-                <NavigationMenuTrigger>Productos</NavigationMenuTrigger>
+                <NavigationMenuLink href="/productos" :class="navigationMenuTriggerStyle()">
+                    Productos
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink href="/audiometrias" :class="navigationMenuTriggerStyle()">
+                    Audiometrías
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuTrigger>Parámetros</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
-                        <li v-for="item in productosItems" :key="item.title">
+                        <li v-for="item in parametrosItems" :key="item.title">
                             <NavigationMenuLink as-child>
                                 <a :href="item.href"
                                     class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
@@ -107,16 +113,6 @@ const productosItems: { title: string, href: string}[] = [
                         </li>
                     </ul>
                 </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuLink href="/audiometrias" :class="navigationMenuTriggerStyle()">
-                    Audiometrías
-                </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">
-                    Parámetros
-                </NavigationMenuLink>
             </NavigationMenuItem>
         </NavigationMenuList>
         <div class="px-2 flex justify-between w-[13rem] items-center ">
