@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import type {Cliente, RecetaContacto, HistoriaClinicaContacto } from '@/api/entities';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronRightIcon, DownloadIcon, ArchiveIcon, Pencil1Icon  } from '@radix-icons/vue'
+import { ChevronRightIcon, DownloadIcon, ArchiveIcon, Pencil1Icon, ValueNoneIcon  } from '@radix-icons/vue'
 import {
     Dialog,
     DialogContent,
@@ -119,11 +119,11 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
 
         <div v-else class="view w-[75%] h-[100%] px-8">
             <div class="datos flex flex-col" v-if="currentRec">
-                <div class="flex flex-row justify-between">
-                    <div class="flex flex-col ">
+                <div class="flex flex-row justify-end">
+                    <!-- <div class="flex flex-col ">
                         <span class="text-lg font-bold">Tipo Receta: </span>
                         <span>{{ currentRec.tipo }}</span>
-                    </div>
+                    </div> -->
                     <div class="flex flex-col ">
                         <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
                         <span>{{ currentRec.fecha.toISOString().split("T")[0] }}</span>
@@ -132,44 +132,86 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
             </div>
             <Separator class="my-6" />
 
-            <div v-if="currentRec?.tipo == 'Anteojo Lejos'">
-                <ItemDetalleReceta :receta="currentRec" title="Lejos" />
+            <div>
+                <div class="flex flex-row justify-start items-center">
+                    <h1 class="mr-20 text-2xl font-extrabold w-24 ">Lentes Definitivas</h1>
+                    <div class="flex flex-col ">
+                        <div class="flex  h-10 items-center">
+                            <p class="font-bold w-20 text-lg">O.D.</p>
+
+                            <p class="font-bold w-12 text-right pr-4">C.B.: </p>
+                            <p class="w-20">{{ currentRec.odCb.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Esf.: </p>
+                            <p class="w-20">{{ currentRec.odEsferico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Cil.:</p>
+                            <p class="w-20">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-12 text-right pr-4">Eje.:</p>
+                            <p class="w-20">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-16 text-right flex justify-start items-center">
+                                <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
+                            </p>
+                            <p class="w-20">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+
+                        </div>
+
+                        <Separator class="my-4" />
+
+                        <div class="flex  h-10 items-center">
+                            <p class="font-bold w-20 text-lg">O.D.</p>
+
+                            <p class="font-bold w-12 text-right pr-4">C.B.: </p>
+                            <p class="w-20">{{ currentRec.oiCb.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Esf.: </p>
+                            <p class="w-20">{{ currentRec.oiEsferico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Cil.:</p>
+                            <p class="w-20">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-12 text-right pr-4">Eje.:</p>
+                            <p class="w-20">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-16 text-right flex justify-start items-center">
+                                <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
+                            </p>
+                            <p class="w-20">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+
+                        </div>
+                    </div>
+                </div>
+                <Separator class="my-6" />
+                <div class="datos flex flex-col" v-if="currentRec">
+                    <div class="mt-6">
+                        <span class="text font-bold mr-2">Marca: </span>
+                        <span>{{ currentRec.marca ?? '--' }}</span>
+                    </div>
+                    <div class="flex flex-col items-start mt-6">
+                        <span class="text font-bold">Observaciones: </span>
+                        <span>{{ currentRec.observaciones ?? '--' }}</span>
+                    </div>
+                </div>
             </div>
-            <div v-else-if="currentRec?.tipo == 'Anteojo Cerca'">
-                <ItemDetalleReceta :receta="currentRec" title="Cerca" />
-            </div>
-            <div v-else-if="currentRec?.tipo == 'Multifocal'">
-                <ItemDetalleReceta :receta="currentRec" title="Cerca" />
-                <Separator class="my-8" />
-                <ItemDetalleReceta :receta="currentRec" title="Lejos" />
-            </div>
-            <div v-else-if="currentRec?.tipo == 'Bifocal'">
-                <ItemDetalleReceta :receta="currentRec" title="Cerca" />
-                <Separator class="my-8" />
-                <ItemDetalleReceta :receta="currentRec" title="Lejos" />
+
+            <div>
+
             </div>
 
             <Separator class="my-8" />
 
-            <div class="datos flex flex-col" v-if="currentRec">
-                <div class="flex flex-row justify-between ">
-                    <div class="flex flex-col w-[12rem]">
-                        <span class="text font-bold ">Cristal: </span>
-                        <span>{{ currentRec.cristal ?? '--' }}</span>
-                    </div>
-                    <div class="flex flex-col  w-[12rem]">
-                        <span class="text font-bold ">Color: </span>
-                        <span>{{ currentRec.color ?? '---' }}</span>
-                    </div>
-                    <div class="flex flex-col  w-[12rem]">
-                        <span class="text font-bold">Tratamiento: </span>
-                        <span>{{ currentRec.tratamiento ?? '--' }}</span>
-                    </div>
-                </div>
-                <div class="flex flex-col items-start mt-6">
-                    <span class="text font-bold">Observaciones: </span>
-                    <span>{{ currentRec.observaciones ?? '--' }}</span>
-                </div>
+            <div class="datos flex flex-col">
+
             </div>
         </div>
     </div>
