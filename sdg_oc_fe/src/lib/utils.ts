@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { Updater } from '@tanstack/vue-table'
 import type { Ref } from 'vue'
-import { RecetaRecetados } from '@/api/entities';
+import { RecetaContacto, RecetaRecetados } from '@/api/entities';
 import {jsPDF} from "jspdf"; 
 import autoTable from "jspdf-autotable"
 
@@ -17,7 +17,7 @@ export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref
 }
 
 
-export function generateRecetasPDF (recetas: RecetaRecetados[], nombreCliente:string) {
+export function generateRecetasRecetadosPDF (recetas: RecetaRecetados[], nombreCliente:string) {
 
     const doc = new jsPDF();
     let yOffset = 10; // Posición inicial en el eje Y
@@ -25,6 +25,8 @@ export function generateRecetasPDF (recetas: RecetaRecetados[], nombreCliente:st
     recetas.forEach((receta) => {
         doc.setFontSize(16);
         doc.text(`Receta ${receta.id}`, 10, yOffset);
+        doc.text(`Cliente: ${nombreCliente}`, 10, yOffset);
+
         yOffset += 10;
 
         doc.setFontSize(12);
@@ -70,6 +72,67 @@ export function generateRecetasPDF (recetas: RecetaRecetados[], nombreCliente:st
         yOffset += 10; 
 
         doc.text(`Tratamiento: ${receta.tratamiento || "--"}`, 10, yOffset);
+        yOffset += 10; 
+
+        doc.text(`Observaciones: ${receta.observaciones || "--"}`, 10, yOffset);
+        yOffset += 20;
+
+        if (yOffset > 200) {
+            doc.addPage();
+            yOffset = 20;
+        }
+    });
+
+
+    doc.save(`Recetas_${nombreCliente}.pdf`);
+};
+
+
+export function generateRecetasContactoPDF (recetas: RecetaContacto[], nombreCliente:string) {
+
+    const doc = new jsPDF();
+    let yOffset = 10; // Posición inicial en el eje Y
+
+    recetas.forEach((receta) => {
+        doc.setFontSize(16);
+        doc.text(`Receta ${receta.id}`, 10, yOffset);
+        yOffset += 10;
+        doc.text(`Cliente: ${nombreCliente}`, 10, yOffset);
+
+        yOffset += 10;
+
+        doc.setFontSize(12);
+        doc.text(`Receta Lentes de Contacto`, 10, yOffset);
+        doc.text(`Fecha Receta: ${receta.fecha.toISOString().split("T")[0]}`, 140, yOffset, { align: "right" });
+        yOffset += 10;
+
+        autoTable(doc, {
+            startY: yOffset,
+            head: [["Ojo", "C.B.", "Esf.", "Cil.", "Eje", "Diam."]],
+            body: [
+                [
+                    "O.D.",
+                    receta.odCb !== null && receta.odCb !== undefined ? receta.odCb.toFixed(2) : "--",
+                    receta.odEsferico !== null && receta.odEsferico !== undefined ? receta.odEsferico.toFixed(2) : "--",
+                    receta.odCilindrico !== null && receta.odCilindrico !== undefined ? receta.odCilindrico.toFixed(2): "--",
+                    receta.odEje !== null && receta.odEje !== undefined ? receta.odEje + "°" : "--",
+                    receta.odDiametro !== null && receta.odDiametro !== undefined ? receta.odDiametro : "--"
+
+                ],
+                [
+                    "O.I.",
+                    receta.oiCb !== null && receta.oiCb !== undefined ? receta.oiCb.toFixed(2) : "--",
+                    receta.oiEsferico !== null && receta.oiEsferico !== undefined ? receta.oiEsferico.toFixed(2) : "--",
+                    receta.oiCilindrico !== null && receta.oiCilindrico !== undefined ? receta.oiCilindrico.toFixed(2): "--",
+                    receta.oiEje !== null && receta.oiEje !== undefined ? receta.oiEje + "°" : "--",
+                    receta.oiDiametro !== null && receta.oiDiametro !== undefined ? receta.oiDiametro : "--"
+                ],
+            ],
+            theme: "grid",
+        });
+        yOffset += 30;
+
+       doc.text(`Marca: ${receta.marca || "--"}`, 10, yOffset);
         yOffset += 10; 
 
         doc.text(`Observaciones: ${receta.observaciones || "--"}`, 10, yOffset);

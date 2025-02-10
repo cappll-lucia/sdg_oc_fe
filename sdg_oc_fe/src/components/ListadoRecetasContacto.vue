@@ -16,6 +16,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { generateRecetasContactoPDF } from '@/lib/utils';
 
 
 const props = defineProps<{
@@ -36,9 +37,15 @@ const handleCheckboxChange = (receta: RecetaContacto) => {
 };
 
 
-const printRecetas = ()=>{
-    
-}
+
+const printRecetas = () => {
+    console.log(selectedToPrint)
+    if (selectedToPrint.value.length === 0) {
+        alert("Por favor, selecciona al menos una receta para imprimir.");
+        return;
+    }
+    generateRecetasContactoPDF(selectedToPrint.value, props.nombreCliente)
+};
 
 
 

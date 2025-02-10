@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Cliente, RecetaRecetados } from '@/api/entities';
+import type {  RecetaRecetados } from '@/api/entities';
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon, DownloadIcon } from '@radix-icons/vue'
@@ -15,7 +15,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { generateRecetasPDF } from '@/lib/utils';
+import { generateRecetasRecetadosPDF } from '@/lib/utils';
 
 
 const props = defineProps<{
@@ -37,7 +37,7 @@ const printRecetas = () => {
         alert("Por favor, selecciona al menos una receta para imprimir.");
         return;
     }
-    generateRecetasPDF(selectedToPrint.value, props.nombreCliente)
+    generateRecetasRecetadosPDF(selectedToPrint.value, props.nombreCliente)
 };
 
 
