@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type {Cliente, RecetaContacto, HistoriaClinicaContacto } from '@/api/entities';
+import type { RecetaContacto, HistoriaClinicaContacto } from '@/api/entities';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon, DownloadIcon, ArchiveIcon, PlusIcon, ValueNoneIcon  } from '@radix-icons/vue'
@@ -14,7 +14,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue'
+import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 
 const props = defineProps<{
@@ -141,7 +142,6 @@ const printRecetas = ()=>{
                 </div>
             </div>
             <Separator class="my-6" />
-
                 <div class="flex flex-row justify-start items-center" v-if="currentRec" > 
                     <h1 class="mr-20 text-2xl font-extrabold w-24 ">Lentes Definitivas</h1>
                     <div class="flex flex-col ">
@@ -160,7 +160,7 @@ const printRecetas = ()=>{
                             <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
-                            <p class="font-bold w-12 text-right pr-4">Eje.:</p>
+                            <p class="font-bold w-12 text-right pr-4">Eje:</p>
                             <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
@@ -188,7 +188,7 @@ const printRecetas = ()=>{
                             <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
-                            <p class="font-bold w-12 text-right pr-4">Eje.:</p>
+                            <p class="font-bold w-12 text-right pr-4">Eje:</p>
                             <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
@@ -212,15 +212,76 @@ const printRecetas = ()=>{
                     </div>
                 </div>
 
-            <div>
+                <Separator class="my-8" />  
 
+            <div class="flex flex-row justify-start items-start" v-if="currentRec" > 
+                <h1 class="mr-20 mt-2 text-2xl font-extrabold w-20 ">Pruebas </h1>
+                <div class="flex flex-col items-start" v-if="currentRec.pruebas.length">
+                    <Accordion type="single" collapsible class="w-[50rem]" v-for="prueba in currentRec.pruebas">
+                        <AccordionItem value="item-1">
+                        <AccordionTrigger>Prueba {{ prueba.numeroPrueba }}</AccordionTrigger>
+                        <AccordionContent>
+                            <div class="flex  h-10 items-center">
+                            <p class="font-bold w-20 text-lg">O.D.</p>
+
+                            <p class="font-bold w-12 text-right pr-4">C.B.: </p>
+                            <p class="w-14">{{ prueba.odCb.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Esf.: </p>
+                            <p class="w-14">{{ prueba.odEsferico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Cil.:</p>
+                            <p class="w-14">{{ prueba.odCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-12 text-right pr-4">Eje:</p>
+                            <p class="w-14">{{ prueba.odCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-16 text-right flex justify-start items-center">
+                                <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
+                            </p>
+                            <p class="w-14">{{ prueba.odCilindrico.toFixed(2) }}</p>
+
+                        </div>
+
+                        <Separator class="my-4" />
+                           <div class="flex  h-10 items-center">
+                            <p class="font-bold w-20 text-lg">O.D.</p>
+
+                            <p class="font-bold w-12 text-right pr-4">C.B.: </p>
+                            <p class="w-14">{{ prueba.oiCb.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Esf.: </p>
+                            <p class="w-14">{{ prueba.oiEsferico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+
+                            <p class="font-bold w-12 text-right pr-4">Cil.:</p>
+                            <p class="w-14">{{ prueba.oiCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-12 text-right pr-4">Eje:</p>
+                            <p class="w-14">{{ prueba.oiCilindrico.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4 " />
+
+                            <p class="font-bold w-16 text-right flex justify-start items-center">
+                                <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
+                            </p>
+                            <p class="w-14">{{ prueba.oiCilindrico.toFixed(2) }}</p>
+                        </div>
+                        </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                    
+                </div>
+                <div class="flex flex-col items-start" v-else>
+                    <p class="font-light mt-4 w-[50rem] text-sm">No hay pruebas registradas para la receta</p>
+                </div>
             </div>
 
-            <Separator class="my-8" />
-
-            <div class="datos flex flex-col">
-
-            </div>
         </div>
     </div>
 </template>

@@ -78,6 +78,11 @@ export interface Prueba extends BaseEntity {
     odCilindrico: number;
     odEsferico: number;
     odCb: number;
+    oiDiametro: number;
+    oiEje: number;
+    oiCilindrico: number;
+    oiEsferico: number;
+    oiCb: number;
 }
 
 export interface HistoriaClinicaContacto extends BaseEntity {
