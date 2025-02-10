@@ -47,7 +47,7 @@ const nombreCliente = computed(()=> cliente.value?.apellido +", "+cliente.value?
         </Breadcrumb>
         <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
         <div class="pt-2">
-            // TODO inicializar en tab recetados
+            <!-- TODO inicializar en tab recetados  -->
             <Tabs default-value="contacto" class="w-[100%]">
                 <TabsList class="w-[100%]">
                     <TabsTrigger class="w-[50%]" value="recetados">
@@ -62,7 +62,7 @@ const nombreCliente = computed(()=> cliente.value?.apellido +", "+cliente.value?
                     <h2 v-else>El cliente no tiene recetas registradas para anteojos recetados </h2>
                 </TabsContent>
                 <TabsContent class="bg-secondary h-[60rem] px-2 py-6 rounded" value="contacto">
-                    <ListadoRecetasContacto v-if="cliente?.recetasContacto && cliente.recetasContacto.length > 0" :recetas="cliente.recetasContacto" :historiaClinica="cliente.historiaClinicaContacto" />
+                    <ListadoRecetasContacto v-if="cliente?.recetasContacto && cliente.recetasContacto.length > 0" :nombreCliente="nombreCliente" :recetas="cliente.recetasContacto" :historiaClinica="cliente.historiaClinicaContacto" />
                     <h2 v-else>El cliente no tiene recetas registradas para lentes de contato </h2>
                 </TabsContent>
             </Tabs>

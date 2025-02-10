@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 
 const props = defineProps<{
-    historiaClinica: HistoriaClinicaContacto,
+    historiaClinica: HistoriaClinicaContacto | undefined,
 }>();
 // TODO inicializar en primera receta
 
@@ -16,7 +16,10 @@ const props = defineProps<{
 
 
 <template>
-    <div class="datos flex flex-col">
+    <div class="datos flex flex-col" v-if="!props.historiaClinica">
+        <span class="text-lg font-bold">Historia clinica no registrada para el cliente </span>
+    </div>
+    <div class="datos flex flex-col" v-if="props.historiaClinica">
         <div class="flex flex-row justify-between items-center">
             <div class="flex flex-col ">
                 <span class="text-lg font-bold">Historia Clínica Lentes de Contacto </span>

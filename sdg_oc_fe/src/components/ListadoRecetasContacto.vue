@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import type {Cliente, RecetaContacto, HistoriaClinicaContacto } from '@/api/entities';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronRightIcon, DownloadIcon, ArchiveIcon, Pencil1Icon, ValueNoneIcon  } from '@radix-icons/vue'
+import { ChevronRightIcon, DownloadIcon, ArchiveIcon, PlusIcon, ValueNoneIcon  } from '@radix-icons/vue'
 import {
     Dialog,
     DialogContent,
@@ -18,21 +18,26 @@ import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto
 
 
 const props = defineProps<{
-    historiaClinica: HistoriaClinicaContacto,
+    historiaClinica: HistoriaClinicaContacto | undefined,
     recetas: RecetaContacto[],
     nombreCliente: string
 }>();
 // TODO inicializar en primera receta
 const currentRec = ref(props.recetas[0]);
-const selectedToPrint = ref<RecetaRecetados[]>([])
+const selectedHistoriaClinica = ref(false);
+const selectedToPrint = ref<RecetaContacto[]>([])
 
-const handleCheckboxChange = (receta: RecetaRecetados) => {
+const handleCheckboxChange = (receta: RecetaContacto) => {
     const index = selectedToPrint.value.findIndex((selected) => selected.id === receta.id);
     index !== -1
         ? selectedToPrint.value.splice(index, 1)
         : selectedToPrint.value.push(receta);
 };
 
+
+const printRecetas = ()=>{
+    
+}
 
 
 
@@ -42,7 +47,12 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
 <template>
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
-            <div class="flex justify-end mr-2">
+            <div class="flex justify-between mr-2">
+                <!-- TODO add link to create -->
+                <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
+                        Nueva Receta
+                    <PlusIcon class="w-4 h-4" />
+                </Button>
                 <Dialog>
                     <DialogTrigger as-child>
                         <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
@@ -80,7 +90,7 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
             <Separator class="my-2 w-[95%]" />
             <div class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
-                    :class="{ 'bg-[#d7e5ec]': currentRec === 'historia_clinica' }">
+                    :class="{ 'bg-[#d7e5ec]': selectedHistoriaClinica }">
                     <p class="font-light text-sm ml-1">
                         <ArchiveIcon class="w-4 h-4" />
                     </p>
@@ -88,7 +98,7 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
                         <p class="font-bold ">Historia Clínica</p>
                     </div>
                     <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]"
-                        @click="() => { currentRec = 'historia_clinica'; console.log(currentRec) }">
+                        @click="() => { selectedHistoriaClinica = true; currentRec=undefined; console.log(currentRec) }">
                         <ChevronRightIcon class="w-4 h-4" />
                     </Button>
                 </div>
@@ -103,7 +113,7 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
                         <p class="font-light  ">{{ receta.marca }}</p>
                     </div>
                     <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]"
-                        @click="() => { currentRec = receta; console.log(currentRec); }">
+                        @click="() => { selectedHistoriaClinica=false; currentRec = receta; console.log(currentRec); }">
                         <ChevronRightIcon class="w-4 h-4" />
                     </Button>
                 </div>
@@ -112,7 +122,7 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
         </div>
         <Separator orientation="vertical" />
 
-        <div v-if="currentRec==='historia_clinica'" class="view w-[75%] h-[100%] px-8">
+        <div v-if="selectedHistoriaClinica" class="view w-[75%] h-[100%] px-8">
             <DetalleHistoriaClinicaContacto :historiaClinica="props.historiaClinica" />
         </div>
 
@@ -132,33 +142,32 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
             </div>
             <Separator class="my-6" />
 
-            <div>
-                <div class="flex flex-row justify-start items-center">
+                <div class="flex flex-row justify-start items-center" v-if="currentRec" > 
                     <h1 class="mr-20 text-2xl font-extrabold w-24 ">Lentes Definitivas</h1>
                     <div class="flex flex-col ">
                         <div class="flex  h-10 items-center">
                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-20">{{ currentRec.odCb.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.odCb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-20">{{ currentRec.odEsferico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.odEsferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-20">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje.:</p>
-                            <p class="w-20">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-20">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
 
                         </div>
 
@@ -168,25 +177,25 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-20">{{ currentRec.oiCb.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oiCb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-20">{{ currentRec.oiEsferico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oiEsferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-20">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje.:</p>
-                            <p class="w-20">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-20">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
 
                         </div>
                     </div>
@@ -202,7 +211,6 @@ const handleCheckboxChange = (receta: RecetaRecetados) => {
                         <span>{{ currentRec.observaciones ?? '--' }}</span>
                     </div>
                 </div>
-            </div>
 
             <div>
 
