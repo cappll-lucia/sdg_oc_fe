@@ -20,22 +20,26 @@ export interface RecetaRecetados extends BaseEntity{
     fecha: Date,
     oftalmologo: string,
     tipo: string,
-    nro1: number,
-    nro2: number,
-    odEsf:  number,
-    odCil:  number,
-    odA: number,
-    oiEsf: number ,
-    oiCil:  number,
-    oiA: number,
-    dnp1: number,
-    dnp2: number,
-    diametro:  number,
     cristal: string,
     color: string ,
     armazon: string,
     tratamiento: string,
     observaciones: string,
+    detalleCerca: DetalleRecetaAereos | undefined,
+    detalleLejos: DetalleRecetaAereos | undefined   
+}
+
+export interface DetalleRecetaAereos extends BaseEntity{
+    odEsferico:  number,
+    odCilindrico:  number,
+    odGrados: number,
+    odDnp: number,
+    odDiametro:  number,
+    oiEsferico:  number,
+    oiCilindrico:  number,
+    oiGrados: number,
+    oiDnp: number,
+    oiDiametro:  number,
 }
 
 export interface RecetaContacto extends BaseEntity {
