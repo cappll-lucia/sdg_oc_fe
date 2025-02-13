@@ -1,11 +1,11 @@
 <script setup lang="ts"> 
 
-import type { RecetaRecetados } from '@/api/entities';
+import type { DetalleRecetaAereos } from '@/api/entities';
 import { Separator } from '@/components/ui/separator'
 
 
 defineProps<{
-    receta: RecetaRecetados;
+    detalleReceta: DetalleRecetaAereos;
     title: string
 }>();
 
@@ -19,15 +19,15 @@ defineProps<{
                 <p class="font-bold w-20 text-lg">O.D.</p>
 
                 <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                <p class="w-10">{{receta.odEsf.toFixed(2)}}</p>
+                <p class="w-10">{{detalleReceta.odEsferico.toFixed(2)}}</p>
                 <Separator orientation="vertical" class="mx-4" />
 
                 <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                <p class="w-10">{{receta.odCil.toFixed(2)}}</p>
+                <p class="w-10">{{detalleReceta.odCilindrico.toFixed(2)}}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
                 <p class="font-bold w-12 text-right pr-4">A:</p>
-                <p class="w-10">{{ receta.odA }} °</p>
+                <p class="w-10">{{ detalleReceta.odGrados }} °</p>
             </div>
 
             <Separator class="my-4" />
@@ -36,28 +36,33 @@ defineProps<{
                 <p class="font-bold w-20 text-lg">O.I.</p>
 
                 <p class="font-bold w-12 text-right pr-4">Esf.:</p>
-                <p class="w-10">{{receta.oiEsf.toFixed(2)}}</p>
+                <p class="w-10">{{detalleReceta.oiEsferico.toFixed(2)}}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
 
                 <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                <p class="w-10">{{receta.oiCil.toFixed(2)}}</p>
+                <p class="w-10">{{detalleReceta.oiCilindrico.toFixed(2)}}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
                 <p class="font-bold w-12 text-right pr-4">A:</p>
-                <p class="w-10">{{receta.oiA}} °</p>
+                <p class="w-10">{{detalleReceta.oiGrados}} °</p>
+                <Separator orientation="vertical" class="mx-4 " />
+
+                <p class=" font-bold w-12 text-center">DNP</p>
+                <p class="w-12 text-center">{{detalleReceta.odDnp}}</p>
+
             </div>
         </div>
         <Separator orientation="vertical" class="w-20" />
         <div class="pr-4">
             <p class=" font-bold w-12 text-center">DNP</p>
-            <p class="w-12 text-center">{{receta.dnp1}}</p>
+            <p class="w-12 text-center">{{detalleReceta.odDnp}}</p>
         </div>
 
         <Separator orientation="vertical" class="w-14" />
         <div class="pr-4">
             <p class="font-bold w-12 text-center">Φ </p>
-            <p class="w-12 text-center">{{receta.dnp2}}</p>
+            <p class="w-12 text-center">{{detalleReceta.oiDnp}}</p>
         </div>
     </div>
 

@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { generateRecetasContactoPDF } from '@/lib/utils';
+import Input from './ui/input/Input.vue';
 
 
 const props = defineProps<{
@@ -82,9 +83,6 @@ const printRecetas = () => {
                                     class="font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                     {{ receta.fecha.toISOString().split("T")[0] }}
                                 </label>
-                                <label class="text-sm">
-                                    {{ receta.marca }}
-                                </label>
                             </div>
                         </div>
                         <DialogFooter class="sm:justify-end">
@@ -118,7 +116,6 @@ const printRecetas = () => {
                     <p class="font-light text-sm ">{{ receta.id }}</p>
                     <div class="flex-col  w-[50%]">
                         <p class="font-bold ">{{ receta.fecha.toISOString().split("T")[0] }}</p>
-                        <p class="font-light  ">{{ receta.marca }}</p>
                     </div>
                     <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]"
                         @click="() => { selectedHistoriaClinica=false; currentRec = receta; console.log(currentRec); }">
@@ -150,7 +147,7 @@ const printRecetas = () => {
             </div>
             <Separator class="my-6" />
                 <div class="flex flex-row justify-start items-center" v-if="currentRec" > 
-                    <h1 class="mr-20 text-2xl font-extrabold w-24 ">Lentes Definitivas</h1>
+                    <h1 class="mr-[4rem] text-2xl font-extrabold w-[11rem] ">Lentes Definitivas</h1>
                     <div class="flex flex-col ">
                         <div class="flex  h-10 items-center">
                             <p class="font-bold w-20 text-lg">O.D.</p>
@@ -210,19 +207,107 @@ const printRecetas = () => {
                 <Separator class="my-6" />
                 <div class="datos flex flex-col" v-if="currentRec">
                     <div class="mt-6">
-                        <span class="text font-bold mr-2">Marca: </span>
-                        <span>{{ currentRec.marca ?? '--' }}</span>
+                        <span class="text font-bold mr-2">Marca O.D.: </span>
+                        <span class="mr-6">{{ currentRec.odMarca ?? '--' }}</span> |
+                        <span class="text font-bold mr-2 ml-6">Marca O.I.: </span>
+                        <span>{{ currentRec.oiMarca ?? '--' }}</span>
                     </div>
                     <div class="flex flex-col items-start mt-6">
                         <span class="text font-bold">Observaciones: </span>
                         <span>{{ currentRec.observaciones ?? '--' }}</span>
                     </div>
                 </div>
-
-                <Separator class="my-8" />  
+    
+            <Separator class="my-8" />  
 
             <div class="flex flex-row justify-start items-start" v-if="currentRec" > 
-                <h1 class="mr-20 mt-2 text-2xl font-extrabold w-20 ">Pruebas </h1>
+                <div class="flex flex-row justify-start items-start">
+                    <h1 class="mr-[1rem] mt-2 text-xl font-extrabold w-[11rem] ">Queterometría </h1>
+                    <div class="flex flex-col items-start" v-if="currentRec.quetM1Od">
+                        
+                    <div class="flex  h-10 items-center">
+                        <p class="font-bold w-20 text-lg">O.D.</p>
+                        <p class="w-14">{{ currentRec.quetM1Od.toFixed(2) || '-' }}</p>
+                        <Separator orientation="vertical" class="mx-4" />
+                        <p class="w-14">{{ currentRec.quetM2Od.toFixed(2) }}</p>
+                    </div>
+                    <Separator class="my-4" />
+                <div class="flex  h-10 items-center">
+                        <p class="font-bold w-20 text-lg">O.I.</p>
+                        <p class="w-14">{{ currentRec.quetM1Oi.toFixed(2) }}</p>
+                        <Separator orientation="vertical" class="mx-4" />
+                        <p class="w-14">{{ currentRec.quetM2Oi.toFixed(2) }}</p>
+                    </div>
+                        
+                    </div>
+                    <div class="flex flex-col items-start" v-else>
+                        <p class="font-light mt-4 w-[50rem] text-sm">No hay registros de Queterometría para esta receta</p>
+                    </div>
+                </div>
+                
+                
+                <div class="flex flex-row justify-end items-start ">
+                    <h1 class="mr-[2rem] mt-2 text-xl font-extrabold w-[11rem] text-right">Evaluación General </h1>
+                    <div class="flex flex-col items-start gap-3 w-[13rem] mt-3" >
+                    
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="currentRec.maquillaje" class="pointer-events-none" />
+                            <label for="terms1"
+                                class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Maquillaje
+                            </label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="currentRec.tonicidad" class="pointer-events-none" />
+                            <label for="terms1"
+                                class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                               Tonicidad
+                            </label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="currentRec.hendiduraPalpebral" class="pointer-events-none" />
+                            <label for="terms1"
+                                class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                               Hendidura Palpebral
+                            </label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="currentRec.alturaPalpebral" class="pointer-events-none" />
+                            <label for="terms1"
+                                class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                               Altura Palpebral
+                            </label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <label
+                                class="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                               Estesiometria: 
+                            </label>
+                            <Input type="text"  class="text-black bg-transparent pointer-events-none cursor-not-allowed w-100 text-xs  h-8" :model-value="currentRec.estesiometria" />
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="currentRec.buenParpadeoAmplitud" class="pointer-events-none" />
+                            <label for="terms1"
+                                class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                               Parpadeo: Buena Amplitud
+                            </label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="currentRec.buenParpadeoRitmo" class="pointer-events-none" />
+                            <label for="terms1"
+                                class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Parpadeo: Buen Ritmo
+                            </label>
+                        </div>
+                </div>
+                </div>
+            </div>
+
+            <Separator class="my-8" />  
+
+
+            <div class="flex flex-row justify-start items-start" v-if="currentRec" > 
+                <h1 class="mr-[3rem] mt-2 text-xl font-extrabold ">Pruebas </h1>
                 <div class="flex flex-col items-start" v-if="currentRec.pruebas.length">
                     <Accordion type="single" collapsible class="w-[50rem]" v-for="prueba in currentRec.pruebas">
                         <AccordionItem value="item-1">
@@ -256,7 +341,7 @@ const printRecetas = () => {
 
                         <Separator class="my-4" />
                            <div class="flex  h-10 items-center">
-                            <p class="font-bold w-20 text-lg">O.D.</p>
+                            <p class="font-bold w-20 text-lg">O.I.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
                             <p class="w-14">{{ prueba.oiCb.toFixed(2) }}</p>

@@ -120,21 +120,21 @@ const printRecetas = () => {
             </div>
             <Separator class="my-6" />
 
-            <div v-if="currentRec?.tipo=='Anteojo Lejos' ">
-                <ItemDetalleReceta :receta="currentRec" title="Lejos" />
+            <div v-if="currentRec?.tipo=='Anteojo Lejos' && currentRec.detalleLejos ">
+                <ItemDetalleReceta :detalleReceta="currentRec.detalleLejos" title="Lejos" />
             </div>
-            <div v-else-if="currentRec?.tipo == 'Anteojo Cerca'">
-                <ItemDetalleReceta :receta="currentRec" title="Cerca" />
+            <div v-else-if="currentRec?.tipo == 'Anteojo Cerca' && currentRec.detalleCerca">
+                <ItemDetalleReceta :detalleReceta="currentRec.detalleCerca" title="Cerca" />
             </div>
-            <div v-else-if="currentRec?.tipo == 'Multifocal'">
-                <ItemDetalleReceta :receta="currentRec" title="Cerca" />
+            <div v-else-if="currentRec?.tipo == 'Multifocal' && currentRec.detalleLejos && currentRec.detalleCerca">
+                <ItemDetalleReceta :detalleReceta="currentRec.detalleCerca" title="Cerca" />
                 <Separator class="my-8" />
-                <ItemDetalleReceta :receta="currentRec" title="Lejos" />
+                <ItemDetalleReceta :detalleReceta="currentRec.detalleLejos" title="Lejos" />
             </div>
-            <div v-else-if="currentRec?.tipo == 'Bifocal'">
-                <ItemDetalleReceta :receta="currentRec" title="Cerca" />
+            <div v-else-if="currentRec?.tipo == 'Bifocal' && currentRec.detalleLejos && currentRec.detalleCerca">
+                <ItemDetalleReceta :detalleReceta="currentRec.detalleCerca" title="Cerca" />
                 <Separator class="my-8" />
-                <ItemDetalleReceta :receta="currentRec" title="Lejos" />
+                <ItemDetalleReceta :detalleReceta="currentRec.detalleLejos" title="Lejos" />
             </div>
 
             <Separator class="my-8" />

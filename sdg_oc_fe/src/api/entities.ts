@@ -45,13 +45,11 @@ export interface DetalleRecetaAereos extends BaseEntity{
 export interface RecetaContacto extends BaseEntity {
     oftalmologo: string;
     fecha: Date,
-    queratometriaOd1: number;
     quetM1Od: number;
     quetM2Od: number;
     quetM1Oi: number;
     quetM2Oi: number;
     observacionQueratometria: string;
-    parpado: boolean;
     maquillaje: boolean;
     tonicidad: boolean;
     hendiduraPalpebral: boolean;
@@ -69,7 +67,8 @@ export interface RecetaContacto extends BaseEntity {
     oiCilindrico: number;
     oiEje: number;
     oiDiametro: number;
-    marca: string;
+    odMarca: string;
+    oiMarca: string;
     observaciones: string;
     pruebas: Prueba[]; 
 }
@@ -82,11 +81,21 @@ export interface Prueba extends BaseEntity {
     odCilindrico: number;
     odEsferico: number;
     odCb: number;
+    odMarca: string;
+    odEdema: boolean;
+    oiEdema: boolean;
     oiDiametro: number;
     oiEje: number;
     oiCilindrico: number;
     oiEsferico: number;
     oiCb: number;
+    oiMarca: string;
+    confort: boolean;
+    movilidad: boolean;
+    centraje: boolean;
+    hiperemia: boolean;
+    agudezaVisual:boolean;
+    observaciones: string;
 }
 
 export interface HistoriaClinicaContacto extends BaseEntity {
