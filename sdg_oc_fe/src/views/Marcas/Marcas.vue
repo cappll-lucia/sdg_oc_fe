@@ -18,7 +18,6 @@ const data = ref<Marca[]>([]);
 
 const loadData = async()=>{
     data.value = await marcasApi.getAll();
-
 }
 
 onMounted(async () => {

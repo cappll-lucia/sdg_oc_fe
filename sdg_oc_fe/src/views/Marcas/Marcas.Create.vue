@@ -49,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
         showSuccess.value = true;
         router.replace('/marcas')
         toast({
-            title: 'Marca creada con éxito',
+            title: 'Marca registrada con éxito',
         })
     } catch (err: any) {
         errorMessage.value=err.message as string
