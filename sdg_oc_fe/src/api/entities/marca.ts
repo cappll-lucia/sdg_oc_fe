@@ -20,6 +20,3 @@ export const editMarcaValidator = z.object({
         .max(50, {message: 'El nombre de la marca debe contener entre 2 y 50 caracteres'}),		
 })
 export type EditMarcaValidator = z.infer<typeof editMarcaValidator>;
-
-
-

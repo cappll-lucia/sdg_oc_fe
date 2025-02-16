@@ -42,6 +42,10 @@ const ventasItems: { title: string, href: string, description: string; }[] = [
 
 const parametrosItems: { title: string, href: string}[] = [
     {
+        title: 'Obras Sociales',
+        href: '/obras-sociales'
+    },
+    {
         title: 'Marcas',
         href: '/marcas'
     },

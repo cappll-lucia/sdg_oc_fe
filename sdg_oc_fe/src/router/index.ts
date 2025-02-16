@@ -54,6 +54,21 @@ export const router = createRouter({
             component: () => import('../views/Proveedores/Proveedores.Edit.vue')
         },
         {
+            path: '/obras-sociales',
+            name: 'obras-sociales',
+            component: () => import('../views/ObrasSociales/ObrasSociales.vue')
+        },
+        {
+            path: '/obras-sociales/create',
+            name: 'obras-sociales-create',
+            component: () => import('../views/ObrasSociales/ObrasSociales.Create.vue')
+        },
+        {
+            path: '/obras-sociales/edit/:id',
+            name: 'obras-sociales-edit',
+            component: ()=> import('../views/ObrasSociales/ObrasSociales.Edit.vue')
+        },
+        {
             path: '/productos',
             name: 'productos',
             component: () => import('../views/Productos.vue')
