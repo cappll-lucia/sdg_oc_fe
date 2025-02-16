@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type { ClienteConAudiometria } from '@/api/entities';
+import type { ClienteConAudiometria } from '@/api/entities/entities';
 import { clientesConAudiometria } from '@/api/data/clientesConAudiometria';
 import DataTable from '@/components/tables/audiometrias/data-table.vue';
 import {columns} from '@/components/tables/audiometrias/columns'

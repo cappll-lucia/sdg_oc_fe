@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
-import { Audiometria, ClienteConAudiometria } from '@/api/entities';
+import { Audiometria, ClienteConAudiometria } from '@/api/entities/entities';
 import { clientesConAudiometria } from '@/api/data/clientesConAudiometria';
 import { useRoute } from 'vue-router';
 

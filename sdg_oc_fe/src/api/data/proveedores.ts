@@ -1,4 +1,4 @@
-import type { Proveedor } from "../entities";
+import type { Proveedor } from "../entities/entities";
 
 export const proveedores: Proveedor[] = [
   {

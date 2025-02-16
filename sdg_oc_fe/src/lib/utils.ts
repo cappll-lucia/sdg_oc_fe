@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { Updater } from '@tanstack/vue-table'
 import type { Ref } from 'vue'
-import { RecetaContacto, RecetaRecetados } from '@/api/entities';
+import { RecetaContacto, RecetaRecetados } from '@/api/entities/entities';
 import {jsPDF} from "jspdf"; 
 import autoTable from "jspdf-autotable"
 

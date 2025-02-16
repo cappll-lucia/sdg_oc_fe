@@ -1,6 +1,6 @@
 <script setup lang="ts"> 
 
-import type { DetalleRecetaAereos } from '@/api/entities';
+import type { DetalleRecetaAereos } from '@/api/entities/entities';
 import { Separator } from '@/components/ui/separator'
 
 

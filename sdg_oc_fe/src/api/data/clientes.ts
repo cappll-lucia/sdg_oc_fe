@@ -1,4 +1,4 @@
-import { Cliente } from "../entities"
+import { Cliente } from "../entities/entities"
 
 export const ClientesExample: Cliente[] = [
   {

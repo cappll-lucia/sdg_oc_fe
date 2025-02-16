@@ -10,7 +10,7 @@ import {
 import { SlashIcon } from '@radix-icons/vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { clientesConReceta } from '@/api/data/clientesConRecetas'
-import type { ClienteConReceta } from '@/api/entities';
+import type { ClienteConReceta } from '@/api/entities/entities';
 import { computed, onMounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'

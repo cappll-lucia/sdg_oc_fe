@@ -8,21 +8,9 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import { onMounted, ref } from 'vue';
-import type { ClienteConReceta } from '@/api/entities';
-import { clientesConReceta } from '@/api/data/clientesConRecetas'
-import DataTable from '@/components/tables/recetas/data-table.vue';
-import { columns } from '@/components/tables/recetas/columns';
 
-const data = ref<ClienteConReceta[]>([]);
 
-async function getData(): Promise<ClienteConReceta[]>{
-    return clientesConReceta as ClienteConReceta[]
-}
 
-onMounted(async()=>{
-    data.value=await getData()
-})
 </script>
 
 <template>
@@ -38,16 +26,13 @@ onMounted(async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Recetas</BreadcrumbPage>
+                    <BreadcrumbPage>Clientes</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title ">Recetas por Cliente</h1>
+        <h1 class="page-title ">Clientes</h1>
         <div class="pt-2">
-            <DataTable :columns="columns" :data="data" />
+            Crear Nuevo Cliente
         </div>
-
-
-
     </div>
 </template>

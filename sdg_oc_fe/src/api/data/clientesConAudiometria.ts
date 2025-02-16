@@ -1,4 +1,4 @@
-import type { ClienteConAudiometria } from "../entities";
+import type { ClienteConAudiometria } from "../entities/entities";
 
 export const clientesConAudiometria: ClienteConAudiometria[] =  [
   {

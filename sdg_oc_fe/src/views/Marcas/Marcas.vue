@@ -8,17 +8,18 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type { Marca } from '@/api/entities';
+import type { Marca } from '@/api/entities/marca';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/marcas/columns';
 import { marcas } from '@/api/data/marcas';
 import DataTable from '@/components/tables/marcas/data-table.vue';
 
 const data = ref<Marca[]>([]);
-
 async function getData(): Promise<Marca[]> {
     return marcas as Marca[];
 }
+
+
 
 onMounted(async () => {
     data.value = await getData();

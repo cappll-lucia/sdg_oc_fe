@@ -43,7 +43,8 @@ const table = useVueTable({
             <Input class="max-w-sm" placeholder="Buscar Marca"
                 :model-value="table.getColumn('nombre')?.getFilterValue() as string"
                 @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
-            <Button class="text-xs">Registrar Nueva Marca</Button>
+            <Button class="text-xs"><a href="/marcas/create">Registrar Nueva Marca</a></Button>
+
         </div>
 <div class="border rounded-md">
         <Table>

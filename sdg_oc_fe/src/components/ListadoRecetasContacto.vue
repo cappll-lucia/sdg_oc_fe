@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { RecetaContacto, HistoriaClinicaContacto } from '@/api/entities';
+import type { RecetaContacto, HistoriaClinicaContacto } from '@/api/entities/entities';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon, DownloadIcon, ArchiveIcon, PlusIcon, ValueNoneIcon  } from '@radix-icons/vue'

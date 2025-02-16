@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {  RecetaRecetados } from '@/api/entities';
+import type {  RecetaRecetados } from '@/api/entities/entities';
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon, DownloadIcon } from '@radix-icons/vue'

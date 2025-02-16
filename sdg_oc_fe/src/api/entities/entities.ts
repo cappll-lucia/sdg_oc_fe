@@ -1,4 +1,6 @@
-interface BaseEntity {
+import type { Marca } from "./marca";
+
+export interface BaseEntity {
 	id: number;
 	createdAt: string;
 	updatedAt: string;
@@ -170,10 +172,6 @@ export interface ClienteConAudiometria extends BaseEntity{
     fechaNac: Date , 
     observaciones: string ,
     audiometrias: Audiometria[] 
-}
-
-export interface Marca extends BaseEntity {
-    nombre: string;
 }
 
 export interface Proveedor extends BaseEntity {

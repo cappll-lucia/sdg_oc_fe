@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type { Producto } from '@/api/entities';
+import type { Producto } from '@/api/entities/entities';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/productos/columns';
 import { productos } from '@/api/data/productos';

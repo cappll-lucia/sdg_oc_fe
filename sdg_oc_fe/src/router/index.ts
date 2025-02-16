@@ -16,12 +16,22 @@ export const router = createRouter({
         {
             path: '/clientes',
             name: 'clientes',
-            component: () => import('../views/Clientes.vue')
+            component: () => import('../views/Clientes/Clientes.vue')
+        },
+        {
+            path: '/clientes/create',
+            name: 'clientes-create',
+            component: () => import('../views/Clientes/Clientes.Create.vue')
         },
         {
             path: '/marcas',
             name: 'marcas',
-            component: () => import('../views/Marcas.vue')
+            component: () => import('../views/Marcas/Marcas.vue')
+        },
+        {
+            path: '/marcas/create',
+            name: 'marcas-create',
+            component: () => import('../views/Marcas/Marcas.Create.vue')
         },
         {
             path: '/proveedores',
@@ -36,7 +46,7 @@ export const router = createRouter({
         {
             path: '/recetas',
             name: 'recetas',
-            component: () => import('../views/Recetas.vue')
+            component: () => import('../views/Recetas/Recetas.vue')
         },        
         {
             path: '/audiometrias',
@@ -51,7 +61,7 @@ export const router = createRouter({
         {
             path: '/recetas/:idCliente',
             name: 'recetas_cliente',
-            component: () => import('../views/RecetasCliente.vue')
+            component: () => import('../views/Recetas/RecetasCliente.vue')
         },
     ]
 })

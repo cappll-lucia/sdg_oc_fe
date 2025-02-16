@@ -1,4 +1,4 @@
-import type { Marca  } from '../entities';
+import type { Marca  } from '../entities/entities';
 
 export const marcas: Marca[] = [
   { id: 1, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), nombre: 'Marca A' },

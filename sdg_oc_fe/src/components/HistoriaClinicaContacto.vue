@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { HistoriaClinicaContacto } from '@/api/entities';
+import type { HistoriaClinicaContacto } from '@/api/entities/entities';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Pencil1Icon } from '@radix-icons/vue';

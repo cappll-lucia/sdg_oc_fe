@@ -1,4 +1,4 @@
-import type { Producto } from "../entities";
+import type { Producto } from "../entities/entities";
 
 export enum CategoriaProducto {
   AUDIFONO = 'Audifono',

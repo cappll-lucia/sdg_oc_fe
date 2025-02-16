@@ -1,4 +1,4 @@
-import { Cliente } from '@/api/entities';
+import { Cliente } from '@/api/entities/entities';
 import { h } from 'vue'
 import { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from './data-table-dropdown.vue'

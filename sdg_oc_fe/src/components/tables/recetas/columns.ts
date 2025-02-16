@@ -1,4 +1,4 @@
-import { ClienteConReceta } from "@/api/entities";
+import { ClienteConReceta } from "@/api/entities/entities";
 import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import { Button } from "@/components/ui/button";

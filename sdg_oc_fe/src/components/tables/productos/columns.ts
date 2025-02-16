@@ -1,7 +1,7 @@
 import { h } from "vue";
 import { ColumnDef } from "@tanstack/vue-table";
 import DropdownAction from './data-table-dropdown.vue';
-import { Producto } from "@/api/entities";
+import { Producto } from "@/api/entities/entities";
 
 export const columns: ColumnDef<Producto>[] = [
     {
