@@ -31,16 +31,16 @@ const closeDialog = () => {
   <AlertDialog :open="modelValue">
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>{{ title }}</AlertDialogTitle>
-        <AlertDialogDescription>
+        <AlertDialogTitle class="text-center">{{ title }}</AlertDialogTitle>
+        <AlertDialogDescription class="text-center">
           {{ message }}
         </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter class=" bg-red-500 flex  sm:justify-between  lg:justify-between  md:justify-between  xs:justify-between  xl:justify-between 2xl:justify-between w-full" >
-        <AlertDialogCancel  class="w-[40%]" @click="secondaryAction ? secondaryAction() : closeDialog()">
+      <AlertDialogFooter class=" mt-4 flex sm:justify-between  lg:justify-between  md:justify-between  xs:justify-between  xl:justify-between 2xl:justify-between w-full" >
+        <AlertDialogCancel  class="w-[45%]" @click="secondaryAction ? secondaryAction() : closeDialog()">
           {{ secondaryBtn }}
         </AlertDialogCancel>
-        <AlertDialogAction class="w-[40%]" @click="primaryAction ? primaryAction() : closeDialog()">
+        <AlertDialogAction class="w-[45%]" @click="primaryAction ? primaryAction() : closeDialog()">
           {{ primaryBtn }}
         </AlertDialogAction>
       </AlertDialogFooter>

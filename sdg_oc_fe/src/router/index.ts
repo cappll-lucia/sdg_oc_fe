@@ -34,6 +34,11 @@ export const router = createRouter({
             component: () => import('../views/Marcas/Marcas.Create.vue')
         },
         {
+            path: '/marcas/edit/:id',
+            name: 'marcas-edit',
+            component: () => import('../views/Marcas/Marcas.Edit.vue')
+        },
+        {
             path: '/proveedores',
             name: 'proveedores',
             component: () => import('../views/Proveedores.vue')

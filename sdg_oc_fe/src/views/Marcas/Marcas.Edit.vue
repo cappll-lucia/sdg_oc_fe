@@ -20,37 +20,47 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
 import { SlashIcon } from '@radix-icons/vue';
 import { toTypedSchema } from '@vee-validate/zod'
-import { createMarcaValidator } from '@/api/entities/marca';
+import { editMarcaValidator, Marca } from '@/api/entities/marca';
 import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
 import { router } from '@/router';
 import { marcasApi } from '@/api/libs/marcas';
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 
-const showSuccess = ref<boolean>(false);
+const currentMarca = ref<Marca>();
+
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 const loading = ref<boolean>(false);
 
 
-const formSchema = toTypedSchema(createMarcaValidator)
-const {handleSubmit} = useForm({
-    validationSchema: formSchema
+const formSchema = toTypedSchema(editMarcaValidator)
+const {handleSubmit, setValues} = useForm({
+    validationSchema: formSchema,
+    initialValues: {nombre: ''}
 })
 
-
+onMounted(async ()=>{
+    currentMarca.value = await marcasApi.getOne(Number(route.params.id));
+    if (currentMarca.value) {
+        setValues({ nombre: currentMarca.value.nombre });
+    }
+})
 
 const onSubmit = handleSubmit(async (values) => {
     loading.value=true;
     try {
-        await marcasApi.create(values)
-        loading.value=false;
-        showSuccess.value = true;
-        router.replace('/marcas')
-        toast({
-            title: 'Marca creada con éxito',
-        })
+        if(currentMarca.value){
+            await marcasApi.edit(currentMarca.value.id, values)
+            loading.value=false;
+            router.replace('/marcas')
+            toast({
+                title: 'Marca actualizada con éxito',
+            })
+        }
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -89,14 +99,14 @@ const onSubmit = handleSubmit(async (values) => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Editar</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title ">Marcas</h1>
         <div class="pt-2" >
             <form @submit="onSubmit" class="forms">
-                <h3 class="page-subtitle" >Registrar Nueva Marca</h3>
+                <h3 class="page-subtitle" >Editar Marca</h3>
                 <Separator class="my-6" />
                 
                 <FormField v-slot="{ componentField }" name="nombre">
@@ -112,19 +122,18 @@ const onSubmit = handleSubmit(async (values) => {
                 </FormField>
 
                 <div class="form-footer w-full flex flex-row justify-end mt-4">
-                    <Button variant="outline" class="w-[25%] mr-5">Cancelar</Button>
-
+                    <Button variant="outline" class="w-[25%] mr-5" :onclick="()=> {router.replace('/marcas')}"  >Cancelar</Button>
                     <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>
         </div>
 
         <AlertError 
-        v-model="showError"
-        title="Error"
-        :message="errorMessage"
-        button="Aceptar"
-        :action="()=>{showError=false}"
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
         />
     
     

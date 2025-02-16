@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Marca } from '@/api/entities/marca';
+import { marcasApi } from '@/api/libs/marcas';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,22 +10,21 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type { Marca } from '@/api/entities/marca';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/marcas/columns';
-import { marcas } from '@/api/data/marcas';
 import DataTable from '@/components/tables/marcas/data-table.vue';
 
 const data = ref<Marca[]>([]);
-async function getData(): Promise<Marca[]> {
-    return marcas as Marca[];
+
+const loadData = async()=>{
+    data.value = await marcasApi.getAll();
+
 }
 
-
-
 onMounted(async () => {
-    data.value = await getData();
+    await loadData()
 });
+
 </script>
 
 <template>

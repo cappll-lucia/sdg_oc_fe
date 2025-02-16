@@ -1,7 +1,7 @@
 import { h } from "vue";
 import { ColumnDef } from "@tanstack/vue-table";
 import DropdownAction from './data-table-dropdown.vue';
-import { Marca } from "@/api/entities/entities";
+import type { Marca } from "@/api/entities/marca";
 
 export const columns: ColumnDef<Marca>[] = [
     {
@@ -20,7 +20,7 @@ export const columns: ColumnDef<Marca>[] = [
         cell: ({ row }) => {
           const marca = row.original
           return h('div', { class: 'relative text-right right-10' }, h(DropdownAction, {
-            marca: { ...marca, id: marca.id.toString() },
+            marca: { ...marca, id: marca.id, nombre: marca.nombre },
           }))
         },
     }
