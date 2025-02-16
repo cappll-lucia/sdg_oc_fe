@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Proveedor } from '@/api/entities/proveedor';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -8,26 +9,27 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type { Proveedor } from '@/api/entities/entities';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/proveedores/columns';
-import { proveedores } from '@/api/data/proveedores';
 import DataTable from '@/components/tables/proveedores/data-table.vue';
+import { proveedoresApi } from '@/api/libs/proveedores';
+
 
 const data = ref<Proveedor[]>([]);
 
-async function getData(): Promise<Proveedor[]> {
-    return proveedores as Proveedor[];
+const loadData = async()=>{
+    data.value = await proveedoresApi.getAll();
 }
 
 onMounted(async () => {
-    data.value = await getData();
+    await loadData()
 });
+
 </script>
 
 <template>
     <div class="page">
-       <Breadcrumb>
+        <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
@@ -55,4 +57,4 @@ onMounted(async () => {
             <DataTable :columns="columns" :data="data" />
         </div>
     </div>
-</template>
+</template> 

@@ -1,7 +1,7 @@
 import { h } from "vue";
 import { ColumnDef } from "@tanstack/vue-table";
 import DropdownAction from './data-table-dropdown.vue';
-import { Proveedor } from "@/api/entities/entities";
+import { Proveedor } from "@/api/entities/proveedor";
 
 export const columns: ColumnDef<Proveedor>[] =[
     {
@@ -35,7 +35,7 @@ export const columns: ColumnDef<Proveedor>[] =[
         cell: ({ row }) => {
           const proveedor = row.original
           return h('div', { class: 'relative text-right right-10' }, h(DropdownAction, {
-            proveedor: { ...proveedor, id: proveedor.id.toString() },
+            proveedor: { ...proveedor, id: proveedor.id, razonSocial: proveedor.razonSocial   },
           }))
         },
     }

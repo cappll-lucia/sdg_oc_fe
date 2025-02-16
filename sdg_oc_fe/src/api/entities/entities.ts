@@ -1,4 +1,5 @@
 import type { Marca } from "./marca";
+import { Proveedor } from "./proveedor";
 
 export interface BaseEntity {
 	id: number;
@@ -174,12 +175,6 @@ export interface ClienteConAudiometria extends BaseEntity{
     audiometrias: Audiometria[] 
 }
 
-export interface Proveedor extends BaseEntity {
-    cuit: string;
-    razonSocial: string;
-    email: string;
-    telefono: string;
-}
 
 export interface Producto extends BaseEntity {
     nombre: string;

@@ -41,7 +41,17 @@ export const router = createRouter({
         {
             path: '/proveedores',
             name: 'proveedores',
-            component: () => import('../views/Proveedores.vue')
+            component: () => import('../views/Proveedores/Proveedores.vue')
+        },
+        {
+            path: '/proveedores/create',
+            name: 'proveedores-create',
+            component: () => import('../views/Proveedores/Proveedores.Create.vue')
+        },
+        {
+            path: '/proveedores/edit/:id',
+            name: 'proveedores-edit',
+            component: () => import('../views/Proveedores/Proveedores.Edit.vue')
         },
         {
             path: '/productos',

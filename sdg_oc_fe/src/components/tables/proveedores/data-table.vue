@@ -48,7 +48,7 @@ const table = useVueTable({
             <Input class="max-w-sm" placeholder="Buscar Proveedor"
                 :model-value="table.getColumn('razonSocial')?.getFilterValue() as string"
                 @update:model-value=" table.getColumn('razonSocial')?.setFilterValue($event)" />
-            <Button class="text-xs">Registrar Nuevo Proveedor</Button>
+            <Button class="text-xs"><a href="/proveedores/create">Registrar Nuevo Proveedor</a></Button>
         </div>
 <div class="border rounded-md">
         <Table>
