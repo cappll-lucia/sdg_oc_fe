@@ -7,18 +7,6 @@ export interface BaseEntity {
 	updatedAt: string;
 }
 
-export interface Cliente extends BaseEntity {
-    dni: string , 
-    nombre: string , 
-    apellido: string , 
-    email: string , 
-    sexo:  string, 
-    telefono: string , 
-    domicilio: string , 
-    fechaNac: Date , 
-    observaciones: string , 
-}
-
 export interface RecetaRecetados extends BaseEntity{
     fecha: Date,
     oftalmologo: string,

@@ -1,97 +1,22 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized } from "vue-router";
+import { routerRoutes } from "./routes";
+import { useUserStore } from "@/stores/UsersStore";
 
-export const router = createRouter({
+const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes:[
-        {
-            path: '/',
-            name: 'home',
-            component: ()=> import('../views/Home.vue')
-        },
-        {
-            path: '/login',
-            name: 'login',
-            component: () => import('../views/Login.vue')
-        },
-        {
-            path: '/clientes',
-            name: 'clientes',
-            component: () => import('../views/Clientes/Clientes.vue')
-        },
-        {
-            path: '/clientes/create',
-            name: 'clientes-create',
-            component: () => import('../views/Clientes/Clientes.Create.vue')
-        },
-        {
-            path: '/marcas',
-            name: 'marcas',
-            component: () => import('../views/Marcas/Marcas.vue')
-        },
-        {
-            path: '/marcas/create',
-            name: 'marcas-create',
-            component: () => import('../views/Marcas/Marcas.Create.vue')
-        },
-        {
-            path: '/marcas/edit/:id',
-            name: 'marcas-edit',
-            component: () => import('../views/Marcas/Marcas.Edit.vue')
-        },
-        {
-            path: '/proveedores',
-            name: 'proveedores',
-            component: () => import('../views/Proveedores/Proveedores.vue')
-        },
-        {
-            path: '/proveedores/create',
-            name: 'proveedores-create',
-            component: () => import('../views/Proveedores/Proveedores.Create.vue')
-        },
-        {
-            path: '/proveedores/edit/:id',
-            name: 'proveedores-edit',
-            component: () => import('../views/Proveedores/Proveedores.Edit.vue')
-        },
-        {
-            path: '/obras-sociales',
-            name: 'obras-sociales',
-            component: () => import('../views/ObrasSociales/ObrasSociales.vue')
-        },
-        {
-            path: '/obras-sociales/create',
-            name: 'obras-sociales-create',
-            component: () => import('../views/ObrasSociales/ObrasSociales.Create.vue')
-        },
-        {
-            path: '/obras-sociales/edit/:id',
-            name: 'obras-sociales-edit',
-            component: ()=> import('../views/ObrasSociales/ObrasSociales.Edit.vue')
-        },
-        {
-            path: '/productos',
-            name: 'productos',
-            component: () => import('../views/Productos.vue')
-        },
-        {
-            path: '/recetas',
-            name: 'recetas',
-            component: () => import('../views/Recetas/Recetas.vue')
-        },        
-        {
-            path: '/audiometrias',
-            name: 'recetas_audiometria',
-            component: () => import('../views/Audiometrias.vue')
-        },
-        {
-            path: '/audiometrias/:idCliente',
-            name: 'audiometria',
-            component: () => import('../views/AudiometriasCliente.vue')
-        },
-        {
-            path: '/recetas/:idCliente',
-            name: 'recetas_cliente',
-            component: () => import('../views/Recetas/RecetasCliente.vue')
-        },
-    ]
-})
+    routes: routerRoutes
+});
+
+router.beforeEach((to: RouteLocationNormalized, _ , next: NavigationGuardNext)=>{
+    const auth: boolean = to.meta.auth as boolean;
+    const userStore = useUserStore();
+    if ( auth && !userStore.isSignedIn){
+		next('/login');
+	} else if (to.fullPath === '/login' && userStore.isSignedIn) {
+		next('/');
+	} else {
+		next();
+	}
+});
+
+export default router;
