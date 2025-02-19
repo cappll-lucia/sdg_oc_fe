@@ -23,7 +23,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { editObraSocialValidator, ObraSocial } from '@/api/entities/obraSocial';
 import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
-import { router } from '@/router';
+import router from '@/router/index';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

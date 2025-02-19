@@ -22,7 +22,7 @@ import { SlashIcon } from '@radix-icons/vue';
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
-import { router } from '@/router';
+import router from '@/router/index';
 import { proveedoresApi } from '@/api/libs/proveedores';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

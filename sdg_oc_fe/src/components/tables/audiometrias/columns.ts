@@ -3,7 +3,7 @@ import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "@radix-icons/vue";
-import {router} from '@/router';
+import router from '@/router/index';
 
 export const columns: ColumnDef<ClienteConAudiometria>[] = [
     {

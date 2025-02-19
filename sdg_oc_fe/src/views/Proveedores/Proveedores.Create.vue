@@ -23,7 +23,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { createProveedorValidator } from '@/api/entities/proveedor';
 import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
-import { router } from '@/router';
+import router from '@/router/index';
 import { proveedoresApi } from '@/api/libs/proveedores';
 import { ref } from 'vue'
 

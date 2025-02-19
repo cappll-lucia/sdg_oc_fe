@@ -23,7 +23,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { editMarcaValidator, Marca } from '@/api/entities/marca';
 import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
-import { router } from '@/router';
+import router from '@/router/index';
 import { marcasApi } from '@/api/libs/marcas';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
