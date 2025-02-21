@@ -15,7 +15,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { generateRecetasRecetadosPDF } from '@/lib/utils';
+import { generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
 
 
 const props = defineProps<{

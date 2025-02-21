@@ -27,7 +27,7 @@ import {
 } from '@tanstack/vue-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { valueUpdater } from '@/lib/utils';
+import { valueUpdater } from '@/lib/utils.recetas';
 import { marcas } from '@/api/data/marcas';
 import { proveedores } from '@/api/data/proveedores';
 import { CategoriaProducto } from '@/api/data/productos';

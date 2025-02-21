@@ -16,7 +16,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { generateRecetasContactoPDF } from '@/lib/utils';
+import { generateRecetasContactoPDF } from '@/lib/utils.recetas';
 import Input from './ui/input/Input.vue';
 
 

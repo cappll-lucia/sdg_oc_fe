@@ -1,5 +1,5 @@
 import { Cliente } from "../entities/entities"
-
+/*
 export const ClientesExample: Cliente[] = [
   {
     id: 1,
@@ -212,3 +212,6 @@ export const ClientesExample: Cliente[] = [
     updatedAt:"*"
   }
 ]
+*/
+
+export const ClientesExample: Cliente[] = []

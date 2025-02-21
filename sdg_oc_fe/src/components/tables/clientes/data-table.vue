@@ -17,7 +17,7 @@ import {
 } from '@tanstack/vue-table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button';
-import { valueUpdater } from '@/lib/utils'
+import { valueUpdater } from '@/lib/utils.recetas'
 
 
 const props = defineProps<{

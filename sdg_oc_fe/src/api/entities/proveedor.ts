@@ -1,6 +1,6 @@
 import { BaseEntity } from "./entities";
 import { z } from 'zod';
-import { isCuit } from "@/lib/utils";
+import { isCuit } from "@/lib/utils.recetas";
 
 
 export interface Proveedor extends BaseEntity {

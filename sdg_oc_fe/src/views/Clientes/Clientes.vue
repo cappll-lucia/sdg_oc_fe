@@ -8,23 +8,22 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type {Cliente} from '@/api/entities/entities'
 import { onMounted, ref } from 'vue';
 import {columns} from '@/components/tables/clientes/columns'
-import {ClientesExample} from '@/api/data/clientes.ts'
 import DataTable from '@/components/tables/clientes/data-table.vue';
+import { clientesApi } from '@/api/libs/clientes';
+import { Cliente } from '@/api/entities/clientes';
 
 
 const data = ref<Cliente[]>([]);
 
-async function getData() : Promise<Cliente[]> {
-    return ClientesExample as Cliente[]
+const loadData = async()=>{
+    data.value = await clientesApi.getAll();
 }
 
-onMounted(async()=>{
-    data.value=await getData()
-})
-
+onMounted(async () => {
+    await loadData()
+});
 
 </script>
 

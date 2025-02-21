@@ -23,7 +23,7 @@ const getOne = async (_id: number) => {
 const create = async(_marca: CreateMarcaValidator ) =>{
     try {
 		const resp = await http.post('/marca', _marca);
-		return resp.data.data as Marca[];
+		return resp.data.data as Marca;
 	} catch (error: any) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la marca')
 	}
@@ -32,7 +32,7 @@ const create = async(_marca: CreateMarcaValidator ) =>{
 const edit = async(_id: number, _marca: EditMarcaValidator ) =>{
     try {
 		const resp = await http.patch(`/marca/${_id}`, _marca);
-		return resp.data.data as Marca[];
+		return resp.data.data as Marca;
 	} catch (error: any) {
         console.log(error)
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la marca')
