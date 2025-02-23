@@ -71,7 +71,7 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-<div class="page">
+    <div class="page">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
@@ -104,38 +104,35 @@ const onSubmit = handleSubmit(async (values) => {
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title ">Obras Sociales</h1>
-        <div class="pt-2" >
+        <div class="pt-2 flex w-full justify-center items-center">
             <form @submit="onSubmit" class="forms">
-                <h3 class="page-subtitle" >Editar Obra Social</h3>
+                <h3 class="page-subtitle text-center">Editar Obra Social</h3>
                 <Separator class="my-6" />
-                
-                <FormField v-slot="{ componentField }" name="nombre">
-                <FormItem class="h-[5rem]">
-                    <div class="form-item">
-                        <FormLabel class="form-label">Nombre</FormLabel>
-                        <FormControl>
-                            <Input type="text" v-bind="componentField" />
-                        </FormControl>
-                    </div>
-                    <FormMessage class="form-message"/>
-                </FormItem>
+
+                <FormField v-slot="{ componentField, errorMessage }" name="nombre">
+                    <FormItem class="h-[5rem]">
+                        <div class="form-item">
+                            <FormLabel class="form-label">Nombre</FormLabel>
+                            <FormControl>
+                                <Input type="text" v-bind="componentField" />
+                            </FormControl>
+                        </div>
+                        <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}
+                        </FormMessage>
+                    </FormItem>
                 </FormField>
 
-                <div class="form-footer w-full flex flex-row justify-end mt-4">
-                    <Button variant="outline" class="w-[25%] mr-5" :onclick="()=> {router.replace('/obras-sociales')}"  >Cancelar</Button>
+                <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
+                    <Button variant="outline" class="w-[25%] mr-5"
+                        :onclick="()=> {router.replace('/obras-sociales')}">Cancelar</Button>
                     <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>
         </div>
 
-        <AlertError 
-            v-model="showError"
-            title="Error"
-            :message="errorMessage"
-            button="Aceptar"
-            :action="()=>{showError=false}"
-        />
-    
-    
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
+
+
     </div>
 </template>

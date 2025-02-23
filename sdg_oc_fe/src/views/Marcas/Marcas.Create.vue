@@ -32,6 +32,7 @@ const showSuccess = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 const loading = ref<boolean>(false);
+const submitted = ref<boolean>(false);
 
 
 const formSchema = toTypedSchema(createMarcaValidator)
@@ -58,10 +59,15 @@ const onSubmit = handleSubmit(async (values) => {
     };
 })
 
+const validateAndSubmit = async () => {
+    submitted.value = true;
+    await onSubmit();
+}
+
 </script>
 
 <template>
-<div class="page">
+    <div class="page">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
@@ -93,40 +99,36 @@ const onSubmit = handleSubmit(async (values) => {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title ">Marcas</h1>
-        <div class="pt-2" >
-            <form @submit="onSubmit" class="forms">
-                <h3 class="page-subtitle" >Registrar Nueva Marca</h3>
+        <div class="pt-2 flex w-full justify-center items-center">
+            <form @submit.prevent="validateAndSubmit" class="forms">
+                <h3 class="page-subtitle text-center">Registrar Nueva Marca</h3>
                 <Separator class="my-6" />
-                
-                <FormField v-slot="{ componentField }" name="nombre">
-                <FormItem class="h-[5rem]">
-                    <div class="form-item">
-                        <FormLabel class="form-label">Nombre</FormLabel>
-                        <FormControl>
-                            <Input type="text" v-bind="componentField" />
-                        </FormControl>
-                    </div>
-                    <FormMessage class="form-message"/>
-                </FormItem>
+
+                <FormField v-slot="{ componentField, errorMessage }" name="nombre">
+                    <FormItem class="h-[5rem]">
+                        <div class="form-item">
+                            <FormLabel class="form-label">Nombre</FormLabel>
+                            <FormControl>
+                                <Input type="text" v-bind="componentField" />
+                            </FormControl>
+                        </div>
+                        <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}
+                        </FormMessage>
+                    </FormItem>
                 </FormField>
 
-                <div class="form-footer w-full flex flex-row justify-end mt-4">
-                    <Button variant="outline" class="w-[25%] mr-5">Cancelar</Button>
+                <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
+                    <Button variant="outline" class="w-[25%] mr-5"
+                        :onclick="() => { router.replace('/marcas'); }">Cancelar</Button>
 
                     <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>
         </div>
 
-        <AlertError 
-        v-model="showError"
-        title="Error"
-        :message="errorMessage"
-        button="Aceptar"
-        :action="()=>{showError=false}"
-        />
-    
-    
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
+
+
     </div>
 </template>

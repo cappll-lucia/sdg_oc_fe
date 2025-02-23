@@ -81,7 +81,6 @@ const removeObraSocial = (index: number) => {
 
 
 const onSubmit = handleSubmit(async (values) => {
-    submitted.value = true;
     loading.value = true;
     const osCliente = selectedObrasSociales.value.filter(os => os.obraSocial.id !== null) as {obraSocial: {id:number}, numeroSocio: string}[];
      if (osCliente.find(os=> os.numeroSocio=='') )return;
