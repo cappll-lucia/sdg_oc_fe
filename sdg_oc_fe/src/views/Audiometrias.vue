@@ -39,14 +39,6 @@ onMounted(async () => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/recetas">
-                        Recetas
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
                     <BreadcrumbPage>Audiometrías</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>

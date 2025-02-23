@@ -32,6 +32,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/clientes/edit/:id',
+            name: 'clientes-edit',
+            component: () => import('../views/Clientes/Clientes.Edit.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/marcas',
             name: 'marcas',
             component: () => import('../views/Marcas/Marcas.vue'),

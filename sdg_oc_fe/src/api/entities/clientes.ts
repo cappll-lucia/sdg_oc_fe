@@ -24,7 +24,7 @@ export const createClienteValidator = z.object({
   email: z.string({message: "Ingrese el email del cliente"}).email("Email inválido"),
   telefono: z.string().regex(/^\d+$/, "Telefono inválido"),
   sexo: z.enum(["Masculino", "Femenino"]),
-   fechaNac: z
+  fechaNac: z
     .object({
       day: z.string(),
       month: z.string(),
@@ -55,14 +55,15 @@ export const editClienteValidator = z.object({
   email: z.string().email("Formato de email inválido"),
   telefono: z.string().regex(/^\d+$/, "El teléfono solo debe contener números"),
   sexo: z.enum(["Masculino", "Femenino"]),
-   fechaNac: z
+  fechaNac: z
     .object({
-      day: z.string(),
-      month: z.string(),
-      year: z.string(),
+      day: z.string({message: 'hola'}),
+      month: z.string({message: 'hola'}),
+      year: z.string({message: 'hola'}),
     })
     .transform(({ day, month, year }) => {
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00.000Z`;
+      let dayNumber = Number(day) +1 ;
+      const formattedDate = `${year}-${month.padStart(2, '0')}-${(dayNumber.toString()).padStart(2, '0')}T00:00:00.000Z`;
       return formattedDate;
     })
     .refine((date) => !isNaN(Date.parse(date)), {

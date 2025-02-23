@@ -106,7 +106,7 @@ const onSubmit = handleSubmit(async (values) => {
         <h1 class="page-title ">Obras Sociales</h1>
         <div class="pt-2" >
             <form @submit="onSubmit" class="forms">
-                <h3 class="page-subtitle" >Editar Marca</h3>
+                <h3 class="page-subtitle" >Editar Obra Social</h3>
                 <Separator class="my-6" />
                 
                 <FormField v-slot="{ componentField }" name="nombre">
