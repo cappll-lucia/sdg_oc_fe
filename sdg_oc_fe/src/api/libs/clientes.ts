@@ -42,9 +42,7 @@ const edit = async (_id: number, _cliente: EditClienteValidator, _obrasSociales:
             ..._cliente,
             clienteObrasSociales: _obrasSociales
         }
-        console.log(updatedCliente)
-        return
-        const resp = await http.patch(`/marca/${_id}`, _cliente);
+        const resp = await http.patch(`/cliente/${_id}`, updatedCliente);
         return resp.data.data as Cliente;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -56,7 +54,7 @@ const remove = async(_id: number ) =>{
 		await http.delete(`/cliente/${_id}`);
 	} catch (error: any) {
         console.log(error)
-        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la marca')
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al eliminar el cliente')
 	}
 }
 

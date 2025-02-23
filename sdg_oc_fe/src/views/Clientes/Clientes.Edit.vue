@@ -34,7 +34,7 @@ import { Cliente, editClienteValidator } from '@/api/entities/clientes';
 import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
 import { clientesApi } from '@/api/libs/clientes';
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onBeforeMount } from 'vue'
 import { Localidad } from '@/api/entities/localidad';
 import { localidadesApi } from '@/api/libs/localidades';
 import { ObraSocial } from '@/api/entities/obraSocial';
@@ -70,15 +70,16 @@ const {handleSubmit, setValues } = useForm({
     initialValues: { }
 })
 
-onMounted(async ()=>{
+onMounted(async()=>{
     currentCliente.value = await clientesApi.getOne(Number(route.params.id))
+    console.log(currentCliente.value, 'mmmm')
     localidades.value = await localidadesApi.getAll();
     obrasSociales.value = await obrasSocialesApi.getAll();
+        if(currentCliente.value){
     const date = new Date(currentCliente.value.fechaNac);
     fechaNac.value.day = date.getUTCDate().toString();
     fechaNac.value.month = (date.getUTCMonth() +1 ).toString();
     fechaNac.value.year = date.getUTCFullYear().toString();
-    if(currentCliente.value){
         setValues({
             dni: currentCliente.value.dni,
             nombre: currentCliente.value.nombre ,
@@ -88,19 +89,20 @@ onMounted(async ()=>{
             sexo: "Masculino"===currentCliente.value.sexo || "Femenino"===currentCliente.value.sexo ? currentCliente.value.sexo : undefined , 
             observaciones: currentCliente.value.observaciones || '' ,
             domicilio: currentCliente.value.domicilio , 
-            localidad: currentCliente.value.localidad,
+            localidad:{id: currentCliente.value.localidad.id},
             fechaNac: {  
                 day: fechaNac.value.day,
                 month: fechaNac.value.month,
                 year: fechaNac.value.year
-            }
+            },
+            // "localidad.id": currentCliente.value.localidad.id
         });
-    } 
-    currentCliente.value.fechaNac = new Date(currentCliente.value.fechaNac)
-    currentCliente.value.clienteObrasSociales.forEach((os)=>{
-        selectedObrasSociales.value.push({obraSocial: {id: os.id}, numeroSocio: os.numeroSocio})
-    })
-});
+        currentCliente.value.fechaNac = new Date(currentCliente.value.fechaNac)
+        currentCliente.value.clienteObrasSociales.forEach((cliOs)=>{
+            selectedObrasSociales.value.push({obraSocial: {id: cliOs.obraSocial.id}, numeroSocio: cliOs.numeroSocio})
+        })
+    }
+})
 
 const addObraSocial = ()=>{
     selectedObrasSociales.value.push({obraSocial:{id: null }, numeroSocio: ''});
@@ -118,11 +120,14 @@ const onSubmit = handleSubmit(async (values) => {
      if (osCliente.find(os=> os.numeroSocio=='') )return;
      loading.value = true;
   try {
-    await clientesApi.create(values, osCliente);
-    loading.value = false;
-    showSuccess.value = true;
-    router.replace('/clientes');
-    toast({ title: 'Cliente registrado con éxito' });
+    if(currentCliente.value){
+        console.log(osCliente)
+        await clientesApi.edit(currentCliente.value?.id, values, osCliente);
+        loading.value = false;
+        showSuccess.value = true;
+        router.replace('/clientes');
+        toast({ title: 'Cliente actualizado con éxito' });
+    }
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;
@@ -140,9 +145,21 @@ const validateAndSubmit = async()=>{
 const filteredObrasSociales = (index: number) => {
   const selectedIds = selectedObrasSociales.value
     .map((os, i) => (i !== index ? os.obraSocial.id : null))
-    .filter(id => id );
-  return obrasSociales.value.filter(os => !selectedIds.includes(os.id));
+    .filter(id => id);
+  return obrasSociales.value.filter(os => {
+    if (selectedObrasSociales.value[index]?.obraSocial.id === os.id) {
+      return true;
+    }
+    return !selectedIds.includes(os.id);
+  });
 };
+
+const getObraSocialName = (id:number)=> {
+    console.log(id)   
+    return obrasSociales.value.find(os=> os.id ==id)?.nombre || 'Selec'
+}
+
+
 
 </script>
 
@@ -175,14 +192,14 @@ const filteredObrasSociales = (index: number) => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Editar</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2 mb-4 " >
             <form @submit.prevent="validateAndSubmit" class="forms-wide flex flex-col justify-between items-start bg-red-500 px-[5rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center" >Registrar Nuevo Cliente</h3>
+                    <h3 class="page-subtitle text-center" >Actualizar Cliente</h3>
                     <Separator class="my-6 w-full" />
                 </div>
                 <div class="flex flex-col w-full  justify-evenly items-start">
@@ -287,25 +304,28 @@ const filteredObrasSociales = (index: number) => {
                             </FormItem>
                         </FormField>
 
-                        <FormField v-slot="{ field, errorMessage }" name="localidad.id">
+                        <FormField v-slot="{ field, errorMessage }" name="localidad">
                             <FormItem class="h-[5rem] mt-8">
                                 <div class="form-item-wide">
-                                <FormLabel class="form-label">Localidad</FormLabel>
-                                <Select v-bind="field.value" @update:model-value="(value) => field.onChange(Number(value))"  >
+                                    <FormLabel class="form-label">Localidad</FormLabel>
+                                    <Select
+                                    :model-value="field.value?.id?.toString()"
+                                    @update:model-value="(value) => field.onChange({ id: Number(value) })"
+                                    >
                                         <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue  placeholder="Seleccionar" />
+                                            <SelectValue class="text-black" :placeholder="currentCliente?.localidad.localidad" />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectItem 
-                                                    v-for="loc in localidades" 
-                                                    :key="loc.id" 
-                                                    :value="loc.id.toString()"
-                                                >
-                                                    {{ `${loc.localidad}, ${loc.provincia.provincia}` }}
-                                                </SelectItem>
+                                            <SelectItem 
+                                                v-for="loc in localidades" 
+                                                :key="loc.id" 
+                                                :value="loc.id.toString()"
+                                            >
+                                                {{ `${loc.localidad}, ${loc.provincia.provincia}` }}
+                                            </SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -363,6 +383,8 @@ const filteredObrasSociales = (index: number) => {
 
                     </div>
                     <Separator class="mt-12 m-b-4 w-full" />
+                    
+                    
                     <div class="flex flex-row justify-start items-start  ml-[6%] ">
                         <FormField name="clienteObrasSociales" >
                             <FormItem class="min-h-[5rem] mt-8">
@@ -371,10 +393,12 @@ const filteredObrasSociales = (index: number) => {
                                     <div class="flex flex-col w-[40rem] justify-start items-start p-0 m-0">
                                         <div v-for="(_, index) in selectedObrasSociales" :key="index" class="flex flex-col mb-3 w-[50rem]">
                                             <div class="flex flex-row gap-2 items-start justify-start ">
-                                            <FormField :name="`clienteObrasSociales.${index}.obraSocial.id`" class="w-60">
+                                            <FormField :name="`clienteObrasSociales.${index}.obraSocial.id`" v-slot="{ field }" class="w-60">
                                                 <FormControl class="w-60">
+                                                    <!-- :model-value="selectedObrasSociales[index]?.obraSocial.id?.toString()"˚ -->
+
                                                     <Select
-                                                        :model-value="selectedObrasSociales[index]?.obraSocial.id?.toString()"
+                                                        :model-value="field.value?.id?.toString() "
                                                         @update:model-value="(value) => {
                                                             if (!selectedObrasSociales[index]) {
                                                                 selectedObrasSociales[index] = { obraSocial: { id: null }, numeroSocio: '' };
@@ -383,7 +407,12 @@ const filteredObrasSociales = (index: number) => {
                                                         }"
                                                     >
                                                         <SelectTrigger class="w-60">
-                                                            <SelectValue placeholder="Seleccione una obra social" />
+                                                            <SelectValue 
+                                                            :class="{
+    'text-black': (selectedObrasSociales[index]?.obraSocial.id || 0) !== 0,
+    'text-gray-500': (selectedObrasSociales[index]?.obraSocial.id || 0) === 0
+  }"
+   :placeholder="getObraSocialName(selectedObrasSociales[index]?.obraSocial.id || 0)" />
                                                         </SelectTrigger>
                                                         <SelectContent class="w-60">
                                                             <SelectGroup>
