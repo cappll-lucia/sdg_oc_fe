@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
-import { Cliente, CreateClienteValidator } from '../entities/clientes';
+import { Cliente, CreateClienteValidator, EditClienteValidator } from '../entities/clientes';
 
 const getAll = async () => {
     try {
@@ -14,6 +14,7 @@ const getAll = async () => {
 const getOne = async (_id: number) => {
     try {
         const resp = await http.get(`/cliente/${_id}`);
+        console.log(resp.data.data)
         return resp.data.data as Cliente;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -35,8 +36,14 @@ const create = async (_cliente: CreateClienteValidator, _obrasSociales: {obraSoc
     }
 };
 
-const edit = async (_id: number, _cliente: any) => {
+const edit = async (_id: number, _cliente: EditClienteValidator, _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[]) => {
     try {
+        const updatedCliente = {
+            ..._cliente,
+            clienteObrasSociales: _obrasSociales
+        }
+        console.log(updatedCliente)
+        return
         const resp = await http.patch(`/marca/${_id}`, _cliente);
         return resp.data.data as Cliente;
     } catch (error) {
@@ -57,6 +64,6 @@ export const clientesApi = {
     getAll: ()=> getAll(),
     getOne: (_id: number)=> getOne(_id),
     create: (_cliente: CreateClienteValidator, _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> create(_cliente, _obrasSociales),
-    edit: (_id: number, _cliente: any)=> edit(_id, _cliente),
+    edit: (_id: number, _cliente: EditClienteValidator,  _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),
     remove: (_id: number)=> remove(_id),
 }
