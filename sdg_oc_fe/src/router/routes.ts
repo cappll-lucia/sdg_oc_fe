@@ -114,7 +114,7 @@ export const routerRoutes = [
         {
             path: '/productos',
             name: 'productos',
-            component: () => import('../views/Productos.vue'),
+            component: () => import('../views/Productos/Productos.vue'),
             meta: {
 			    auth: true,
 		    },
@@ -130,7 +130,15 @@ export const routerRoutes = [
         {
             path: '/audiometrias',
             name: 'recetas_audiometria',
-            component: () => import('../views/Audiometrias.vue'),
+            component: () => import('../views/Audiometrias/Audiometrias.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/audiometrias/create',
+            name: 'create-audiometrias',
+            component: () => import('../views/Audiometrias/Audiometrias.Create.vue'),
             meta: {
 			    auth: true,
 		    },
@@ -138,7 +146,7 @@ export const routerRoutes = [
         {
             path: '/audiometrias/:idCliente',
             name: 'audiometria',
-            component: () => import('../views/AudiometriasCliente.vue'),
+            component: () => import('../views/Audiometrias/AudiometriasCliente.vue'),
             meta: {
 			    auth: true,
 		    },

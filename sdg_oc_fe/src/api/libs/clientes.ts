@@ -21,6 +21,17 @@ const getOne = async (_id: number) => {
     }
 };
 
+// TODO update endpoint
+const getPaginated = async (_txt:string) => {
+    try {
+        const clientes = await getAll();
+        return clientes.filter(c=> c.nombre.includes(_txt)) as Cliente[];
+    } catch (error) {
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+};
+
+
 const create = async (_cliente: CreateClienteValidator, _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[]) => {
     try {
         const newCliente = {
@@ -60,6 +71,7 @@ const remove = async(_id: number ) =>{
 
 export const clientesApi = {
     getAll: ()=> getAll(),
+    getPaginated : (txt: string)=> getPaginated(txt),
     getOne: (_id: number)=> getOne(_id),
     create: (_cliente: CreateClienteValidator, _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> create(_cliente, _obrasSociales),
     edit: (_id: number, _cliente: EditClienteValidator,  _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),

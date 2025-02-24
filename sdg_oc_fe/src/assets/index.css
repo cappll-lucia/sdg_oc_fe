@@ -84,6 +84,7 @@
 }
 
 
+
 .page nav{
   margin-bottom: 1rem;
 }
@@ -187,3 +188,6 @@
   margin: 0.8rem 2.1rem 0.8rem 0rem;
 }
 
+.search-area-item{
+  border-bottom: #F5F5F5 1px solid;
+}
