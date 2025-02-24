@@ -144,6 +144,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/audiometrias/edit/:id',
+            name: 'edit-audiometrias',
+            component: () => import('../views/Audiometrias/Audiometrias.Edit.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/audiometrias/:idCliente',
             name: 'audiometria',
             component: () => import('../views/Audiometrias/AudiometriasCliente.vue'),

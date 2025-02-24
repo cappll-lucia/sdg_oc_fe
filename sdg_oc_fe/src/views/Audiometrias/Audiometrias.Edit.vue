@@ -33,7 +33,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
 import { SlashIcon, MagnifyingGlassIcon } from '@radix-icons/vue';
 import { toTypedSchema } from '@vee-validate/zod'
-import { createAudiometriaValidator } from '@/api/entities/audiometrias';
+import { editAudiometriaValidator, Audiometria } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
 import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
@@ -41,19 +41,24 @@ import router from '@/router/index';
 import {onMounted, ref } from 'vue'
 import { Cliente } from '@/api/entities/clientes';
 import { clientesApi } from '@/api/libs/clientes';
+import { useRoute } from 'vue-router';
+import AlertConfirm from '@/components/AlertConfirm.vue';
+
+const currentAudiometria = ref<Audiometria>();
+const route = useRoute();
+
 
 const showSuccess = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
-const errorPDF =ref<string>('');
 const loading = ref<boolean>(false);
 const submitted = ref<boolean>(false);
-const searchClienteOpen = ref<boolean>(false);
-const searchClientesTxt = ref<string>('');
-const selectedCliente = ref<Cliente | null>(null);
-const foundClientes = ref<Cliente[]>([]);
-const audiometriaFile = ref<any>(null);
-const audiometriaURL = ref(); //TODO REMOVE
+const audiometriaURL = ref();
+const audiometriaFile = ref();
+const errorPDF =ref<string>('');
+const targetUpdate = ref();
+const showNewPDFAlert = ref(false); 
+const newPDF = ref(false);
 
 const fechaInforme = ref({
   day: '',
@@ -61,47 +66,56 @@ const fechaInforme = ref({
   year: ''
 })
 
-
-const formSchema = toTypedSchema(createAudiometriaValidator)
-const {handleSubmit, setFieldValue} = useForm({
-    validationSchema: formSchema
+const formSchema = toTypedSchema(editAudiometriaValidator)
+const {handleSubmit, setValues } = useForm({ 
+   validationSchema: formSchema,
+    initialValues: { }
 })
+
 
 onMounted(async()=>{
-    // TODO pagination
-    foundClientes.value = await clientesApi.getAll();
+    currentAudiometria.value = await audiometriasApi.getOne(Number(route.params.id));
+    if(currentAudiometria.value){
+         const date = new Date(currentAudiometria.value.fechaInforme);
+        fechaInforme.value.day = date.getUTCDate().toString();
+        fechaInforme.value.month = (date.getUTCMonth() +1 ).toString();
+        fechaInforme.value.year = date.getUTCFullYear().toString();
+        setValues({
+            fechaInforme:{
+                day: fechaInforme.value.day,
+                month: fechaInforme.value.month,
+                year: fechaInforme.value.year, 
+            }
+        });
+        currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme);
+        audiometriaURL.value = currentAudiometria.value.linkPDF;
+    }
 })
-
-const selectCliente = (cliente: Cliente) => {
-    selectedCliente.value = cliente
-    setFieldValue("cliente.id", selectedCliente.value.id);
-    searchClienteOpen.value = false;
-};
 
 const onSubmit = handleSubmit(async (values) => {
     loading.value=true;
     errorPDF.value = '';
-    console.log(audiometriaFile.value)
-    if (!audiometriaFile.value) {
-        errorPDF.value = 'Suba el archivo del informe';
-        audiometriaFile.value = null; 
-        return;
-    }
-    if (audiometriaFile.value?.type !== 'application/pdf') {
+
+    if (audiometriaFile.value && audiometriaFile.value?.type !== 'application/pdf') {
         errorPDF.value = 'Archivo inválido, debe ser un PDF';
         audiometriaFile.value = null;
         return;
     }
     try {
-        // TODO Send files
-        const fromData = new FormData()
-        await audiometriasApi.create(values, fromData )
-        loading.value=false;
-        showSuccess.value = true;
-        router.replace('/audiometrias')
-        toast({
-            title: 'Audiometría registrada con éxito',
-        })
+        if(currentAudiometria.value){
+            if(newPDF){
+                const fromData = new FormData()
+                await audiometriasApi.edit( currentAudiometria.value?.id ,values, fromData )
+            }else{
+                await audiometriasApi.edit( currentAudiometria.value?.id ,values )
+            }
+            loading.value=false;
+            showSuccess.value = true;
+            router.replace('/audiometrias')
+            toast({
+                title: 'Audiometría actualizada con éxito',
+            })
+        }
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -109,19 +123,22 @@ const onSubmit = handleSubmit(async (values) => {
     };
 })
 
-const validateAndSubmit = async () => {
-    submitted.value = true;
-    await onSubmit();
-};
 
-const searchClientes = async()=>{
-    foundClientes.value = await clientesApi.getPaginated(searchClientesTxt.value)
+
+const validateAndSubmit = async()=>{
+    submitted.value =true;
+    await onSubmit();
 }
 
-const handleFileUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-        const file = target.files[0];
+const confirmFileUpload = (event: Event) => {
+    targetUpdate.value = event.target as HTMLInputElement;
+    showNewPDFAlert.value=true;
+};
+
+const handleFileUpload = () => {
+    showNewPDFAlert.value=false;
+    if (targetUpdate.value.files && targetUpdate.value.files.length > 0) {
+        const file = targetUpdate.value.files[0];
         if (file?.type !== 'application/pdf') {
             errorPDF.value = 'Archivo inválido, debe ser un PDF';
             audiometriaFile.value = null;
@@ -129,11 +146,9 @@ const handleFileUpload = (event: Event) => {
             errorPDF.value = '';
             audiometriaFile.value = file;
             audiometriaURL.value = URL.createObjectURL(file);
-
         }
     }
 };
-
 
 
 </script>
@@ -159,70 +174,24 @@ const handleFileUpload = (event: Event) => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Editar</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2 mb-4 " >
             <form @submit.prevent="validateAndSubmit" class="forms-wide h-[45rem] flex flex-col justify-start items-start bg-red-500 px-[5rem]">
                  <div class="w-full ">
-                    <h3 class="page-subtitle text-center" >Registrar Nueva Audiometría</h3>
+                    <h3 class="page-subtitle text-center" >Actualizar Audiometría</h3>
                     <Separator class="my-6 w-full" />
                 </div>
                 <div class="flex flex-row w-[100%] h-[40rem] justify-between items-start">
                 
                  <div class="flex flex-col w-[40%] h-full">
 
-                    <FormField v-slot="{ errorMessage }" name="cliente.id">
-                        <FormItem class="h-[5rem] mt-6 w-full">
-                            <div class="flex items-center justify-between">
-                                <FormLabel class="form-label w-[7rem] text-right">Cliente</FormLabel>
-                                <div class="flex flex-row justify-end items-center">
-                                    <FormControl>
-                                        <Input type="text" 
-                                            class="w-[24rem] h-10"
-                                            readonly
-                                            :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
-                                            @click="searchClienteOpen = true"
-                                        />
-                                    </FormControl>
-                                    
-                                    <Dialog v-model:open="searchClienteOpen">
-                                        <DialogTrigger as-child>
-                                            <Button variant="default" size="icon" class="w-9 h-9 ml-4">
-                                                <MagnifyingGlassIcon />
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent class="w-[60rem] h-[40rem] max-w-[60rem] px-8">
-                                            <DialogHeader>
-                                                <DialogTitle class="text-center">Audiometría: Seleccionar Cliente</DialogTitle>
-                                            </DialogHeader>
-                                            <Separator class="my-2" />
-                                            <div class="flex flex-row justify-between px-4 h-2 mb-4">
-                                                <Input type="text" v-model="searchClientesTxt" class="mr-4" @keyup.enter="searchClientes()" />
-                                                <Button variant="default" size="icon" class="w-12 h-9" @click="searchClientes()">
-                                                    <MagnifyingGlassIcon />
-                                                </Button>
-                                            </div>
-                                            <ScrollArea class="h-[30rem] w-[51rem] pl-4 mt-4">
-                                                <div v-for="cliente in foundClientes" 
-                                                    :key="cliente.id" 
-                                                    @click="selectCliente(cliente)"
-                                                    class="cursor-pointer search-area-item hover:bg-secondary px-4 py-2 w-[49rem] flex flex-row justify-start items-center"
-                                                >
-                                                    <User :size="35" class="border-secondary rounded-full bg-secondary p-2" />
-                                                    <span class="ml-4 text-sm">
-                                                        {{ cliente.apellido }}, {{ cliente.nombre }}
-                                                    </span>
-                                                </div>
-                                            </ScrollArea>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
+                     <div class="flex items-center justify-between mb-4">
+                                <Label class="form-label w-[7rem] text-right">Cliente</Label>
+                                <Input type="text" disabled :value="`${currentAudiometria?.cliente.apellido}, ${ currentAudiometria?.cliente.nombre }`" class="w-[20rem] mr-[7rem]"/>
                             </div>
-                            <FormMessage class="ml-[9rem]" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
-                        </FormItem>
-                    </FormField>
 
 
                     <FormField v-slot="{ handleChange, errorMessage }" name="fechaInforme">
@@ -247,19 +216,18 @@ const handleFileUpload = (event: Event) => {
                     <div class="h-[5rem] mt-2 w-full">
                             <div class="flex items-center justify-between">
                                 <Label class="w-[7rem] text-right ">PDF</Label>
-                                    <Input type="file" class="w-[27rem]" accept=".pdf" @change="handleFileUpload" />
-
+                                    <Input type="file" class="w-[27rem]" accept=".pdf" @change="confirmFileUpload" />
                             </div>
                             <span class=" text-sm text-destructive ml-[9rem]" v-if="submitted && errorPDF">{{ errorPDF }}</span>
                     </div>
 
                     <FormField v-slot="{ componentField, errorMessage }" name="observaciones">
-                    <FormItem class="h-[12rem] mt-2 w-full">
+                    <FormItem class="h-[15rem] mt-2 w-full">
                         <div class="flex items-start justify-between">
                             <FormLabel class="w-[7rem] text-right ">Observaciones</FormLabel>
-                            <FormControl>
+                             <FormControl>
                                 <Textarea
-                                    class="resize-none w-[27rem] h-[12rem]"
+                                    class="resize-none w-[27rem] h-[15rem]"
                                     v-bind="componentField"
                                 />
                             </FormControl>
@@ -268,7 +236,7 @@ const handleFileUpload = (event: Event) => {
                     </FormItem>
                     </FormField>
                 </div>
-                 <div class="flex flex-col w-[50%] mr-7 h-full">
+                 <div class="flex flex-col w-[50%] h-full">
                         <div v-if="audiometriaURL" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
                             <iframe :src="audiometriaURL" class="w-full h-full border-none" frameborder="0"
                             allowfullscreen></iframe>
@@ -287,14 +255,24 @@ const handleFileUpload = (event: Event) => {
             </form>
 
 
-        </div>
+        </div>>
 
         <AlertError 
-        v-model="showError"
-        title="Error"
-        :message="errorMessage"
-        button="Aceptar"
-        :action="()=>{showError=false}"
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
+        />
+
+        <AlertConfirm
+            v-model="showNewPDFAlert"
+            title="¿Está seguo de actualizar el PDF?"
+            message="Al almacenar el nuevo PDF, se eliminará el anterior"
+            primary-btn="Aceptar"
+            :primary-action="handleFileUpload"
+            secondary-btn="Cancelar"
+            :secondary-action="()=>showNewPDFAlert=false"
         />
     
     

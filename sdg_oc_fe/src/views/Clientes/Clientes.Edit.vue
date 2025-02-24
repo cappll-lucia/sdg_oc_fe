@@ -34,7 +34,7 @@ import { Cliente, editClienteValidator } from '@/api/entities/clientes';
 import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
 import { clientesApi } from '@/api/libs/clientes';
-import { onMounted, ref, onBeforeMount } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Localidad } from '@/api/entities/localidad';
 import { localidadesApi } from '@/api/libs/localidades';
 import { ObraSocial } from '@/api/entities/obraSocial';
@@ -72,14 +72,13 @@ const {handleSubmit, setValues } = useForm({
 
 onMounted(async()=>{
     currentCliente.value = await clientesApi.getOne(Number(route.params.id))
-    console.log(currentCliente.value, 'mmmm')
     localidades.value = await localidadesApi.getAll();
     obrasSociales.value = await obrasSocialesApi.getAll();
-        if(currentCliente.value){
-    const date = new Date(currentCliente.value.fechaNac);
-    fechaNac.value.day = date.getUTCDate().toString();
-    fechaNac.value.month = (date.getUTCMonth() +1 ).toString();
-    fechaNac.value.year = date.getUTCFullYear().toString();
+    if(currentCliente.value){
+        const date = new Date(currentCliente.value.fechaNac);
+        fechaNac.value.day = date.getUTCDate().toString();
+        fechaNac.value.month = (date.getUTCMonth() +1 ).toString();
+        fechaNac.value.year = date.getUTCFullYear().toString();
         setValues({
             dni: currentCliente.value.dni,
             nombre: currentCliente.value.nombre ,
@@ -95,7 +94,6 @@ onMounted(async()=>{
                 month: fechaNac.value.month,
                 year: fechaNac.value.year
             },
-            // "localidad.id": currentCliente.value.localidad.id
         });
         currentCliente.value.fechaNac = new Date(currentCliente.value.fechaNac)
         currentCliente.value.clienteObrasSociales.forEach((cliOs)=>{
@@ -121,7 +119,6 @@ const onSubmit = handleSubmit(async (values) => {
      loading.value = true;
   try {
     if(currentCliente.value){
-        console.log(osCliente)
         await clientesApi.edit(currentCliente.value?.id, values, osCliente);
         loading.value = false;
         showSuccess.value = true;
@@ -155,7 +152,6 @@ const filteredObrasSociales = (index: number) => {
 };
 
 const getObraSocialName = (id:number)=> {
-    console.log(id)   
     return obrasSociales.value.find(os=> os.id ==id)?.nombre || 'Selec'
 }
 
