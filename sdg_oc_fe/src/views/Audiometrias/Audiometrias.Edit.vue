@@ -15,23 +15,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {Textarea} from '@/components/ui/textarea';
-import {
-  User,
-} from 'lucide-vue-next'
-import {ScrollArea} from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/toast'
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
-import { SlashIcon, MagnifyingGlassIcon } from '@radix-icons/vue';
+import { SlashIcon } from '@radix-icons/vue';
 import { toTypedSchema } from '@vee-validate/zod'
 import { editAudiometriaValidator, Audiometria } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
@@ -39,8 +27,6 @@ import { useForm } from 'vee-validate';
 import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
 import {onMounted, ref } from 'vue'
-import { Cliente } from '@/api/entities/clientes';
-import { clientesApi } from '@/api/libs/clientes';
 import { useRoute } from 'vue-router';
 import AlertConfirm from '@/components/AlertConfirm.vue';
 
@@ -186,7 +172,7 @@ const handleFileUpload = () => {
                 </div>
                 <div class="flex flex-row w-[100%] h-[40rem] justify-between items-start">
                 
-                 <div class="flex flex-col w-[40%] h-full">
+                 <div class="flex flex-col w-[45%] h-full">
 
                      <div class="flex items-center justify-between mb-4">
                                 <Label class="form-label w-[7rem] text-right">Cliente</Label>

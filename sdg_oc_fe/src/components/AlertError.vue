@@ -2,9 +2,6 @@
 import {
   AlertDialog,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';

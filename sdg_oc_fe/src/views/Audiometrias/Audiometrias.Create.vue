@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
   FormControl,
   FormField,
@@ -15,23 +15,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import {Textarea} from '@/components/ui/textarea';
-import {
-  User,
-} from 'lucide-vue-next'
-import {ScrollArea} from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/toast'
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
-import { SlashIcon, MagnifyingGlassIcon } from '@radix-icons/vue';
+import { SlashIcon } from '@radix-icons/vue';
 import { toTypedSchema } from '@vee-validate/zod'
 import { createAudiometriaValidator } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
@@ -41,6 +30,7 @@ import router from '@/router/index';
 import {onMounted, ref } from 'vue'
 import { Cliente } from '@/api/entities/clientes';
 import { clientesApi } from '@/api/libs/clientes';
+import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 
 const showSuccess = ref<boolean>(false);
 const showError = ref<boolean>(false);
@@ -49,7 +39,6 @@ const errorPDF =ref<string>('');
 const loading = ref<boolean>(false);
 const submitted = ref<boolean>(false);
 const searchClienteOpen = ref<boolean>(false);
-const searchClientesTxt = ref<string>('');
 const selectedCliente = ref<Cliente | null>(null);
 const foundClientes = ref<Cliente[]>([]);
 const audiometriaFile = ref<any>(null);
@@ -71,12 +60,6 @@ onMounted(async()=>{
     // TODO pagination
     foundClientes.value = await clientesApi.getAll();
 })
-
-const selectCliente = (cliente: Cliente) => {
-    selectedCliente.value = cliente
-    setFieldValue("cliente.id", selectedCliente.value.id);
-    searchClienteOpen.value = false;
-};
 
 const onSubmit = handleSubmit(async (values) => {
     loading.value=true;
@@ -114,9 +97,6 @@ const validateAndSubmit = async () => {
     await onSubmit();
 };
 
-const searchClientes = async()=>{
-    foundClientes.value = await clientesApi.getPaginated(searchClientesTxt.value)
-}
 
 const handleFileUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -133,6 +113,12 @@ const handleFileUpload = (event: Event) => {
         }
     }
 };
+
+const handleSelectCliente = (cliente:Cliente)=>{
+    selectedCliente.value=cliente;
+    setFieldValue("cliente.id", selectedCliente.value.id);
+    searchClienteOpen.value=false;
+}
 
 
 
@@ -171,7 +157,7 @@ const handleFileUpload = (event: Event) => {
                 </div>
                 <div class="flex flex-row w-[100%] h-[40rem] justify-between items-start">
                 
-                 <div class="flex flex-col w-[40%] h-full">
+                 <div class="flex flex-col w-[45%] h-full ">
 
                     <FormField v-slot="{ errorMessage }" name="cliente.id">
                         <FormItem class="h-[5rem] mt-6 w-full">
@@ -186,38 +172,11 @@ const handleFileUpload = (event: Event) => {
                                             @click="searchClienteOpen = true"
                                         />
                                     </FormControl>
-                                    
-                                    <Dialog v-model:open="searchClienteOpen">
-                                        <DialogTrigger as-child>
-                                            <Button variant="default" size="icon" class="w-9 h-9 ml-4">
-                                                <MagnifyingGlassIcon />
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent class="w-[60rem] h-[40rem] max-w-[60rem] px-8">
-                                            <DialogHeader>
-                                                <DialogTitle class="text-center">Audiometría: Seleccionar Cliente</DialogTitle>
-                                            </DialogHeader>
-                                            <Separator class="my-2" />
-                                            <div class="flex flex-row justify-between px-4 h-2 mb-4">
-                                                <Input type="text" v-model="searchClientesTxt" class="mr-4" @keyup.enter="searchClientes()" />
-                                                <Button variant="default" size="icon" class="w-12 h-9" @click="searchClientes()">
-                                                    <MagnifyingGlassIcon />
-                                                </Button>
-                                            </div>
-                                            <ScrollArea class="h-[30rem] w-[51rem] pl-4 mt-4">
-                                                <div v-for="cliente in foundClientes" 
-                                                    :key="cliente.id" 
-                                                    @click="selectCliente(cliente)"
-                                                    class="cursor-pointer search-area-item hover:bg-secondary px-4 py-2 w-[49rem] flex flex-row justify-start items-center"
-                                                >
-                                                    <User :size="35" class="border-secondary rounded-full bg-secondary p-2" />
-                                                    <span class="ml-4 text-sm">
-                                                        {{ cliente.apellido }}, {{ cliente.nombre }}
-                                                    </span>
-                                                </div>
-                                            </ScrollArea>
-                                        </DialogContent>
-                                    </Dialog>
+                                    <SelectClienteDialog
+                                        v-model="searchClienteOpen"
+                                        title="Nueva Audiometría: Seleccionar Cliente"
+                                        @select-cliente="handleSelectCliente"
+                                    />
                                 </div>
                             </div>
                             <FormMessage class="ml-[9rem]" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
