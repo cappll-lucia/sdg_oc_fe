@@ -1,30 +1,3 @@
-<!-- <script lang="ts" setup>
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { SlashIcon } from '@radix-icons/vue';
-import { audiometriasApi } from '@/api/libs/audiometrias';
-import DataTable from '@/components/tables/audiometrias/data-table.vue';
-import {columns} from '@/components/tables/audiometrias/columns'
-import { onMounted, ref } from 'vue';
-import type { Audiometria } from '@/api/entities/audiometrias';
-
-const data = ref<Audiometria[]>([]);
-
-const loadData = async () => {
-    data.value = await audiometriasApi.getAll();
-};
-
-onMounted(async () => {
-    await loadData();
-});
-
-</script> -->
 <script lang="ts" setup>
 import {
     Breadcrumb,

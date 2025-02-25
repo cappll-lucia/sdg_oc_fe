@@ -1,7 +1,7 @@
 import { h } from "vue";
 import { ColumnDef } from "@tanstack/vue-table";
 import DropdownAction from './data-table-dropdown.vue';
-import { Producto } from "@/api/entities/entities";
+import { Producto } from "@/api/entities/producto";
 
 export const columns: ColumnDef<Producto>[] = [
     {
@@ -10,13 +10,13 @@ export const columns: ColumnDef<Producto>[] = [
         cell: info=> info.getValue()
     },
     {
-        accessorKey: 'nombre',
-        header: () => h('div', 'Nombre'),
+        accessorKey: 'descripcion',
+        header: () => h('div', 'Descripción'),
         cell: info=> info.getValue(),
     },
     {
         accessorKey: 'categoria',
-        header: () => h('div', 'Categoria'),
+        header: () => h('div', 'Categoría'),
         cell: info=> info.getValue(),
     },
     {

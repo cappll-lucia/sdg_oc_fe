@@ -164,12 +164,12 @@ export interface ClienteConAudiometria extends BaseEntity{
 }
 
 
-export interface Producto extends BaseEntity {
-    nombre: string;
-    descripcion: string;
-    categoria: string; 
-    precio: number;
-    stock: number;
-    marca: Marca;
-    proveedor: Proveedor; 
-}
+// export interface Producto extends BaseEntity {
+//     nombre: string;
+//     descripcion: string;
+//     categoria: string; 
+//     precio: number;
+//     stock: number;
+//     marca: Marca;
+//     proveedor: Proveedor; 
+// }

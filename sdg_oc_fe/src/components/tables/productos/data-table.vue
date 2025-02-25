@@ -11,33 +11,18 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
     FlexRender,
     getCoreRowModel,
     useVueTable,
     getFilteredRowModel,
 } from '@tanstack/vue-table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { valueUpdater } from '@/lib/utils.recetas';
-import { marcas } from '@/api/data/marcas';
-import { proveedores } from '@/api/data/proveedores';
-import { CategoriaProducto } from '@/api/data/productos';
 
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];
-    data: TData[]
+    data: TData[];
 }>();
-
 
 
 const columnFilters = ref <ColumnFiltersState> ([]);
@@ -56,45 +41,6 @@ const table = useVueTable({
 </script>
 
 <template>
-    <div class="flex flex-row justify-between items-center py-4">
-        <div class="search flex w-[75%]  flex-row justify-between">
-            <Input class="max-w-sm " placeholder="Buscar Producto"
-                :model-value="table.getColumn('nombre')?.getFilterValue() as string"
-                @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)"
-            />
-            <Select >
-                <SelectTrigger class="w-[200px]">
-                    <SelectValue placeholder="Filtrar por Proveedor" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectItem v-for="proveedor in proveedores" :value="proveedor.id.toString()">{{ proveedor.razonSocial }}</SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-            <Select >
-                <SelectTrigger class="w-[200px]">
-                    <SelectValue placeholder="Filtrar por Marca" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectItem v-for="marca in marcas" :value="marca.id.toString()">{{ marca.nombre }}</SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-            <Select >
-                <SelectTrigger class="w-[200px]">
-                    <SelectValue placeholder="Filtrar por Categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectItem v-for="categoria in CategoriaProducto" :value="categoria">{{ categoria }}</SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-        </div>    
-        <Button class="text-xs">Registrar Nuevo Producto</Button>
-    </div>
     <div class="border rounded-md">
         <Table>
             <TableHeader>
@@ -117,7 +63,7 @@ const table = useVueTable({
                 <template v-else>
                     <TableRow>
                         <TableCell :colspan="columns.length" class="h-24 text-center">
-                            Producto no encontrado
+                            Ningún producto coincide con los criterios de búsqueda
                         </TableCell>
                     </TableRow>
                 </template>
