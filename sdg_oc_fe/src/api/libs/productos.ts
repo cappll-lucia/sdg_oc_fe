@@ -3,6 +3,7 @@ import {http} from '../http';
 import { Producto } from '../entities/producto';
 
 interface ProductoFilters {
+    id?: string | null;
     proveedorId?: string | null;
     marcaId?: string | null;
     categoria?: string | null;

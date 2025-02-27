@@ -167,4 +167,12 @@ export const routerRoutes = [
 			    auth: true,
 		    },
         },
+        {
+            path: '/ventas/new',
+            name:'new-venta',
+            component: ()=> import('../views/Ventas/Ventas.New.vue'),
+            meta: {
+                auth: true
+            }
+        }
     ]

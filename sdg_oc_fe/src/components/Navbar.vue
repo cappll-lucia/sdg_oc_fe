@@ -18,19 +18,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
+import router from '@/router';
 
-const ventasItems: { title: string, href: string, description: string; }[] = [
+const ventasItems: { title: string, href: string, description?: string; }[] = [
     {
         title: 'Nueva Venta',
-        href: '/docs/components/alert-dialog',
-        description:
-            'A modal dialog that interrupts the user with important content and expects a response.',
+        href: '/ventas/new',
     },
     {
         title: 'Historial de Ventas',
         href: '/docs/components/hover-card',
         description:
-            'For sighted users to preview content available behind a link.',
+            'A modal dialog that interrupts the user with important content and expects a response.',
     },
     {
         title: 'Facturación Electrónica',
@@ -74,7 +73,7 @@ const parametrosItems: { title: string, href: string}[] = [
                                 <a :href="item.href"
                                     class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                                     <div class="text-sm font-medium leading-none">{{ item.title }}</div>
-                                    <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                    <p v-if="item.description" class="line-clamp-2 text-sm leading-snug text-muted-foreground">
                                         {{ item.description }}
                                     </p>
                                 </a>
@@ -120,7 +119,7 @@ const parametrosItems: { title: string, href: string}[] = [
             </NavigationMenuItem>
         </NavigationMenuList>
         <div class="px-2 flex justify-between w-[13rem] items-center ">
-            <Button class="text-xs">Nueva Venta</Button>
+            <Button class="text-xs" @click="router.replace('/ventas/new')" >Nueva Venta</Button>
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Avatar>

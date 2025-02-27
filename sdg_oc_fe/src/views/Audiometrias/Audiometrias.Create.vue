@@ -150,7 +150,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2 mb-4 " >
-            <form @submit.prevent="validateAndSubmit" class="forms-wide h-[45rem] flex flex-col justify-start items-start bg-red-500 px-[5rem]">
+            <form @submit.prevent="validateAndSubmit" class="forms-wide h-[45rem] flex flex-col justify-start items-start  px-[5rem]">
                  <div class="w-full ">
                     <h3 class="page-subtitle text-center" >Registrar Nueva Audiometría</h3>
                     <Separator class="my-6 w-full" />
