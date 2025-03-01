@@ -7,14 +7,13 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { SlashIcon, PlusIcon, Cross2Icon } from '@radix-icons/vue';
-import { computed, onMounted, ref } from 'vue';
+import { SlashIcon, PlusIcon, Cross2Icon, ArrowRightIcon, MagicWandIcon } from '@radix-icons/vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -28,23 +27,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Cliente } from '@/api/entities/clientes';
-import { Venta, createVentaValidator } from '@/api/entities/venta';
-import { LineaVenta } from '@/api/entities/LineaVenta';
+import { createVentaValidator } from '@/api/entities/venta';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 import SelectProductoDialog from '@/components/SelectProductoDialog.vue';
-import Separator from '@/components/ui/separator/Separator.vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { Producto } from '@/api/entities/producto';
 import { toast } from '@/components/ui/toast'
 import Label from '@/components/ui/label/Label.vue';
+import { TipoMedioDePagoEnum, RedDePago } from '@/api/entities/mediosDePago';
+import { useForm } from 'vee-validate';
 
 
 const selectedCliente = ref<Cliente>();
 const searchClienteOpen =ref<boolean>(false);
 const searchProductoOpen =ref<boolean>(false);
+const showMedioPago = ref<boolean>(false);
 const submitted = ref<boolean>(false);
 const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number|undefined}[] >([]);
-
+const mediosDePago = ref<{importe: number, tipoMedioPago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
+const porcDto = ref<number>(0);
 
 const agregarLineaVenta = () => {
     lineasDeVenta.value.push({
@@ -54,15 +55,48 @@ const agregarLineaVenta = () => {
     });
 };
 
+const agregarMedioPago=()=>{
+    mediosDePago.value.push({
+        importe: 0,
+        tipoMedioPago: undefined,
+        redDePago: undefined,
+        entidadBancaria: undefined
+    })
+}
+
 const eliminarLineaVenta = (index: number) => {
     lineasDeVenta.value.splice(index, 1);
 };
 
+const eliminarMedioPago = (index: number) => {
+    mediosDePago.value.splice(index, 1);
+};
 
-// const formSchema = toTypedSchema(createVentaValidator);
-// const {handleSubmit, setFieldValue} = useForm({
-//     validationSchema: formSchema
-// })
+const agregarPagoDefault = ()=>{
+    mediosDePago.value.push({
+        importe: totalVentaNeto.value,
+        tipoMedioPago: TipoMedioDePagoEnum.EFECTIVO,
+        redDePago: undefined,
+        entidadBancaria: undefined
+    })
+}
+
+
+
+
+const formSchema = toTypedSchema(createVentaValidator);
+const {handleSubmit, setFieldValue} = useForm({
+    validationSchema: formSchema
+})
+
+const onSubmit = async()=>{
+
+}
+
+const validateAndSubmit = ()=>{
+    
+}
+
 
 onMounted(async () => {
     agregarLineaVenta();
@@ -71,7 +105,7 @@ onMounted(async () => {
 
 const handleSelectCliente = (cliente:Cliente)=>{
     selectedCliente.value=cliente;
-   // setFieldValue("cliente.id", selectedCliente.value.id);
+    setFieldValue("cliente.id", selectedCliente.value.id);
     searchClienteOpen.value=false;
 }
 
@@ -107,11 +141,39 @@ const isLastLineaEmpty = computed(()=>{
         : false;
 })
 
-const totalVenta = computed(()=>{
+const totalVentaBruto = computed(()=>{
     return lineasDeVenta.value.reduce((total, linea) => {
         return total + (linea.precioIndividual ? linea.precioIndividual * linea.cantidad : 0);
     }, 0);
 })
+
+const montoDto = computed(()=>{
+    return totalVentaBruto.value * porcDto.value / 100
+})
+
+const totalVentaNeto = computed(()=>{
+    return totalVentaBruto.value - montoDto.value
+})
+
+const importeIngresado = computed<number>(() => {
+    return mediosDePago.value.reduce((total, medioPago) => {
+        return total + (medioPago.importe || 0);
+    }, 0);
+});
+
+const autocompleteMedioPagoImporte=(index: number)=>{
+    if(mediosDePago.value[index]){    
+        mediosDePago.value[index].importe = totalVentaNeto.value - importeIngresado.value
+    }else{
+        console.log('as')
+    }
+    
+}
+
+watch(lineasDeVenta.value, () => {
+    console.log("Cambio detectado en lineasDeVenta");
+}, { deep: true });
+
 
 </script>
 
@@ -141,7 +203,7 @@ const totalVenta = computed(()=>{
         <div class="pt-2">
             <div class="flex flex-row justify-between items-center py-4 ">
                 <div class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start">
-                    <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center">
+                    <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8">
                         <FormField v-slot="{ errorMessage }" name="cliente.id">
                             <FormItem class="h-[3rem] w-full sm:w-auto flex items-center justify-start">
                                 <FormLabel class="form-label w-[5rem] h-[1.2rem] text-lg">Cliente</FormLabel>
@@ -168,14 +230,13 @@ const totalVenta = computed(()=>{
                         </div>
                     </div>
 
-                    <Separator class="my-6" />
 
-                    <div class="flex flex-col w-full justify-start items-start">
+                    <div class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
                         <h3 class="page-subtitle">Detalle</h3>
 
                         <div class="linea-venta-header bg-secondary mt-4 rounded-lg">
                             <span>ID</span>
-                            <span class="text-left ml-6">DESCRIPCIÓN</span>
+                            <span class="text-left">DESCRIPCIÓN</span>
                             <span>IMPORTE UNITARIO</span>
                             <span>CANTIDAD</span>
                             <span>IMPORTE TOTAL</span>
@@ -185,13 +246,13 @@ const totalVenta = computed(()=>{
                         <div v-for="(linea, index) in lineasDeVenta" :key="index" class="linea-venta-item">
                             <Input
                                 @click="searchProductoOpen = true" 
-                                v-model="linea.producto.id" 
+                                :model-value="linea.producto.id" 
                                 readonly class="rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input" 
                                 type="text" 
                             />
                             <Input
                                 @click="searchProductoOpen = true" 
-                                v-model="linea.producto.descripcion" 
+                                :model-value="linea.producto.descripcion" 
                                 readonly class="rounded-lg cursor-default focus:outline-none focus:border-none text-left descripcion-input" 
                                 type="text"
                             />
@@ -200,7 +261,12 @@ const totalVenta = computed(()=>{
                                 readonly class="rounded-lg cursor-default  focus:outline-none focus:border-none  text-center" 
                             />
                             <Input
-                                v-model="linea.cantidad"
+                                :model-value="linea.cantidad" 
+                                @update:model-value="(value)=>{
+                                    if(lineasDeVenta[index]){
+                                        lineasDeVenta[index].cantidad=Number(value)
+                                    }
+                                }"
                                 class="rounded-lg text-center focus:outline-none focus:border-none " 
                                 type="number"  min="1" 
                             />
@@ -219,20 +285,137 @@ const totalVenta = computed(()=>{
                         </div>
 
                         <Button variant="outline" class="mt-4" :disabled="isLastLineaEmpty"  @click="agregarLineaVenta">Agregar <PlusIcon /></Button>
+
                         
-                        <div class="w-full flex justify-end mt-4">
-                            <Label class="page-subtitle w-[10rem]">Importe Final: </Label>
-                            <Label class="page-subtitle w-[20rem]">$ {{ totalVenta.toFixed(2) }}</Label>
+                        <div class="w-full flex flex-row justify-start mt-10">
+                            <div class="w-[50%] flex flex-col justify-start  items-start">
+                                <h3 class="page-subtitle">Aplicar Descuento</h3>
+                                <div class="flex flex-row items-center">
+                                    <Label class="w-[5.5rem]">Porcentaje: </Label>
+                                    <Input 
+                                    class="w-14 mr-2 text-center" 
+                                        :model-value="porcDto" 
+                                        @update:model-value="(value) => {
+                                            porcDto = Number(value) || 0;
+                                        }"
+                                    />
+                                    <Label>%</Label>
+                                </div>
+                            </div>
+                            <div v-if="!porcDto" class="w-full flex justify-end mt-4">
+                                <Label class="page-subtitle w-[10rem]">Importe Final: </Label>
+                                <Label class="page-subtitle w-[11rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
+                            </div>
+                            <div v-if="porcDto" class="w-full flex flex-col">
+                                <div class=" flex  justify-end mt-4">
+                                    <Label class=" w-[10rem]">Importe Total: </Label>
+                                    <Label class=" w-[11rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
+                                </div>
+                                <div class=" flex  justify-end items-center mt-4">
+                                    <Label class=" w-[10rem]">Descuento: </Label>
+                                    <Label class=" w-[11rem]">- $ {{ montoDto.toFixed(2) }}</Label>
+                                </div>
+                                <div class=" flex  justify-end mt-4">
+                                    <Label class="page-subtitle w-[10rem]">Importe Final: </Label>
+                                    <Label class="page-subtitle w-[11rem]">$ {{ totalVentaNeto.toFixed(2) }}</Label>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <div  v-if="!showMedioPago" class="w-full flex justify-end mt-4">
+                        <Button @click="()=>{showMedioPago=true; agregarPagoDefault()}">Continuar <ArrowRightIcon /></Button>
+                    </div>
+
+
+                    <div v-if="showMedioPago" class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
+                        <h3 class="page-subtitle mb-4">Medios de Pago</h3>
+                        <div v-for="(medio, index) in mediosDePago" class="medio-pago-item items-center flex flex-row w-full justify-start gap-5 mb-4">
+                            <Select 
+                                :modelValue="medio.tipoMedioPago" 
+                                @update:modelValue="(value) => {
+                                    if (mediosDePago[index]) {
+                                        mediosDePago[index].tipoMedioPago = value as TipoMedioDePagoEnum;
+                                    }
+                                }"
+                            >
+
+                                <SelectTrigger  class="w-[15rem]">
+                                <SelectValue placeholder="Medio De Pago" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem 
+                                            v-for="tipo in TipoMedioDePagoEnum" 
+                                            :key="tipo" 
+                                            :value="tipo"
+                                        >
+                                            {{ tipo }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <div class=" w-[13rem] flex flex-row justify-start items-center">
+
+                                <Label class=" ml-6 mr-2">$</Label>
+                                <Input
+                                :model-value="medio.importe" 
+                                @update:model-value="(value)=>{
+                                    if(mediosDePago[index]){
+                                        mediosDePago[index].importe=Number(value)
+                                    }
+                                }"
+                                 class=" w-[8rem] cursor-default  focus:outline-none focus:border-none " 
+                                 placeholder="Importe"
+                                 /> 
+                                 <Button size="sm" variant="ghost"  v-if=" index && mediosDePago.length>1" @click="autocompleteMedioPagoImporte(index)"  > <MagicWandIcon/> </Button>
+                                </div>
+                            <Select 
+                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO"
+                                :modelValue="medio.redDePago" 
+                                @update:modelValue="(value) => {
+                                    if (mediosDePago[index]) {
+                                        mediosDePago[index].redDePago = value as RedDePago;
+                                    }
+                                }"
+                            >
+
+                                <SelectTrigger  class="w-[15rem]">
+                                <SelectValue placeholder="Red De Pago" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem 
+                                            v-for="red in RedDePago" 
+                                            :key="red" 
+                                            :value="red"
+                                        >
+                                            {{ red }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <Input
+                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO"
+                                :model-value="medio.entidadBancaria" 
+                                 @update:modelValue="(value) => {
+                                    if (mediosDePago[index]) {
+                                        mediosDePago[index].entidadBancaria = value as RedDePago;
+                                    }
+                                }"
+                                 class=" w-[15rem] cursor-default  focus:outline-none focus:border-none " 
+                                placeholder="Entidad Bancaria"
+                            /> 
+                            <Button size="icon" variant="ghost" @click="eliminarMedioPago(index)"> <Cross2Icon /> </Button>
+
+                        </div>
+                        <Button variant="outline" class="mt-4"  @click="agregarMedioPago">Agregar Medio de Pago <PlusIcon /></Button>
 
                     </div>
 
-                    <Separator class="my-10" />
-                    <div class="flex flex-col w-full justify-start items-start">
-                        <h3 class="page-subtitle">Medios de Pago</h3>
-
+                    <div  v-if="showMedioPago" class="w-full flex justify-end mt-4">
+                        <Button @click="()=>validateAndSubmit()">Confirmar Venta <ArrowRightIcon /></Button>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -247,7 +430,7 @@ const totalVenta = computed(()=>{
 
 .linea-venta-header {
     display: grid;
-    grid-template-columns: 0.5fr 3fr 1fr 0.4fr 1fr 1fr;
+    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 0.2fr;
     gap: 0.5rem;
     font-weight: bold;
     text-align: center;
@@ -261,7 +444,7 @@ const totalVenta = computed(()=>{
 
 .linea-venta-item {
     display: grid;
-    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 1fr;
+    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 0.1fr;
     gap: 0.5rem;
     align-items: center;
     padding: 0.5rem 0;

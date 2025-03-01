@@ -242,11 +242,11 @@ const filteredObrasSociales = (index: number) => {
                                 <FormLabel class="form-label">Fecha de Nacimiento</FormLabel>
                                 <FormControl>
                                     <div class="flex gap-2 w-full">
-                                    <Input type="text" v-model="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2"
+                                    <Input type="text" :model-value="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2"
                                         @input="handleChange({ ...fechaNac, day: $event.target.value.trim() })"/>
-                                    <Input type="text" v-model="fechaNac.month" placeholder="MM" class="w-16 text-center" maxlength="2"
+                                    <Input type="text" :model-value="fechaNac.month" placeholder="MM" class="w-16 text-center" maxlength="2"
                                         @input="handleChange({ ...fechaNac, month: $event.target.value.trim() })"/>
-                                    <Input type="text" v-model="fechaNac.year" placeholder="AAAA" class="w-20 text-center" maxlength="4"
+                                    <Input type="text" :model-value="fechaNac.year" placeholder="AAAA" class="w-20 text-center" maxlength="4"
                                         @input="handleChange({ ...fechaNac, year: $event.target.value.trim() })"/>
                                     </div>
                                 </FormControl>
