@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon, PlusIcon, Cross2Icon, ArrowRightIcon, MagicWandIcon } from '@radix-icons/vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import {
   Select,
   SelectContent,
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch'
 import {
   FormControl,
   FormField,
@@ -36,29 +37,33 @@ import { toast } from '@/components/ui/toast'
 import Label from '@/components/ui/label/Label.vue';
 import { TipoMedioDePagoEnum, RedDePago } from '@/api/entities/mediosDePago';
 import { useForm } from 'vee-validate';
+import { ventasApi } from '@/api/libs/ventas';
+import router from '@/router';
 
-
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 const selectedCliente = ref<Cliente>();
 const searchClienteOpen =ref<boolean>(false);
 const searchProductoOpen =ref<boolean>(false);
 const showMedioPago = ref<boolean>(false);
 const submitted = ref<boolean>(false);
-const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number|undefined}[] >([]);
-const mediosDePago = ref<{importe: number, tipoMedioPago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
+const lineasDeVenta = ref<{producto: {id:number, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
+const mediosDePago = ref<{importe: number, tipoMedioPago: TipoMedioDePagoEnum|string, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
 const porcDto = ref<number>(0);
+const dto=ref<boolean>(false)
 
 const agregarLineaVenta = () => {
     lineasDeVenta.value.push({
-        producto: {id: undefined, descripcion:''},
+        producto: {id: 0, descripcion:''},
         cantidad: 1,
-        precioIndividual: undefined
+        precioIndividual: 0
     });
 };
 
 const agregarMedioPago=()=>{
     mediosDePago.value.push({
         importe: 0,
-        tipoMedioPago: undefined,
+        tipoMedioPago: '',
         redDePago: undefined,
         entidadBancaria: undefined
     })
@@ -85,16 +90,47 @@ const agregarPagoDefault = ()=>{
 
 
 const formSchema = toTypedSchema(createVentaValidator);
-const {handleSubmit, setFieldValue} = useForm({
-    validationSchema: formSchema
+const {handleSubmit, setFieldValue, errors} = useForm({
+    validationSchema: formSchema,
+        initialValues: {
+        fecha: new Date().toISOString(),
+        descuentoPorcentaje: 0,
+        cliente: { id: undefined },
+        lineasDeVenta: [],
+        mediosDePago: []
+    }
 })
 
-const onSubmit = async()=>{
+const onSubmit = handleSubmit(async(values)=>{
+    try{
+        await ventasApi.create(values)
+        router.replace('/ventas');
+        toast({ title: 'Venta registrada' });
+    }catch (err: any) {
+        errorMessage.value = err.message as string;
+        showError.value = true;
+  }
+})
 
-}
-
-const validateAndSubmit = ()=>{
-    
+const validateAndSubmit = async()=>{
+    submitted.value=true
+    setFieldValue("descuentoPorcentaje", porcDto.value);
+    if(isLastLineaEmpty.value){
+        lineasDeVenta.value.pop();
+    }    
+    setFieldValue("lineasDeVenta", lineasDeVenta.value.map(linea => ({
+        producto: { id: linea.producto.id ?? 0 },
+        cantidad: linea.cantidad,
+        precioIndividual: linea.precioIndividual ?? 0
+    })));
+    setFieldValue("mediosDePago", mediosDePago.value.map(medio => ({
+        importe: medio.importe ?? 0,  
+        tipoMedioDePago: medio.tipoMedioPago,
+        redDePago: medio.redDePago ?? undefined,
+        entidadBancaria: medio.entidadBancaria ?? undefined
+    })));
+    submitted.value = true;
+    await onSubmit();
 }
 
 
@@ -119,13 +155,11 @@ const hanldeSelectProducto = (_producto: Producto)=>{
 
         })
     }else{
-        if (!isLastLineaEmpty) agregarLineaVenta()
         lineasDeVenta.value[lineasDeVenta.value.length-1]={
            producto: { id: _producto.id, descripcion: _producto.descripcion},
            cantidad:1,
            precioIndividual: _producto.precio
        }
-       agregarLineaVenta();
     }
     searchProductoOpen.value =false;
 }
@@ -134,10 +168,9 @@ const hanldeSelectProducto = (_producto: Producto)=>{
 const isLastLineaEmpty = computed(()=>{
     const lastItem = lineasDeVenta.value[lineasDeVenta.value.length - 1];
     return lastItem 
-        ? lastItem.producto.id === undefined &&
+        ? !lastItem.producto.id &&
           lastItem.producto.descripcion === '' &&
-          lastItem.cantidad === 1 &&
-          lastItem.precioIndividual === undefined
+          !lastItem.precioIndividual
         : false;
 })
 
@@ -161,6 +194,11 @@ const importeIngresado = computed<number>(() => {
     }, 0);
 });
 
+const getProductoIdDisplay = (id: number) => {
+    return id === 0 ? '' : id;
+};
+
+
 const autocompleteMedioPagoImporte=(index: number)=>{
     if(mediosDePago.value[index]){    
         mediosDePago.value[index].importe = totalVentaNeto.value - importeIngresado.value
@@ -170,9 +208,6 @@ const autocompleteMedioPagoImporte=(index: number)=>{
     
 }
 
-watch(lineasDeVenta.value, () => {
-    console.log("Cambio detectado en lineasDeVenta");
-}, { deep: true });
 
 
 </script>
@@ -195,7 +230,7 @@ watch(lineasDeVenta.value, () => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Productos</BreadcrumbPage>
+                    <BreadcrumbPage>Nueva Venta</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
@@ -205,12 +240,12 @@ watch(lineasDeVenta.value, () => {
                 <div class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start">
                     <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8">
                         <FormField v-slot="{ errorMessage }" name="cliente.id">
-                            <FormItem class="h-[3rem] w-full sm:w-auto flex items-center justify-start">
-                                <FormLabel class="form-label w-[5rem] h-[1.2rem] text-lg">Cliente</FormLabel>
-                                <div class="flex flex-row justify-end items-center w-full">
+                            <FormItem class="h-[3rem] w-[60%] flex items-center justify-start">
+                                <FormLabel class="form-label w-[8rem]  h-[1.2rem] text-lg">Cliente</FormLabel>
+                                <div class="flex flex-row justify-start items-center w-full">
                                     <FormControl>
                                         <Input type="text" 
-                                            class="w-full sm:w-[24rem] h-10"
+                                            class="w-full sm:w-[20rem] h-10"
                                             readonly
                                             :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
                                             @click="searchClienteOpen = true"
@@ -222,14 +257,13 @@ watch(lineasDeVenta.value, () => {
                                         @select-cliente="handleSelectCliente"
                                     />
                                 </div>
-                                <FormMessage class="ml-[3rem]" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
+                                <FormMessage class="ml-[1rem] w-[20rem] " v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
                             </FormItem>
                         </FormField>
                         <div class="date w-auto sm:w-[10rem] text-center">
                             <Label>Fecha: {{ new Date().toLocaleDateString('es-ES') }}</Label>
                         </div>
                     </div>
-
 
                     <div class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
                         <h3 class="page-subtitle">Detalle</h3>
@@ -246,7 +280,7 @@ watch(lineasDeVenta.value, () => {
                         <div v-for="(linea, index) in lineasDeVenta" :key="index" class="linea-venta-item">
                             <Input
                                 @click="searchProductoOpen = true" 
-                                :model-value="linea.producto.id" 
+                                :model-value="getProductoIdDisplay(linea.producto.id)" 
                                 readonly class="rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input" 
                                 type="text" 
                             />
@@ -258,7 +292,7 @@ watch(lineasDeVenta.value, () => {
                             />
                             <Input
                                 :value="linea.precioIndividual?.toFixed(2)" 
-                                readonly class="rounded-lg cursor-default  focus:outline-none focus:border-none  text-center" 
+                                readonly class="rounded-lg cursor-default border-none focus:outline-none  focus:border-none  text-center" 
                             />
                             <Input
                                 :model-value="linea.cantidad" 
@@ -271,7 +305,7 @@ watch(lineasDeVenta.value, () => {
                                 type="number"  min="1" 
                             />
                             <Input
-                                readonly class="rounded-lg cursor-default  focus:outline-none focus:border-none text-center" 
+                                readonly class="rounded-lg cursor-default border-none focus:outline-none focus:border-none text-center" 
                                 :value="linea.precioIndividual ? (linea.precioIndividual * linea.cantidad).toFixed(2) : ''"  
                             />
                             
@@ -284,13 +318,22 @@ watch(lineasDeVenta.value, () => {
                             />
                         </div>
 
+                         <div v-if="submitted && Object.keys(errors).length && errors.lineasDeVenta" class="text-destructive">
+                            <p>
+                                {{ errors.lineasDeVenta }}
+                            </p>
+                        </div>
+
                         <Button variant="outline" class="mt-4" :disabled="isLastLineaEmpty"  @click="agregarLineaVenta">Agregar <PlusIcon /></Button>
 
                         
                         <div class="w-full flex flex-row justify-start mt-10">
-                            <div class="w-[50%] flex flex-col justify-start  items-start">
+                            <div class="w-[25%] flex flex-col justify-start  items-start">
+                            <div class="w-full flex flex-row justify-between  items-center">
                                 <h3 class="page-subtitle">Aplicar Descuento</h3>
-                                <div class="flex flex-row items-center">
+                                <Switch :model-value="dto" @update:model-value="dto=!dto"></Switch>
+                            </div>
+                            <div v-if="dto" class="flex flex-row items-center">
                                     <Label class="w-[5.5rem]">Porcentaje: </Label>
                                     <Input 
                                     class="w-14 mr-2 text-center" 
@@ -409,6 +452,11 @@ watch(lineasDeVenta.value, () => {
                             <Button size="icon" variant="ghost" @click="eliminarMedioPago(index)"> <Cross2Icon /> </Button>
 
                         </div>
+                        <div v-if="submitted && Object.keys(errors).length && errors.mediosDePago" class="text-destructive">
+                            <p>
+                                {{ errors.mediosDePago }}
+                            </p>
+                        </div>
                         <Button variant="outline" class="mt-4"  @click="agregarMedioPago">Agregar Medio de Pago <PlusIcon /></Button>
 
                     </div>
@@ -419,6 +467,13 @@ watch(lineasDeVenta.value, () => {
                 </div>
             </div>
         </div>
+        <AlertError 
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
+        />
     </div>
 </template>
 
@@ -457,6 +512,7 @@ watch(lineasDeVenta.value, () => {
     min-width: 4rem;
     text-align: center;
 }
+
 
 .descripcion-input {
     width: 100%;

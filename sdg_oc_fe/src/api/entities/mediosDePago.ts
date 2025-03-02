@@ -30,9 +30,9 @@ export interface MedioDePago{
 
 
 export const createMedioDePagoValidator = z.object({
-    tipoMedioDePago: z.enum(Object.values(TipoMedioDePagoEnum) as [string, ...string[]]),
+    tipoMedioDePago: z.enum(Object.values(TipoMedioDePagoEnum) as [string, ...string[]], {message: 'Seleccione tipo de medio de pago'}),
     entidadBancaria: z.string().optional(),
     redDePago: z.enum(Object.values(RedDePago) as [string, ...string[]]).optional(),
-    importe: z.number()
+    importe: z.number().min(1, {message: 'Indique el importe'})
 })
 export type CreateMedioDePagoValidator = z.infer<typeof createMedioDePagoValidator>

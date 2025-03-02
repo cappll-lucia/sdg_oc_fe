@@ -88,7 +88,6 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     await clientesApi.create(values, osCliente);
     loading.value = false;
-    showSuccess.value = true;
     router.replace('/clientes');
     toast({ title: 'Cliente registrado con éxito' });
   } catch (err: any) {
