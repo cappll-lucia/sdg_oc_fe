@@ -11,6 +11,15 @@ const getAll = async () => {
     }
 };
 
+const getOne = async (_id: string) => {
+    try {
+        const resp = await http.get(`/venta/${_id}`);
+        return resp.data.data as Venta;
+    } catch (error) {
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+};
+
 
 const create = async(_venta: CreateVentaValidator ) =>{
     try {
@@ -24,5 +33,6 @@ const create = async(_venta: CreateVentaValidator ) =>{
 
 export const ventasApi = {
     getAll: ()=> getAll(),
+    getOne: (_id: string)=> getOne(_id),
     create: (_venta: CreateVentaValidator)=> create(_venta),
 }

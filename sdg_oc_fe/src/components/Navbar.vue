@@ -27,9 +27,7 @@ const ventasItems: { title: string, href: string, description?: string; }[] = [
     },
     {
         title: 'Historial de Ventas',
-        href: '/docs/components/hover-card',
-        description:
-            'A modal dialog that interrupts the user with important content and expects a response.',
+        href: '/ventas',
     },
     {
         title: 'Facturación Electrónica',

@@ -168,6 +168,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/ventas',
+            name:'ventas',
+            component: ()=> import('../views/Ventas/Ventas.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
             path: '/ventas/new',
             name:'new-venta',
             component: ()=> import('../views/Ventas/Ventas.New.vue'),
