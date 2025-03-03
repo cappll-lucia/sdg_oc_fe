@@ -1,11 +1,11 @@
 import { Cliente } from "./clientes";
-import { BaseEntity } from "./entities";
+import { BaseEntity, BaseEntitySt } from "./entities";
 import { createLineaVentaValidator, LineaVenta } from "./lineaVenta";
 import {number, z} from 'zod'
 import { createMedioDePagoValidator, MedioDePago } from "./mediosDePago";
 
 
-export interface Venta extends BaseEntity{
+export interface Venta extends BaseEntitySt{
     fecha: Date;
     descuentoPorcentaje: number;
     importe: number;

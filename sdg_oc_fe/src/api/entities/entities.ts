@@ -7,6 +7,12 @@ export interface BaseEntity {
 	updatedAt: string;
 }
 
+export interface BaseEntitySt {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
 export interface RecetaRecetados extends BaseEntity{
     fecha: Date,
     oftalmologo: string,

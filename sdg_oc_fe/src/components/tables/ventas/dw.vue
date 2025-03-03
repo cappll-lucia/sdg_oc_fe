@@ -8,12 +8,10 @@ import router from '@/router/index';
 defineProps<{
     venta: {
         id: string;
-    }
-}>()
-
+    };
+}>();
 
 </script>
-
 
 <template>
     <DropdownMenu>
@@ -26,7 +24,7 @@ defineProps<{
         <DropdownMenuContent align="end">
             <DropdownMenuItem @click="()=>router.replace(`/ventas/view/${venta.id}`)">Ver Detalle</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Ver Factura</DropdownMenuItem>
+            <DropdownMenuItem>Factura</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

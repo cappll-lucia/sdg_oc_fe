@@ -1,5 +1,5 @@
 import { BaseEntity } from "./entities";
-import {z} from 'zod';
+import {date, z} from 'zod';
 import { Localidad } from "./localidad";
 import { ClienteObraSocial } from "./clienteObraSocial";
 
@@ -31,8 +31,10 @@ export const createClienteValidator = z.object({
       year: z.string(),
     })
     .transform(({ day, month, year }) => {
+      console.log('d: '+ day+'- m: '+month+' - y: '+year)
       let dayNumber = Number(day) +1 ;
       const formattedDate = `${year}-${month.padStart(2, '0')}-${(dayNumber.toString()).padStart(2, '0')}T00:00:00.000Z`;
+      console.log(formattedDate)
       return formattedDate;
     })
     .refine((date) => !isNaN(Date.parse(date)), {

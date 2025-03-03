@@ -43,7 +43,6 @@ import {Cross2Icon} from '@radix-icons/vue';
 
 
 
-const showSuccess = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 const loading = ref<boolean>(false);
@@ -82,6 +81,7 @@ const removeObraSocial = (index: number) => {
 
 const onSubmit = handleSubmit(async (values) => {
     loading.value = true;
+    console.log(values)
     const osCliente = selectedObrasSociales.value.filter(os => os.obraSocial.id !== null) as {obraSocial: {id:number}, numeroSocio: string}[];
      if (osCliente.find(os=> os.numeroSocio=='') )return;
      loading.value = true;
@@ -241,11 +241,11 @@ const filteredObrasSociales = (index: number) => {
                                 <FormLabel class="form-label">Fecha de Nacimiento</FormLabel>
                                 <FormControl>
                                     <div class="flex gap-2 w-full">
-                                    <Input type="text" :model-value="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2"
+                                    <Input type="text" v-model="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2"
                                         @input="handleChange({ ...fechaNac, day: $event.target.value.trim() })"/>
-                                    <Input type="text" :model-value="fechaNac.month" placeholder="MM" class="w-16 text-center" maxlength="2"
+                                    <Input type="text" v-model="fechaNac.month" placeholder="MM" class="w-16 text-center" maxlength="2"
                                         @input="handleChange({ ...fechaNac, month: $event.target.value.trim() })"/>
-                                    <Input type="text" :model-value="fechaNac.year" placeholder="AAAA" class="w-20 text-center" maxlength="4"
+                                    <Input type="text" v-model="fechaNac.year" placeholder="AAAA" class="w-20 text-center" maxlength="4"
                                         @input="handleChange({ ...fechaNac, year: $event.target.value.trim() })"/>
                                     </div>
                                 </FormControl>

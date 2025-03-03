@@ -1,7 +1,7 @@
 import { Venta } from "@/api/entities/venta";
 import {h} from 'vue';
-import DropdownAction from './data-table-dropdown.vue'
 import { ColumnDef } from "@tanstack/vue-table";
+import DropdownAction from './data-table-dropdown.vue'
 
 
 const formatDate = (dateString: string) => {

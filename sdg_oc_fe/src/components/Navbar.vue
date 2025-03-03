@@ -63,9 +63,9 @@ const parametrosItems: { title: string, href: string}[] = [
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-                <NavigationMenuTrigger>Ventas</NavigationMenuTrigger>
+                <NavigationMenuTrigger >Ventas</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                    <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul class=" grid w-[300px] gap-3 p-4 md:w-[300px] md:grid-cols-1 lg:w-[300px] item-venta ">
                         <li v-for="item in ventasItems" :key="item.title">
                             <NavigationMenuLink as-child>
                                 <a :href="item.href"
@@ -137,3 +137,11 @@ const parametrosItems: { title: string, href: string}[] = [
         </div>
     </NavigationMenu>
 </template>
+
+<style>
+.item-venta:fi{
+    background-color: yellowgreen;
+    position: absolute;
+    left: 3rem;
+}
+</style>

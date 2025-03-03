@@ -46,8 +46,6 @@ onMounted(async () => {
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title ">Ventas</h1>
-
-        <p>{{ data }}</p>
         <div class="pt-2">
             <DataTable :columns="columns" :data="data" />
         </div>
