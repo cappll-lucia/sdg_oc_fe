@@ -2,12 +2,7 @@ import { Venta } from "@/api/entities/venta";
 import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import DropdownAction from './data-table-dropdown.vue'
-
-
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
+import { formatDate } from "@/lib/utils.recetas";
 
 export const columns: ColumnDef<Venta>[]=[
     {

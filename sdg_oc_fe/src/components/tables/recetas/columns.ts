@@ -1,15 +1,13 @@
-import { ClienteConReceta } from "@/api/entities/entities";
+import { ClienteRecetasCount } from '@/api/entities/clientes';
 import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from '@radix-icons/vue';
 import router from "@/router/index";
-export const columns: ColumnDef<ClienteConReceta>[] = [
-  {
-    accessorKey: 'id',
-    header: () => h('div', 'ID'),
-    cell: info=> info.getValue()
-  },
+import { formatDate } from "@/lib/utils.recetas";
+
+
+export const columns: ColumnDef<ClienteRecetasCount>[] = [
   {
     accessorKey: 'nombre',
     header: () => h('div', 'Nombre'),
@@ -21,25 +19,18 @@ export const columns: ColumnDef<ClienteConReceta>[] = [
     cell: info=> info.getValue(),
   },
   {
-    accessorKey: 'ultima_receta',
+    accessorKey: 'fecha_ultima_receta',
     header: ()=> h('div', 'Fecha Ultima Receta'),
-    cell: ({row})=>{
-        const fechas_recetados = row.original.recetasRecetados.map((rec)=>rec.fecha)
-        const fechas_contacto = row.original.recetasContacto.map((rec)=>rec.fecha)
-        const max_recetados = fechas_recetados.reduce((max, current)=>(current > max ? current : max), new Date(0)).toISOString().split("T")[0] || 0
-        const max_contacto = fechas_contacto.reduce((max, current)=>(current > max ? current : max), new Date(0)).toISOString().split("T")[0] || 0
-        return max_contacto > max_recetados ? max_contacto : max_recetados
-    }
+    cell: info => h('span', formatDate(info.getValue() as string))
   },
   {
     accessorKey: 'cantidad_recetas_recetados',
     header: ()=> h('div', 'Cantidad Recetas Anteojos Recetados'),
-    cell: ({row})=>row.original.recetasRecetados.length
-  },
+    cell: ({row})=>row.original.cantidad_recetas_lentes_aereos  },
     {
     accessorKey: 'cantidad_recetas_contacto',
     header: ()=> h('div', 'Cantidad Recetas Lentes de Contacto'),
-    cell: ({row})=>row.original.recetasContacto.length
+    cell: ({row})=>row.original.cantidad_recetas_lentes_contacto
   },
 {
     accessorKey: 'acciones',
@@ -49,7 +40,7 @@ export const columns: ColumnDef<ClienteConReceta>[] = [
         variant: 'outline',
         size: 'icon',
         onClick: () => {
-         router.replace( `/recetas/${row.original.id}`)
+         router.replace( `/recetas/${row.original.clienteId}`)
         }
       }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }

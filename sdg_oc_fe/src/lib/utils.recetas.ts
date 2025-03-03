@@ -16,6 +16,10 @@ export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref
     : updaterOrValue
 }
 
+export const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
 
 export function generateRecetasRecetadosPDF (recetas: RecetaRecetados[], nombreCliente:string) {
 

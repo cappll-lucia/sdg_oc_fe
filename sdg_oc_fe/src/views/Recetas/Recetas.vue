@@ -9,19 +9,16 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
-import type { ClienteConReceta } from '@/api/entities/entities';
-import { clientesConReceta } from '@/api/data/clientesConRecetas'
 import DataTable from '@/components/tables/recetas/data-table.vue';
 import { columns } from '@/components/tables/recetas/columns';
+import { ClienteRecetasCount } from '@/api/entities/clientes';
+import { recetasApi } from '@/api/libs/recetas';
 
-const data = ref<ClienteConReceta[]>([]);
+const data = ref<ClienteRecetasCount[]>([]);
 
-async function getData(): Promise<ClienteConReceta[]>{
-    return clientesConReceta as ClienteConReceta[]
-}
 
 onMounted(async()=>{
-    data.value=await getData()
+    data.value=await recetasApi.getAllGroupByCliente()
 })
 </script>
 
