@@ -29,6 +29,7 @@ import router from '@/router/index';
 import {onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import AlertConfirm from '@/components/AlertConfirm.vue';
+import { VPdfViewer } from '@vue-pdf-viewer/viewer';
 
 const currentAudiometria = ref<Audiometria>();
 const route = useRoute();
@@ -223,9 +224,13 @@ const handleFileUpload = () => {
                     </FormField>
                 </div>
                  <div class="flex flex-col w-[50%] h-full">
+                    <p>{{ audiometriaURL }}</p>
                         <div v-if="audiometriaURL" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
                             <iframe :src="audiometriaURL" class="w-full h-full border-none" frameborder="0"
                             allowfullscreen></iframe>
+                            
+
+                            <!-- <VPdfViewer  src="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf" /> -->
                         </div>
                         <div v-else class="flex justify-center items-center w-full h-full border rounded-md">
                             <span class="font-light color-secondary">Ningún PDF Seleccionado</span>

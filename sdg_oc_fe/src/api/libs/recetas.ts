@@ -5,10 +5,7 @@ import { ClienteRecetasCount } from '../entities/clientes';
 
 const getAllGroupByCliente = async () => {
     try {
-        console.log('a')
         const resp = await http.get('/cliente/recetas/count');
-        console.log(resp)
-
         return resp.data.data as ClienteRecetasCount[];
     } catch (error) {
         throw error instanceof AxiosError ?  

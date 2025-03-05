@@ -17,13 +17,11 @@ import { clientesConAudiometria } from '@/api/data/clientesConAudiometria';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const cliente = ref<undefined | ClienteConAudiometria>(undefined);
 const selectedAudiom = ref<undefined | Audiometria>();
 
 
 onMounted(() => {
-    cliente.value = clientesConAudiometria.find((cliente) => cliente.id == Number(route.params.idCliente));
-    selectedAudiom.value = cliente.value?.audiometrias[0];
+
 })
 
 
@@ -76,6 +74,7 @@ onMounted(() => {
                         </div>
                         <Separator class="my-2" />
                     </div>
+                    <p>{{ selectedAudiom }}</p>
                 </div>
                 <Separator orientation="vertical" />
                 <div class="view w-[75%] h-[100%] p-4">

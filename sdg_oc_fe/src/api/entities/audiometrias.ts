@@ -9,6 +9,12 @@ export interface Audiometria extends BaseEntity{
     cliente: Cliente
 }
 
+export interface ClienteAudiometriasFecha {
+    clienteId: string ;
+    nombre: string ;
+    apellido: string ;
+    fechaUltimaAudiometria: Date | null
+}   
 
 export const createAudiometriaValidator = z.object({
     fechaInforme: z

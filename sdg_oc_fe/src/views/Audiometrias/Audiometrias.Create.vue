@@ -76,9 +76,7 @@ const onSubmit = handleSubmit(async (values) => {
         return;
     }
     try {
-        // TODO Send files
-        const fromData = new FormData()
-        await audiometriasApi.create(values, fromData )
+        await audiometriasApi.create(values, audiometriaFile.value )
         loading.value=false;
         showSuccess.value = true;
         router.replace('/audiometrias')
