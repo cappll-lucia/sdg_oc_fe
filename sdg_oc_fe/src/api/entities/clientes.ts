@@ -1,5 +1,5 @@
 import { BaseEntity } from "./entities";
-import {date, z} from 'zod';
+import { z} from 'zod';
 import { Localidad } from "./localidad";
 import { ClienteObraSocial } from "./clienteObraSocial";
 
@@ -16,6 +16,16 @@ export interface Cliente extends BaseEntity {
     localidad: Localidad,
     clienteObrasSociales : ClienteObraSocial[]
 }
+
+export interface ClienteRecetasCount {
+    clienteId: string ;
+    nombre: string ;
+    apellido: string ;
+    cantidadRecetasLentesAereos: number ;
+    cantidadRecetasLentesContacto: number ;
+    fechaUltimaReceta: Date | null
+}   
+
 
 export const createClienteValidator = z.object({
   dni: z.number().int().positive(), 

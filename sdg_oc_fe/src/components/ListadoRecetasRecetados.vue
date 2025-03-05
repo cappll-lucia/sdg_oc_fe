@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type {  RecetaRecetados } from '@/api/entities/entities';
+import { RecetasAereos } from '@/api/entities/recetasAereos';
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button';
-import { ChevronRightIcon, DownloadIcon } from '@radix-icons/vue'
-import {ref} from 'vue';
+import { ChevronRightIcon, DownloadIcon, Pencil1Icon } from '@radix-icons/vue'
+import {onMounted, ref} from 'vue';
 import ItemDetalleReceta from '@/components/ItemDetalleRecetaRecetados.vue'
 import {
     Dialog,
@@ -15,17 +15,27 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
+import { formatDate, generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
+import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
+import { PlusIcon } from 'lucide-vue-next';
 
 
 const props = defineProps<{
-    recetas: RecetaRecetados[],
+    recetas: RecetasAereos[],
     nombreCliente: string
 }>();
-const currentRec = ref(props.recetas[0]);
-const selectedToPrint = ref<RecetaRecetados[]>([])
+const currentRec = ref<RecetasAereos|undefined>();
+const detalleCerca = ref<DetalleRecetaAereos|undefined>();
+const detalleLejos = ref<DetalleRecetaAereos|undefined>();
+const selectedToPrint = ref<RecetasAereos[]>([]);
 
-const handleCheckboxChange = (receta: RecetaRecetados) => {
+onMounted(()=>{
+    currentRec.value = props.recetas[0];
+    detalleCerca.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Cerca')
+    detalleLejos.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Lejos')
+})
+
+const handleCheckboxChange = (receta: RecetasAereos) => {
     const index = selectedToPrint.value.findIndex((selected) => selected.id === receta.id);
     index !== -1 
         ? selectedToPrint.value.splice(index, 1)
@@ -47,7 +57,11 @@ const printRecetas = () => {
 <template>
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
-            <div class="flex justify-end mr-2">
+            <div class="flex justify-between mr-2">
+                <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
+                        Nueva Receta
+                    <PlusIcon class="w-4 h-4" />
+                </Button>
                 <Dialog>
                     <DialogTrigger as-child>
                         <Button  variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
@@ -70,12 +84,12 @@ const printRecetas = () => {
                                 :for="`${receta.id}`"
                                 class="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 >
-                               {{ receta.fecha.toISOString().split("T")[0] }} 
+                               {{ formatDate(receta.fecha.toString())}} 
                                 </label>
                                 <label
                                 class="text-sm"
                                 >
-                               {{ receta.tipo }} 
+                               {{ receta.tipoReceta }} 
                                 </label>
                             </div>                           
                         </div>
@@ -93,11 +107,10 @@ const printRecetas = () => {
                     :class="{ 'bg-[#d7e5ec]': currentRec === receta }">
                     <p class="font-light text-sm ">{{ receta.id}}</p>
                     <div class="flex-col  w-[50%]">
-                        <p class="font-bold ">{{ receta.fecha.toISOString().split("T")[0] }}</p>
-                        <p class="font-light  ">{{receta.tipo}}</p>
+                        <p class="font-bold ">{{ formatDate(receta.fecha.toString())}}</p>
+                        <p class="font-light  ">{{receta.tipoReceta}}</p>
                     </div>
-                    <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]"
-                        @click="()=>{currentRec=receta; console.log(currentRec)}">
+                    <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]">
                         <ChevronRightIcon class="w-4 h-4" />
                     </Button>
                 </div>
@@ -105,36 +118,41 @@ const printRecetas = () => {
             </div>
         </div>
         <Separator orientation="vertical" />
+        
         <div class="view w-[75%] h-[100%] px-8">
             <div class="datos flex flex-col" v-if="currentRec">
-                <div class="flex flex-row justify-between">
-                    <div class="flex flex-col ">
-                        <span class="text-lg font-bold">Tipo Receta: </span>
-                        <span>{{currentRec.tipo}}</span>
+                <div class="flex flex-row justify-between items-center">
+                    <div class="flex flex-col">
+                        <div class="flex flex-row">
+                            <span class="text-lg font-bold w-[10rem]">Tipo Receta: </span>
+                            <span>{{currentRec.tipoReceta}}</span>
+                        </div>
+                        <div class="flex flex-row ">
+                            <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
+                            <span>{{formatDate(currentRec.fecha.toString())}}</span>
+                        </div>
                     </div>
                     <div class="flex flex-col ">
-                        <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
-                        <span>{{currentRec.fecha.toISOString().split("T")[0]}}</span>
+                        <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
+                            @click="() => { console.log('editar historia clinica'); }">
+                            Editar
+                            <Pencil1Icon class="w-4 h-4" />
+                        </Button>
                     </div>
                 </div>
             </div>
             <Separator class="my-6" />
 
-            <div v-if="currentRec?.tipo=='Anteojo Lejos' && currentRec.detalleLejos ">
-                <ItemDetalleReceta :detalleReceta="currentRec.detalleLejos" title="Lejos" />
+            <div v-if="currentRec?.tipoReceta=='Lejos' && detalleLejos ">
+                <ItemDetalleReceta :detalleReceta="detalleLejos" title="Lejos" />
             </div>
-            <div v-else-if="currentRec?.tipo == 'Anteojo Cerca' && currentRec.detalleCerca">
-                <ItemDetalleReceta :detalleReceta="currentRec.detalleCerca" title="Cerca" />
+            <div v-else-if="currentRec?.tipoReceta=='Cerca' && detalleCerca">
+                <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
             </div>
-            <div v-else-if="currentRec?.tipo == 'Multifocal' && currentRec.detalleLejos && currentRec.detalleCerca">
-                <ItemDetalleReceta :detalleReceta="currentRec.detalleCerca" title="Cerca" />
+            <div v-else-if="currentRec?.tipoReceta == 'Multifocal' && detalleLejos && detalleCerca">
+                <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
                 <Separator class="my-8" />
-                <ItemDetalleReceta :detalleReceta="currentRec.detalleLejos" title="Lejos" />
-            </div>
-            <div v-else-if="currentRec?.tipo == 'Bifocal' && currentRec.detalleLejos && currentRec.detalleCerca">
-                <ItemDetalleReceta :detalleReceta="currentRec.detalleCerca" title="Cerca" />
-                <Separator class="my-8" />
-                <ItemDetalleReceta :detalleReceta="currentRec.detalleLejos" title="Lejos" />
+                <ItemDetalleReceta :detalleReceta="detalleLejos" title="Lejos" />
             </div>
 
             <Separator class="my-8" />
@@ -154,10 +172,10 @@ const printRecetas = () => {
                         <span>{{ currentRec.tratamiento ?? '--' }}</span>
                     </div>
                 </div>
-                <div class="flex flex-col items-start mt-6">
+                <!-- <div class="flex flex-col items-start mt-6">
                     <span class="text font-bold">Observaciones: </span>
                     <span>{{ currentRec.observaciones ?? '--' }}</span>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

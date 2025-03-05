@@ -9,21 +9,34 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { clientesConReceta } from '@/api/data/clientesConRecetas'
-import type { ClienteConReceta } from '@/api/entities/entities';
 import { computed, onMounted, ref} from 'vue';
-import { useRoute } from 'vue-router';
 import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'
 import ListadoRecetasContacto from '@/components/ListadoRecetasContacto.vue';
+import { Cliente } from '@/api/entities/clientes';
+import { RecetasAereos } from '@/api/entities/recetasAereos';
+import { useRoute } from 'vue-router';
+import { clientesApi } from '@/api/libs/clientes';
+import { HistoriaClinica } from '@/api/entities/historiaClinica';
+import { RecetaContacto } from '@/api/entities/recetasContacto';
 
 const route = useRoute()
-const cliente = ref<undefined | ClienteConReceta>(undefined);
+const currentCliente = ref<Cliente>();
+const recetasClienteAereos = ref<RecetasAereos[]>();
+const recetasClienteContacto = ref<RecetaContacto[]>();
+const historiaClinicaCliente = ref<HistoriaClinica>()
+onMounted(async()=>{
 
-onMounted(()=>{
-    cliente.value = clientesConReceta.find((cliente) => cliente.id == Number(route.params.idCliente))
+    currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente))
+    if(currentCliente){
+
+        const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
+        recetasClienteAereos.value = res.recetasLentesAereos;
+        recetasClienteContacto.value = res.recetasLentesContacto;
+        historiaClinicaCliente.value = res.historiaClinicaContacto;
+    }
 })
 
-const nombreCliente = computed(()=> cliente.value?.apellido +", "+cliente.value?.nombre)
+const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+currentCliente.value?.nombre)
 
 </script>
 
@@ -47,8 +60,7 @@ const nombreCliente = computed(()=> cliente.value?.apellido +", "+cliente.value?
         </Breadcrumb>
         <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
         <div class="pt-2">
-            
-            <Tabs default-value="recetados" class="w-[100%]">
+            <Tabs default-value="contacto" class="w-[100%]">
                 <TabsList class="w-[100%]">
                     <TabsTrigger class="w-[50%]" value="recetados">
                         Anteojos Recetados
@@ -58,11 +70,11 @@ const nombreCliente = computed(()=> cliente.value?.apellido +", "+cliente.value?
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent class="bg-secondary h-[40rem] px-2 py-6 rounded" value="recetados">
-                    <ListadoRecetasRecetados v-if="cliente?.recetasRecetados" :recetas="cliente.recetasRecetados" :nombreCliente="nombreCliente" />
+                    <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" />
                     <h2 v-else>El cliente no tiene recetas registradas para anteojos recetados </h2>
                 </TabsContent>
                 <TabsContent class="bg-secondary h-[75rem] px-2 py-6 rounded" value="contacto">
-                    <ListadoRecetasContacto v-if="cliente?.recetasContacto && cliente.recetasContacto.length > 0" :nombreCliente="nombreCliente" :recetas="cliente.recetasContacto" :historiaClinica="cliente.historiaClinicaContacto" />
+                    <ListadoRecetasContacto v-if="recetasClienteContacto && recetasClienteContacto.length > 0" :nombreCliente="nombreCliente" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" />
                     <h2 v-else>El cliente no tiene recetas registradas para lentes de contato </h2>
                 </TabsContent>
             </Tabs>

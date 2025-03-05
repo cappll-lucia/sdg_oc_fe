@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { RecetaContacto, HistoriaClinicaContacto } from '@/api/entities/entities';
+import { onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronRightIcon, DownloadIcon, ArchiveIcon, PlusIcon, ValueNoneIcon  } from '@radix-icons/vue'
+import { ChevronRightIcon, DownloadIcon, ArchiveIcon, PlusIcon, ValueNoneIcon, Pencil1Icon  } from '@radix-icons/vue'
 import {
     Dialog,
     DialogContent,
@@ -16,19 +15,24 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { generateRecetasContactoPDF } from '@/lib/utils.recetas';
+import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
 import Input from './ui/input/Input.vue';
-
+import { RecetaContacto } from '@/api/entities/recetasContacto';
+import { HistoriaClinica } from '@/api/entities/historiaClinica';
 
 const props = defineProps<{
-    historiaClinica: HistoriaClinicaContacto | undefined,
+    historiaClinica: HistoriaClinica | undefined,
     recetas: RecetaContacto[],
     nombreCliente: string
 }>();
-// TODO inicializar en primera receta
-const currentRec = ref(props.recetas[0]);
+
+const currentRec = ref<RecetaContacto|undefined>();
 const selectedHistoriaClinica = ref(false);
 const selectedToPrint = ref<RecetaContacto[]>([])
+
+onMounted(()=>{
+    currentRec.value=props.recetas[0]
+})
 
 const handleCheckboxChange = (receta: RecetaContacto) => {
     const index = selectedToPrint.value.findIndex((selected) => selected.id === receta.id);
@@ -36,7 +40,6 @@ const handleCheckboxChange = (receta: RecetaContacto) => {
         ? selectedToPrint.value.splice(index, 1)
         : selectedToPrint.value.push(receta);
 };
-
 
 
 const printRecetas = () => {
@@ -81,7 +84,7 @@ const printRecetas = () => {
                                 <Checkbox :id="`${receta.id}`" @update:checked="handleCheckboxChange(receta)" />
                                 <label :for="`${receta.id}`"
                                     class="font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    {{ receta.fecha.toISOString().split("T")[0] }}
+                                    {{ formatDate(receta.fecha.toString()) }}
                                 </label>
                             </div>
                         </div>
@@ -115,7 +118,7 @@ const printRecetas = () => {
                     :class="{ 'bg-[#d7e5ec]': currentRec === receta }">
                     <p class="font-light text-sm ">{{ receta.id }}</p>
                     <div class="flex-col  w-[50%]">
-                        <p class="font-bold ">{{ receta.fecha.toISOString().split("T")[0] }}</p>
+                        <p class="font-bold ">{{ formatDate(receta.fecha.toString())}}</p>
                     </div>
                     <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]"
                         @click="() => { selectedHistoriaClinica=false; currentRec = receta; console.log(currentRec); }">
@@ -134,14 +137,21 @@ const printRecetas = () => {
 
         <div v-else class="view w-[75%] h-[100%] px-8">
             <div class="datos flex flex-col" v-if="currentRec">
-                <div class="flex flex-row justify-end">
+                <div class="flex flex-row justify-between items-center ">
                     <!-- <div class="flex flex-col ">
                         <span class="text-lg font-bold">Tipo Receta: </span>
                         <span>{{ currentRec.tipo }}</span>
                     </div> -->
-                    <div class="flex flex-col ">
+                    <div class="flex flex-row ">
                         <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
-                        <span>{{ currentRec.fecha.toISOString().split("T")[0] }}</span>
+                        <span>{{ formatDate(currentRec.fecha.toString()) }}</span>
+                    </div>
+                        <div class="flex flex-col ">
+                        <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
+                            @click="() => { console.log('editar historia clinica'); }">
+                            Editar
+                            <Pencil1Icon class="w-4 h-4" />
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -153,25 +163,25 @@ const printRecetas = () => {
                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-14">{{ currentRec.odCb.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.od_cb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-14">{{ currentRec.odEsferico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.od_esferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.od_cilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje:</p>
-                            <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.od_eje.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-14">{{ currentRec.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.od_diametro.toFixed(2) }}</p> 
 
                         </div>
 
@@ -181,25 +191,25 @@ const printRecetas = () => {
                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-14">{{ currentRec.oiCb.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oi_cb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-14">{{ currentRec.oiEsferico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oi_esferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oi_cilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje:</p>
-                            <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oi_eje.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-14">{{ currentRec.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ currentRec.oi_diametro.toFixed(2) }}</p>
 
                         </div>
                     </div>
@@ -208,9 +218,9 @@ const printRecetas = () => {
                 <div class="datos flex flex-col" v-if="currentRec">
                     <div class="mt-6">
                         <span class="text font-bold mr-2">Marca O.D.: </span>
-                        <span class="mr-6">{{ currentRec.odMarca ?? '--' }}</span> |
+                        <span class="mr-6">{{ currentRec.od_marca ?? '--' }}</span> |
                         <span class="text font-bold mr-2 ml-6">Marca O.I.: </span>
-                        <span>{{ currentRec.oiMarca ?? '--' }}</span>
+                        <span>{{ currentRec.oi_marca ?? '--' }}</span>
                     </div>
                     <div class="flex flex-col items-start mt-6">
                         <span class="text font-bold">Observaciones: </span>
@@ -220,28 +230,27 @@ const printRecetas = () => {
     
             <Separator class="my-8" />  
 
-            <div class="flex flex-row justify-start items-start" v-if="currentRec" > 
+            <div class="flex flex-row justify-start items-start" v-if="currentRec" >
                 <div class="flex flex-row justify-start items-start">
                     <h1 class="mr-[1rem] mt-2 text-xl font-extrabold w-[11rem] ">Queterometría </h1>
-                    <div class="flex flex-col items-start" v-if="currentRec.quetM1Od">
-                        
-                    <div class="flex  h-10 items-center">
-                        <p class="font-bold w-20 text-lg">O.D.</p>
-                        <p class="w-14">{{ currentRec.quetM1Od.toFixed(2) || '-' }}</p>
-                        <Separator orientation="vertical" class="mx-4" />
-                        <p class="w-14">{{ currentRec.quetM2Od.toFixed(2) }}</p>
-                    </div>
-                    <Separator class="my-4" />
-                <div class="flex  h-10 items-center">
-                        <p class="font-bold w-20 text-lg">O.I.</p>
-                        <p class="w-14">{{ currentRec.quetM1Oi.toFixed(2) }}</p>
-                        <Separator orientation="vertical" class="mx-4" />
-                        <p class="w-14">{{ currentRec.quetM2Oi.toFixed(2) }}</p>
-                    </div>
+                    <div class="flex flex-col items-start" v-if="currentRec.quet_m1_oi ">
+                        <div class="flex  h-10 items-center">
+                            <p class="font-bold w-20 text-lg">O.D.</p>
+                            <p class="w-14">{{ currentRec.quet_m1_od.toFixed(2) || '-' }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+                            <p class="w-14">{{ currentRec.quet_m2_od.toFixed(2) }}</p>
+                        </div>
+                        <Separator class="my-4" />
+                        <div class="flex  h-10 items-center">
+                            <p class="font-bold w-20 text-lg">O.I.</p>
+                            <p class="w-14">{{ currentRec.quet_m1_oi.toFixed(2) }}</p>
+                            <Separator orientation="vertical" class="mx-4" />
+                            <p class="w-14">{{ currentRec.quet_m2_oi.toFixed(2) }}</p>
+                        </div>
                         
                     </div>
                     <div class="flex flex-col items-start" v-else>
-                        <p class="font-light mt-4 w-[50rem] text-sm">No hay registros de Queterometría para esta receta</p>
+                        <p class="font-light mt-4 w-[10rem] text-sm">No hay registros de Queterometría para esta receta</p>
                     </div>
                 </div>
                 
@@ -265,14 +274,14 @@ const printRecetas = () => {
                             </label>
                         </div>
                         <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentRec.hendiduraPalpebral" class="pointer-events-none" />
+                            <Checkbox v-model:checked="currentRec.hendidura_palpebral" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Hendidura Palpebral
                             </label>
                         </div>
                         <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentRec.alturaPalpebral" class="pointer-events-none" />
+                            <Checkbox v-model:checked="currentRec.altura_palpebral" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Altura Palpebral
@@ -286,14 +295,14 @@ const printRecetas = () => {
                             <Input type="text"  class="text-black bg-transparent pointer-events-none cursor-not-allowed w-100 text-xs  h-8" :model-value="currentRec.estesiometria" />
                         </div>
                         <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentRec.buenParpadeoAmplitud" class="pointer-events-none" />
+                            <Checkbox v-model:checked="currentRec.buen_parpadeo_amplitud" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Parpadeo: Buena Amplitud
                             </label>
                         </div>
                         <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentRec.buenParpadeoRitmo" class="pointer-events-none" />
+                            <Checkbox v-model:checked="currentRec.buen_parpadeo_ritmo" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Parpadeo: Buen Ritmo
@@ -308,8 +317,8 @@ const printRecetas = () => {
 
             <div class="flex flex-row justify-start items-start" v-if="currentRec" > 
                 <h1 class="mr-[3rem] mt-2 text-xl font-extrabold ">Pruebas </h1>
-                <div class="flex flex-col items-start" v-if="currentRec.pruebas.length">
-                    <Accordion type="single" collapsible class="w-[50rem]" v-for="prueba in currentRec.pruebas">
+                <div class="flex flex-col items-start" v-if="currentRec?.pruebasLentesContacto?.length">
+                    <Accordion type="single" collapsible class="w-[50rem]" v-for="prueba in currentRec.pruebasLentesContacto">
                         <AccordionItem value="item-1">
                         <AccordionTrigger>Prueba {{ prueba.numeroPrueba }}</AccordionTrigger>
                         <AccordionContent>
@@ -317,25 +326,25 @@ const printRecetas = () => {
                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-14">{{ prueba.odCb.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.od_cb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-14">{{ prueba.odEsferico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.od_esferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-14">{{ prueba.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.od_cilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje:</p>
-                            <p class="w-14">{{ prueba.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.od_eje.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-14">{{ prueba.odCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.od_cilindrico.toFixed(2) }}</p>
 
                         </div>
 
@@ -344,25 +353,25 @@ const printRecetas = () => {
                             <p class="font-bold w-20 text-lg">O.I.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-14">{{ prueba.oiCb.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.oi_cb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-14">{{ prueba.oiEsferico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.oi_esferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-14">{{ prueba.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.oi_cilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje:</p>
-                            <p class="w-14">{{ prueba.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.oi_eje.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-14">{{ prueba.oiCilindrico.toFixed(2) }}</p>
+                            <p class="w-14">{{ prueba.oi_cilindrico.toFixed(2) }}</p>
                         </div>
                         </AccordionContent>
                         </AccordionItem>

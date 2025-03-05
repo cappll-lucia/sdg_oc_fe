@@ -2,9 +2,10 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { Updater } from '@tanstack/vue-table'
 import type { Ref } from 'vue'
-import { RecetaContacto, RecetaRecetados } from '@/api/entities/entities';
 import {jsPDF} from "jspdf"; 
 import autoTable from "jspdf-autotable"
+import { RecetasAereos } from '@/api/entities/recetasAereos';
+import { RecetaContacto } from '@/api/entities/recetasContacto';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,7 +22,7 @@ export const formatDate = (dateString: string) => {
     return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
-export function generateRecetasRecetadosPDF (recetas: RecetaRecetados[], nombreCliente:string) {
+export function generateRecetasRecetadosPDF (recetas: RecetasAereos[], nombreCliente:string) {
 
     const doc = new jsPDF();
     let yOffset = 10; // Posición inicial en el eje Y
@@ -34,7 +35,7 @@ export function generateRecetasRecetadosPDF (recetas: RecetaRecetados[], nombreC
         yOffset += 10;
 
         doc.setFontSize(12);
-        doc.text(`Tipo Receta: ${receta.tipo}`, 10, yOffset);
+        doc.text(`Tipo Receta: ${receta.tipoReceta}`, 10, yOffset);
         doc.text(`Fecha Receta: ${receta.fecha.toISOString().split("T")[0]}`, 140, yOffset, { align: "right" });
         yOffset += 10;
 

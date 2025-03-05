@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { HistoriaClinicaContacto } from '@/api/entities/entities';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Pencil1Icon } from '@radix-icons/vue';
 
 import { Checkbox } from '@/components/ui/checkbox';
+import { HistoriaClinica } from '@/api/entities/historiaClinica';
 
 
 const props = defineProps<{
-    historiaClinica: HistoriaClinicaContacto | undefined,
+    historiaClinica: HistoriaClinica | undefined
 }>();
 // TODO inicializar en primera receta
 
@@ -39,14 +39,14 @@ const props = defineProps<{
             <div class="flex flex-row mt-3 justify-between ">
                 <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
                     <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.patologicos" />
+                        <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.patologicas" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Patológicos
                         </label>
                     </div>
                     <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.traumaticos" class="pointer-events-none" />
+                        <Checkbox v-model:checked="props.historiaClinica.traumaticas" class="pointer-events-none" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Traumáticos
@@ -108,7 +108,7 @@ const props = defineProps<{
                 <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
                     <div class="items-center flex gap-x-2">
                         <Checkbox class="pointer-events-none"
-                            v-model:checked="props.historiaClinica.trastornosNeurologicos" />
+                            v-model:checked="props.historiaClinica.transtornosNeurologicos" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Trastornos Neurológicos
@@ -123,7 +123,7 @@ const props = defineProps<{
                     </div>
                     <div class="items-center flex gap-x-2">
                         <Checkbox class="pointer-events-none"
-                            v-model:checked="props.historiaClinica.glandulasEndocrinas" />
+                            v-model:checked="props.historiaClinica.glandulasEndocinas" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Glandulas Endócrinas
@@ -162,7 +162,7 @@ const props = defineProps<{
                         </label>
                     </div>
                     <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.digestivos" class="pointer-events-none" />
+                        <Checkbox v-model:checked="props.historiaClinica.digestivo" class="pointer-events-none" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Digestivos
@@ -247,7 +247,7 @@ const props = defineProps<{
                         </label>
                     </div>
                     <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.piladoraContraceptiva"
+                        <Checkbox v-model:checked="props.historiaClinica.pildoraContraceptiva"
                             class="pointer-events-none" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -288,7 +288,7 @@ const props = defineProps<{
                         </label>
                     </div>
                     <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.diureticos" class="pointer-events-none" />
+                        <Checkbox v-model:checked="props.historiaClinica.dirueticos" class="pointer-events-none" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Diureticos
@@ -304,7 +304,7 @@ const props = defineProps<{
                         </label>
                     </div>
                     <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.porosimpaticoliticos"
+                        <Checkbox v-model:checked="props.historiaClinica.parasimpaticoliticos"
                             class="pointer-events-none" />
                         <label for="terms1"
                             class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -314,7 +314,7 @@ const props = defineProps<{
                 </div>
             </div>
             <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light ">{{ props.historiaClinica.observacionesTratamientos || ' - ' }} </span>
+            <span class="text-sm font-light ">{{ props.historiaClinica.observacionesTratamiento || ' - ' }} </span>
         </div>
 
     </div>

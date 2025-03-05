@@ -26,19 +26,6 @@ export interface RecetaRecetados extends BaseEntity{
     detalleLejos: DetalleRecetaAereos | undefined   
 }
 
-export interface DetalleRecetaAereos extends BaseEntity{
-    odEsferico:  number,
-    odCilindrico:  number,
-    odGrados: number,
-    odDnp: number,
-    odDiametro:  number,
-    oiEsferico:  number,
-    oiCilindrico:  number,
-    oiGrados: number,
-    oiDnp: number,
-    oiDiametro:  number,
-}
-
 export interface RecetaContacto extends BaseEntity {
     oftalmologo: string;
     fecha: Date,

@@ -21,16 +21,16 @@ export const columns: ColumnDef<ClienteRecetasCount>[] = [
   {
     accessorKey: 'fecha_ultima_receta',
     header: ()=> h('div', 'Fecha Ultima Receta'),
-    cell: info => h('span', formatDate(info.getValue() as string))
-  },
+    cell: ({row})=> row.original.fechaUltimaReceta ? formatDate(row.original.fechaUltimaReceta.toString()) : '-' },
+
   {
     accessorKey: 'cantidad_recetas_recetados',
     header: ()=> h('div', 'Cantidad Recetas Anteojos Recetados'),
-    cell: ({row})=>row.original.cantidad_recetas_lentes_aereos  },
+    cell: ({row})=>row.original.cantidadRecetasLentesAereos  },
     {
     accessorKey: 'cantidad_recetas_contacto',
     header: ()=> h('div', 'Cantidad Recetas Lentes de Contacto'),
-    cell: ({row})=>row.original.cantidad_recetas_lentes_contacto
+    cell: ({row})=>row.original.cantidadRecetasLentesContacto
   },
 {
     accessorKey: 'acciones',
