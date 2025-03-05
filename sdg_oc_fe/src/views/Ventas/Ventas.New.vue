@@ -149,6 +149,7 @@ const hanldeSelectProducto = (_producto: Producto)=>{
     const existingLinea = lineasDeVenta.value.find(linea => linea.producto.id === _producto.id);
     if(existingLinea){
         existingLinea.cantidad+=1;
+        eliminarLineaVenta(lineasDeVenta.value.length-- )
         toast({
             title: 'Producto ya seleccionado',
             description: 'Se agregó una unidad.',
@@ -414,7 +415,7 @@ const autocompleteMedioPagoImporte=(index: number)=>{
                                  <Button size="sm" variant="ghost"  v-if=" index && mediosDePago.length>1" @click="autocompleteMedioPagoImporte(index)"  > <MagicWandIcon/> </Button>
                                 </div>
                             <Select 
-                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO"
+                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO && medio.tipoMedioPago!=TipoMedioDePagoEnum.CUENTA_CORRIENTE"
                                 :modelValue="medio.redDePago" 
                                 @update:modelValue="(value) => {
                                     if (mediosDePago[index]) {
@@ -439,7 +440,7 @@ const autocompleteMedioPagoImporte=(index: number)=>{
                                 </SelectContent>
                             </Select>
                             <Input
-                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO"
+                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO && medio.tipoMedioPago!=TipoMedioDePagoEnum.CUENTA_CORRIENTE"
                                 :model-value="medio.entidadBancaria" 
                                  @update:modelValue="(value) => {
                                     if (mediosDePago[index]) {

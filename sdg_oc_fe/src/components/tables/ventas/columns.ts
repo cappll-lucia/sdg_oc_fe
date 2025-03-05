@@ -12,7 +12,7 @@ export const columns: ColumnDef<Venta>[]=[
     },
     {
         accessorKey: 'fecha',
-        header: () => h('div', 'Fecha (dd/mm/yyyy)'),
+        header: () => h('div', 'Fecha'),
        cell: info => h('span', formatDate(info.getValue() as string))
     },
     {
@@ -37,7 +37,7 @@ export const columns: ColumnDef<Venta>[]=[
     {
         accessorKey: 'numeroFactura',
         header: () => h('div', 'Numero Factura'),
-        cell: info=> info.getValue() || ' - '
+        cell: info=> info.getValue() || ' Pendiente '
     },
     {
         id: 'actions',
