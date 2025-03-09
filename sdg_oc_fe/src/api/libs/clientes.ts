@@ -4,6 +4,7 @@ import { Cliente, CreateClienteValidator, EditClienteValidator } from '../entiti
 import { RecetasAereos } from '../entities/recetasAereos';
 import { RecetaContacto } from '../entities/recetasContacto';
 import { HistoriaClinica } from '../entities/historiaClinica';
+import { Audiometria } from '../entities/audiometrias';
 
 const getAll = async () => {
     try {
@@ -36,12 +37,20 @@ const getPaginated = async (_txt:string) => {
 const getRecetasByCliente= async(_idCliente: number)=>{
     try {
         const resp = await http.get(`/cliente/recetas/${_idCliente}`);
-        console.log(resp.data)
          return {
             recetasLentesAereos: resp.data.data.recetasLentesAereos as RecetasAereos[],
             recetasLentesContacto: resp.data.data.recetasLentesContacto as RecetaContacto[],
             historiaClinicaContacto: resp.data.data.historiaClinicaLentesContacto as HistoriaClinica
         };
+    } catch (error) {
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+}
+
+const getAudiometriasByCliente = async(_idCliente: number)=>{
+    try {
+        const resp = await http.get(`/cliente/audiometrias/${_idCliente}`);
+        return resp.data.data.audiometrias as Audiometria[];
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -79,7 +88,6 @@ const remove = async(_id: number ) =>{
     try {
 		await http.delete(`/cliente/${_id}`);
 	} catch (error: any) {
-        console.log(error)
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al eliminar el cliente')
 	}
 }
@@ -89,6 +97,7 @@ export const clientesApi = {
     getPaginated : (txt: string)=> getPaginated(txt),
     getOne: (_id: number)=> getOne(_id),
     getRecetasByCliente: (_idCliente: number)=> getRecetasByCliente(_idCliente),
+    getAudiometriasByCliente: (_idCliente: number)=> getAudiometriasByCliente(_idCliente),
     create: (_cliente: CreateClienteValidator, _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> create(_cliente, _obrasSociales),
     edit: (_id: number, _cliente: EditClienteValidator,  _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),
     remove: (_id: number)=> remove(_id),

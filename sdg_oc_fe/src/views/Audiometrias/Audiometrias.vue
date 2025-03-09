@@ -20,8 +20,9 @@ import { ClienteAudiometriasFecha } from '@/api/entities/audiometrias';
 
 
 onMounted(async () => {
-    data.value = await audiometriasApi.getAllGroupByCliente()
+    data.value = await audiometriasApi.getAllGroupByCliente();
 });
+
 </script>
 <template>
     <div class="page">

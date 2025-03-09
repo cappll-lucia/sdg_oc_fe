@@ -96,7 +96,7 @@ const printRecetas = () => {
                     </DialogContent>
                 </Dialog>
             </div>
-            <Separator class="my-2 w-[95%]" />
+            <Separator class="my-6 w-[95%]" />
             <div class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': selectedHistoriaClinica }">

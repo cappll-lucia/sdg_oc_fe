@@ -57,7 +57,7 @@ const printRecetas = () => {
 <template>
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
-            <div class="flex justify-between mr-2">
+            <div class="flex justify-between mr-2 h-10">
                 <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
@@ -101,7 +101,7 @@ const printRecetas = () => {
                     </DialogContent>
                 </Dialog>
             </div>
-            <Separator class="my-2 w-[95%]" />
+            <Separator class="my-6 w-[95%]" />
             <div v-for="receta in recetas" class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': currentRec === receta }">
@@ -121,7 +121,7 @@ const printRecetas = () => {
         
         <div class="view w-[75%] h-[100%] px-8">
             <div class="datos flex flex-col" v-if="currentRec">
-                <div class="flex flex-row justify-between items-center">
+                <div class="flex flex-row justify-between items-center h-10">
                     <div class="flex flex-col">
                         <div class="flex flex-row">
                             <span class="text-lg font-bold w-[10rem]">Tipo Receta: </span>

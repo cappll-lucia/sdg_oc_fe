@@ -23,12 +23,11 @@ const route = useRoute()
 const currentCliente = ref<Cliente>();
 const recetasClienteAereos = ref<RecetasAereos[]>();
 const recetasClienteContacto = ref<RecetaContacto[]>();
-const historiaClinicaCliente = ref<HistoriaClinica>()
-onMounted(async()=>{
+const historiaClinicaCliente = ref<HistoriaClinica>();
 
+onMounted(async()=>{
     currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente))
     if(currentCliente){
-
         const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
         recetasClienteAereos.value = res.recetasLentesAereos;
         recetasClienteContacto.value = res.recetasLentesContacto;
