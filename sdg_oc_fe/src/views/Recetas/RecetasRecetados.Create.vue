@@ -29,7 +29,7 @@ import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import router from '@/router';
 import { SlashIcon } from 'lucide-vue-next';
-import {computed, onMounted, ref} from 'vue';
+import { onMounted, ref} from 'vue';
 
 
 const selectedCliente = ref<Cliente | null>(null);
