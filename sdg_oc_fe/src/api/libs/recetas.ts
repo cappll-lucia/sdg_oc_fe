@@ -2,6 +2,7 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
 import { ClienteRecetasCount } from '../entities/clientes';
+import { NewRecetaType, RecetasAereos } from '../entities/recetasAereos';
 
 const getAllGroupByCliente = async () => {
     try {
@@ -14,7 +15,20 @@ const getAllGroupByCliente = async () => {
     }
 };
 
+const createRecetaAereos = async (_newReceta: NewRecetaType) => {
+    try {
+        console.log('okkkk')
+        const resp = await http.post('/receta-lentes-aereos', _newReceta);
+        return resp.data.data as RecetasAereos[];
+    } catch (error) {
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+};
+
 
 export const recetasApi ={
-    getAllGroupByCliente: ()=> getAllGroupByCliente()
+    getAllGroupByCliente: ()=> getAllGroupByCliente(),
+    createRecetaAereos: (_newReceta: NewRecetaType)=> createRecetaAereos(_newReceta),
 }

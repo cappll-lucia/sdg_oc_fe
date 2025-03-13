@@ -9,7 +9,7 @@ import { Audiometria } from '../entities/audiometrias';
 const getAll = async () => {
     try {
         const resp = await http.get('/cliente');
-        return resp.data.data as Cliente[];
+        return resp.data.data.items as Cliente[];
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }

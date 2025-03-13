@@ -168,6 +168,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/recetas/recetados/new',
+            name: 'new_receta_recetados',
+            component: () => import('../views/Recetas/RecetasRecetados.Create.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/ventas',
             name:'ventas',
             component: ()=> import('../views/Ventas/Ventas.vue'),

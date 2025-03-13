@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate, generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
 import { PlusIcon } from 'lucide-vue-next';
+import router from '@/router';
 
 
 const props = defineProps<{
@@ -58,7 +59,7 @@ const printRecetas = () => {
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2 h-10">
-                <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
+                <Button @click="router.replace('/recetas/recetados/new')" variant="outline" class="bg-transparent hover:bg-[#d7e5ec]" >
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
@@ -124,11 +125,11 @@ const printRecetas = () => {
                 <div class="flex flex-row justify-between items-center h-10">
                     <div class="flex flex-col">
                         <div class="flex flex-row">
-                            <span class="text-lg font-bold w-[10rem]">Tipo Receta: </span>
+                            <span class="text-lg font-bold w-[10rem]">Receta: </span>
                             <span>{{currentRec.tipoReceta}}</span>
                         </div>
                         <div class="flex flex-row ">
-                            <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
+                            <span class="text-lg font-bold w-[10rem]">Fecha: </span>
                             <span>{{formatDate(currentRec.fecha.toString())}}</span>
                         </div>
                     </div>
@@ -172,10 +173,24 @@ const printRecetas = () => {
                         <span>{{ currentRec.tratamiento ?? '--' }}</span>
                     </div>
                 </div>
-                <!-- <div class="flex flex-col items-start mt-6">
+                <Separator class="my-8" />
+                <div class="flex flex-row  justify-between ">
+                    <div class="flex flex-col w-[12rem]">
+                        <span class="text font-bold ">Oftalmólogo: </span>
+                        <span>{{ currentRec.oftalmologo ?? '--' }}</span>
+                    </div>
+                    <div class="flex flex-col  w-[12rem]">
+                        <span class="text font-bold ">Armazón: </span>
+                        <span>{{ currentRec.armazon ?? '---' }}</span>
+                    </div>
+                    <div class="flex flex-col  w-[12rem]">
+                    </div>
+                </div>
+                <Separator class="my-8" />
+                <div class="flex flex-col items-start">
                     <span class="text font-bold">Observaciones: </span>
-                    <span>{{ currentRec.observaciones ?? '--' }}</span>
-                </div> -->
+                    <span class="min-h-[5rem]">{{ currentRec.observaciones ?? '--' }}</span>
+                </div>
             </div>
         </div>
     </div>

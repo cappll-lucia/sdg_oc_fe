@@ -68,7 +68,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                         Lentes De Contacto
                     </TabsTrigger>
                 </TabsList>
-                <TabsContent class="bg-secondary h-[40rem] px-2 py-6 rounded" value="recetados">
+                <TabsContent class="bg-secondary min-h-[40rem] px-2 py-6 rounded" value="recetados">
                     <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" />
                     <h2 v-else>El cliente no tiene recetas registradas para anteojos recetados </h2>
                 </TabsContent>
