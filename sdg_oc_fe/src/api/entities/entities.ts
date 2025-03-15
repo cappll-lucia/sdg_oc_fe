@@ -7,55 +7,6 @@ export interface BaseEntity {
 	updatedAt: string;
 }
 
-export interface BaseEntitySt {
-	id: string;
-	createdAt: string;
-	updatedAt: string;
-}
-
-export interface RecetaRecetados extends BaseEntity{
-    fecha: Date,
-    oftalmologo: string,
-    tipo: string,
-    cristal: string,
-    color: string ,
-    armazon: string,
-    tratamiento: string,
-    observaciones: string,
-    detalleCerca: DetalleRecetaAereos | undefined,
-    detalleLejos: DetalleRecetaAereos | undefined   
-}
-
-export interface RecetaContacto extends BaseEntity {
-    oftalmologo: string;
-    fecha: Date,
-    quetM1Od: number;
-    quetM2Od: number;
-    quetM1Oi: number;
-    quetM2Oi: number;
-    observacionQueratometria: string;
-    maquillaje: boolean;
-    tonicidad: boolean;
-    hendiduraPalpebral: boolean;
-    alturaPalpebral: boolean;
-    buenParpadeoRitmo: boolean;
-    buenParpadeoAmplitud: boolean;
-    estesiometria: string;
-    odCb: number;
-    odEsferico: number;
-    odCilindrico: number;
-    odEje: number;
-    odDiametro: number;
-    oiCb: number;
-    oiEsferico: number;
-    oiCilindrico: number;
-    oiEje: number;
-    oiDiametro: number;
-    odMarca: string;
-    oiMarca: string;
-    observaciones: string;
-    pruebas: Prueba[]; 
-}
 
 export interface Prueba extends BaseEntity {
     idRecetaLentesContacto: number; 

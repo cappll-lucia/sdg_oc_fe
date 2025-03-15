@@ -28,8 +28,15 @@ import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import router from '@/router';
-import { SlashIcon } from 'lucide-vue-next';
-import {computed, onMounted, ref} from 'vue';
+import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
+import { onMounted, ref} from 'vue';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
+import AlertError from '@/components/AlertError.vue';
 
 
 const selectedCliente = ref<Cliente | null>(null);
@@ -37,6 +44,8 @@ const searchClienteOpen = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const foundClientes = ref<Cliente[]>([]);
 
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 
 const newReceta = ref<{
@@ -110,7 +119,6 @@ const isValidReceta = ref<{
     cristal: boolean,
     color: boolean,
     tratamiento: boolean,
-    observaciones: boolean,
     fecha: boolean,
     cliente: boolean,
 }>({
@@ -119,7 +127,6 @@ const isValidReceta = ref<{
     cristal: true,
     color: true,
     tratamiento: true,
-    observaciones: true,
     fecha: true,
     cliente: true,
 })
@@ -200,9 +207,9 @@ const onSubmit = async()=>{
         })
         router.replace('/recetas')
     } catch (err: any) {
-        // errorMessage.value=err.message as string
-        // showError.value = true;
-        // loading.value=false;
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loading.value=false;
         console.log(err)
     };
 }
@@ -217,7 +224,9 @@ const handleSelectCliente = (cliente:Cliente)=>{
 const validateAndSubmit = async()=>{
     loading.value = true;
     const validDetalle = validateDetalles()
-    const resultReceta = createRecetaAereosCustomValidator(newReceta.value, fechaReceta.value)
+    const resultReceta = createRecetaAereosCustomValidator(newReceta.value, fechaReceta.value);
+    console.log(resultReceta)
+    console.log(validDetalle)
     isValidReceta.value = resultReceta.isValid
     if(validDetalle && resultReceta.success){
         await onSubmit();
@@ -288,8 +297,8 @@ const validateDetalles = ()=>{
                             <!-- Cliente -->
                             <div class="h-[5rem] mt-8  w-[25%]">
                                     <div class="form-item-wide justify-start">
-                                        <Label class="form-label w-[4rem]  text-left">Cliente</Label>
-                                        <div class="flex flex-row justify-end items-center">
+                                        <Label class="form-label w-[3rem] text-left">Cliente</Label>
+                                        <div class="flex flex-row justify-start items-center">
                                             <Input type="text" 
                                                 class="w-[15rem] h-10"
                                                 readonly
@@ -301,21 +310,35 @@ const validateDetalles = ()=>{
                                                 title="Nueva Audiometría: Seleccionar Cliente"
                                                 @select-cliente="handleSelectCliente"
                                             />
-                                            <Label class="text-destructive w-10 text-center text-2lg error-cliente" v-if="!isValidReceta.cliente"> * </Label>
+                                             <TooltipProvider  v-if="!isValidReceta.cliente" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Seleccionar cliente</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Fecha -->
-                                 <div class="h-[5rem] w-[30%]  flex flex-col justify-start items-end mt-8">
-                                    <div class="flex items-center justify-start w-full">
-                                        <Label class="w-[25%]  mr-2">Fecha Receta</Label>
+                                 <div class="h-[5rem] w-[30%] flex flex-col justify-start items-end mt-8">
+                                    <div class="flex items-center justify-end w-full">
+                                        <Label class="w-[25%]">Fecha Receta</Label>
                                         <div class="flex gap-2 w-[60%]">
-                                        <Input type="text" v-model="fechaReceta.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaReceta.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaReceta.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
+                                            <Input type="text" v-model="fechaReceta.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
+                                            <Input type="text" v-model="fechaReceta.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
+                                            <Input type="text" v-model="fechaReceta.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
                                         </div>
-                                        <Label class="text-destructive w-5 text-center  text-2lg" v-if="!isValidReceta.fecha"> * </Label>
+                                        <TooltipProvider  v-if="!isValidReceta.fecha" >
+                                            <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive "> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Ingresar una fecha válida</p>
+                                            </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
                                 </div>
 
@@ -339,7 +362,14 @@ const validateDetalles = ()=>{
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-                                        <Label class="text-destructive w-5 text-center ml-4 text-2lg" v-if="!isValidReceta.tipoReceta">*</Label>
+                                        <TooltipProvider  v-if="!isValidReceta.tipoReceta" >
+                                            <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Seleccionar tipo receta</p>
+                                            </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
                                 </div>
                             
@@ -351,22 +381,46 @@ const validateDetalles = ()=>{
                                 <h1 class="text-xl mb-6 font-extrabold w-20 mr-12 ">Cerca</h1>
                                 <div class="flex flex-row justify-start items-center">
                                     <div class="flex flex-col ">
-                                        <div class="flex  h-10 items-center">
+                                        <div class="flex  h-10 items-center justify-items-start">
                                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleCerca.od_esferico" />
+                                            <Input type="decimal" v-model="currentDetalleCerca.od_esferico" :class="{'w-20' : !isValidDetalleCerca.od_esferico, 'w-20 mr-4': isValidDetalleCerca.od_esferico}"  />
+                                            <TooltipProvider  v-if="!isValidDetalleCerca.od_esferico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -35 a 35</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             
                                             <Separator orientation="vertical" class="mx-4" />
 
                                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleCerca.od_cilindrico" />
+                                            <Input type="decimal"  v-model="currentDetalleCerca.od_cilindrico" :class="{'w-20' : !isValidDetalleCerca.od_cilindrico, 'w-20 mr-4': isValidDetalleCerca.od_cilindrico}" />
+                                            <TooltipProvider  v-if="!isValidDetalleCerca.od_cilindrico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -10 a 10</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
 
                                             <Separator orientation="vertical" class="mx-4 " />
 
                                             <p class="font-bold w-12 text-right pr-4">A:</p>
-                                            <Input type="number" class="w-20" v-model="currentDetalleCerca.od_grados" />
-                                            <p class="ml-4"> °</p>
+                                            <Input type="decimal" v-model="currentDetalleCerca.od_grados" class="w-20" />
+                                            <p class="ml-2 mr-4">°</p>
+                                            <TooltipProvider  v-if="!isValidDetalleCerca.od_grados" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: 0° a 180 °</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
 
                                         <Separator class="my-4" />
@@ -375,26 +429,58 @@ const validateDetalles = ()=>{
                                             <p class="font-bold w-20 text-lg">O.I.</p>
 
                                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleCerca.oi_esferico" />
+                                            <Input type="decimal" v-model="currentDetalleCerca.oi_esferico" :class="{'w-20' : !isValidDetalleCerca.oi_esferico, 'w-20 mr-4': isValidDetalleCerca.oi_esferico}"  />
+                                            <TooltipProvider  v-if="!isValidDetalleCerca.oi_esferico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -35 a 35</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             
                                             <Separator orientation="vertical" class="mx-4" />
 
                                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleCerca.oi_cilindrico" />
+                                            <Input type="decimal" v-model="currentDetalleCerca.oi_cilindrico" :class="{'w-20' : !isValidDetalleCerca.oi_cilindrico, 'w-20 mr-4': isValidDetalleCerca.oi_cilindrico}"  />
+                                            <TooltipProvider  v-if="!isValidDetalleCerca.oi_cilindrico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -10 a 10</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
 
                                             <Separator orientation="vertical" class="mx-4 " />
 
                                             <p class="font-bold w-12 text-right pr-4">A:</p>
-                                            <Input type="number" class="w-20" v-model="currentDetalleCerca.oi_grados" />
-                                            <p class="ml-4"> °</p>
+                                            <Input type="decimal" class="w-20" v-model="currentDetalleCerca.oi_grados" />
+                                            <p class="ml-4 mr-4">°</p>
+                                            <TooltipProvider  v-if="!isValidDetalleCerca.oi_grados" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: 0° a 180 °</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         
 
                                         </div>
                                     </div>
                                     <Separator orientation="vertical" class="w-20" />
-                                    <div class="pr-4">
-                                        <p class=" font-bold w-20 text-center mb-2">DNP</p>
-                                        <Input type="number" class="w-20" v-model="currentDetalleCerca.dnp" />
+                                    <div class="w-[10rem] flex flex-row justify-start items-center">
+                                        <p class=" font-bold w-14 text-start">DNP</p>
+                                        <Input type="decimal" class="w-20" v-model="currentDetalleCerca.dnp" />
+                                        <TooltipProvider  v-if="!isValidDetalleCerca.dnp" >
+                                            <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Campo requerido</p>
+                                            </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
                                 </div>
                             </div>
@@ -410,18 +496,43 @@ const validateDetalles = ()=>{
                                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleLejos.od_esferico" />
+                                            <Input type="decimal" v-model="currentDetalleLejos.od_esferico" :class="{'w-20' : !isValidDetalleLejos.od_esferico, 'w-20 mr-4': isValidDetalleLejos.od_esferico}"  />
+                                            <TooltipProvider  v-if="!isValidDetalleLejos.od_esferico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -35 a 35</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             
                                             <Separator orientation="vertical" class="mx-4" />
 
                                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleLejos.od_cilindrico" />
+                                            <Input type="decimal"  v-model="currentDetalleLejos.od_cilindrico" :class="{'w-20' : !isValidDetalleLejos.od_cilindrico, 'w-20 mr-4': isValidDetalleLejos.od_cilindrico}" />
+                                            <TooltipProvider  v-if="!isValidDetalleLejos.od_cilindrico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -10 a 10</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
 
                                             <Separator orientation="vertical" class="mx-4 " />
 
                                             <p class="font-bold w-12 text-right pr-4">A:</p>
-                                            <Input type="number" class="w-20" v-model="currentDetalleLejos.od_grados" />
-                                            <p class="ml-4"> °</p>
+                                            <Input type="decimal" v-model="currentDetalleLejos.od_grados" class="w-20" />
+                                            <p class="ml-2 mr-4">°</p>
+                                            <TooltipProvider  v-if="!isValidDetalleLejos.od_grados" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: 0° a 180 °</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+
                                         </div>
 
                                         <Separator class="my-4" />
@@ -430,26 +541,59 @@ const validateDetalles = ()=>{
                                             <p class="font-bold w-20 text-lg">O.I.</p>
 
                                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleLejos.oi_esferico" />
+                                            <Input type="decimal" v-model="currentDetalleLejos.oi_esferico" :class="{'w-20' : !isValidDetalleLejos.oi_esferico, 'w-20 mr-4': isValidDetalleLejos.oi_esferico}"  />
+                                            <TooltipProvider  v-if="!isValidDetalleLejos.oi_esferico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -35 a 35</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             
                                             <Separator orientation="vertical" class="mx-4" />
 
                                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                                            <Input type="decimal" class="w-20" v-model="currentDetalleLejos.oi_cilindrico" />
+                                            <Input type="decimal" v-model="currentDetalleLejos.oi_cilindrico" :class="{'w-20' : !isValidDetalleLejos.oi_cilindrico, 'w-20 mr-4': isValidDetalleLejos.oi_cilindrico}"  />
+                                            <TooltipProvider  v-if="!isValidDetalleLejos.oi_cilindrico" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: -10 a 10</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
 
                                             <Separator orientation="vertical" class="mx-4 " />
 
                                             <p class="font-bold w-12 text-right pr-4">A:</p>
-                                            <Input type="number" class="w-20" v-model="currentDetalleLejos.oi_grados" />
-                                            <p class="ml-4"> °</p>
+                                            <Input type="decimal" class="w-20" v-model="currentDetalleLejos.oi_grados" />
+                                            <p class="ml-2 mr-4">°</p>
+                                            <TooltipProvider  v-if="!isValidDetalleLejos.oi_grados" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Rango permitido: 0° a 180 °</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         
 
                                         </div>
                                     </div>
                                     <Separator orientation="vertical" class="w-20" />
-                                    <div class="pr-4">
-                                        <p class=" font-bold w-20 text-center mb-2">DNP</p>
-                                        <Input type="number" class="w-20" v-model="currentDetalleLejos.dnp" />
+
+                                    <div class=" w-[10rem]  flex flex-row justify-start items-center">
+                                        <p class="font-bold w-14 text-start">DNP</p>
+                                        <Input type="decimal" class="w-20" v-model="currentDetalleLejos.dnp" />
+                                        <TooltipProvider  v-if="!isValidDetalleLejos.dnp" >
+                                            <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs ">
+                                                <p>Campo requerido</p>
+                                            </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </div>
                                 </div>
                             </div>
@@ -484,7 +628,14 @@ const validateDetalles = ()=>{
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
-                                            <Label class="text-destructive w-5 text-center ml-4 text-2lg" v-if="!isValidReceta.cristal">*</Label>
+                                            <TooltipProvider  v-if="!isValidReceta.cristal" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Seleccionar tipo de cristal</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
                                     </div>
 
@@ -508,7 +659,14 @@ const validateDetalles = ()=>{
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
-                                            <Label class="text-destructive w-5 text-center ml-4 text-2lg" v-if="!isValidReceta.color">*</Label>
+                                            <TooltipProvider  v-if="!isValidReceta.color" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Seleccionar color de cristal</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
                                     </div>
 
@@ -533,21 +691,21 @@ const validateDetalles = ()=>{
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
-                                            <Label class="text-destructive w-5 text-center ml-4 text-2lg" v-if="!isValidReceta.tratamiento">*</Label>
+                                            <TooltipProvider  v-if="!isValidReceta.tratamiento" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Seleccionar tratamiento de cristal</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                         </div>
                                     </div>
 
                                 </div>
                         </div>
                         <div class="flex flex-col mt-6  w-[60%] justify-start items-start">
-                                <div class="flex flex-row justify-between w-full">
-                                    <Label class="form-label text-right mr-4 w-[8rem]">Observaciones</Label>    
-                                    <Textarea
-                                        class="resize-none w-[80%] h-[7.5rem]"
-                                        v-model="newReceta.observaciones"
-                                    />                            
-                                </div>
-                                <div class="flex flex-row justify-between items-center w-full mt-5">
+                                <div class="flex flex-row justify-between items-center w-full">
                                     <div class="flex flex-row justify-between items-center w-full mt-5">
                                         <Label class="form-label text-right mr-4 w-[8rem]">Armazón</Label>    
                                         <Input
@@ -560,10 +718,24 @@ const validateDetalles = ()=>{
                                         <Input
                                             class="resize-none w-[60%] "
                                             v-model="newReceta.oftalmologo"
-                                        />                            
+                                        />  
+                                        <TooltipProvider  v-if="!isValidReceta.oftalmologo" >
+                                            <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Indique oftalmólogo</p>
+                                            </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>                          
                                     </div>
                                 </div>
-                            
+                                <div class="flex flex-row justify-between w-full mt-5">
+                                    <Label class="form-label text-right mr-4 w-[8rem]">Observaciones</Label>    
+                                    <Textarea
+                                        class="resize-none w-[80%] h-[7.5rem]"
+                                        v-model="newReceta.observaciones"
+                                    />                            
+                                </div>
                         </div>
                         </div>
                 </div>
@@ -573,6 +745,10 @@ const validateDetalles = ()=>{
                 </div>
             </form>
         </div>
+
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
+
     </div>
 </template>
 

@@ -17,7 +17,6 @@ const getAllGroupByCliente = async () => {
 
 const createRecetaAereos = async (_newReceta: NewRecetaType) => {
     try {
-        console.log('okkkk')
         const resp = await http.post('/receta-lentes-aereos', _newReceta);
         return resp.data.data as RecetasAereos[];
     } catch (error) {

@@ -83,7 +83,6 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
       cristal: _newReceta.cristal ? Object.keys(TipoCristal).includes(_newReceta.cristal) : false,
       color: _newReceta.color ? Object.keys(ColorCristal).includes(_newReceta.color) : false,
       tratamiento: _newReceta.tratamiento ? Object.keys(TratamientoCristal).includes(_newReceta.tratamiento) : false,
-      observaciones: Boolean(_newReceta.observaciones),
       fecha: fechaValidator.safeParse(_fecha).success,
       cliente: Boolean(_newReceta.cliente.id)
     };
