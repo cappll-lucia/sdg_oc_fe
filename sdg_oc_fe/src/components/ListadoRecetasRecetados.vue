@@ -135,7 +135,7 @@ const printRecetas = () => {
                     </div>
                     <div class="flex flex-col ">
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                            @click="() => { console.log('editar historia clinica'); }">
+                            @click="() => {router.replace(`/recetas/recetados/edit/${currentRec?.id}`)}">
                             Editar
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>

@@ -40,6 +40,33 @@ export const createDetalleAereosCustomValidator = (_detalle:{
   const success = Object.values(isValid).every(Boolean);
   return {success, isValid};
 }
+export const editDetalleAereosCustomValidator = (_detalle:DetalleRecetaAereos | undefined) =>{
+  const validateEsferico = (value:unknown) => isValidNumber(value) && value >= -35 && value <= 35;
+  const validateCilindrico = (value:unknown) => isValidNumber(value) && value >= -10 && value <= 10;
+  const validateGrados = (value:unknown) => isValidNumber(value) && value >= 0 && value <= 180;
+  const validateDnp = (value:unknown) => isValidNumber(value) && value >= 0;
+  const isValid = {
+    tipo_detalle: _detalle ? Object.keys(TipoReceta).includes(_detalle.tipo_detalle) : false,
+    od_esferico: _detalle ?  validateEsferico(_detalle.od_esferico) : false,
+    od_cilindrico: _detalle ?  validateCilindrico(_detalle.od_cilindrico) : false,
+    od_grados: _detalle ?  validateGrados(_detalle.od_grados) : false,
+    oi_esferico: _detalle ?  validateEsferico(_detalle.oi_esferico) : false,
+    oi_cilindrico: _detalle ?  validateCilindrico(_detalle.oi_cilindrico) : false,
+    oi_grados: _detalle ?  validateGrados(_detalle.oi_grados) : false,
+    dnp: _detalle ?  validateDnp(_detalle.dnp) : false
+  };
+  const success = Object.values(isValid).every(Boolean);
+  return {success, isValid};
+}
+
+const isValidNumber = (value: unknown): value is number => {
+  if (typeof value === "number") return true;
+  if (typeof value === "string" && value.trim() !== "" && !isNaN(Number(value))) {
+    return true;
+  }
+  return false;
+};
+
 
 
 export type NewDetalleType = {

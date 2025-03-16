@@ -90,6 +90,20 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
     return {success, isValid};
   }
 
+  export const editRecetaAereosCustomValidator = (_newReceta:RecetasAereos | undefined, _fecha : {  day: string,  month: string,  year: string,}) =>{
+    const isValid = {
+      tipoReceta: _newReceta ?  Object.keys(TipoReceta).includes(_newReceta.tipoReceta) : false,
+      oftalmologo: _newReceta ?  Boolean(_newReceta.oftalmologo) : false,
+      cristal: _newReceta ?  _newReceta.cristal ? Object.keys(TipoCristal).includes(_newReceta.cristal) : false : false,
+      color: _newReceta ?  _newReceta.color ? Object.keys(ColorCristal).includes(_newReceta.color) : false : false,
+      tratamiento: _newReceta ?  _newReceta.tratamiento ? Object.keys(TratamientoCristal).includes(_newReceta.tratamiento) : false : false,
+      fecha: fechaValidator.safeParse(_fecha).success,
+      cliente: _newReceta ?  Boolean(_newReceta.cliente.id) : false,
+    };
+    const success = Object.values(isValid).every(Boolean);
+    return {success, isValid};
+  }
+
 export type NewRecetaType = {
    tipoReceta: TipoReceta, 
     oftalmologo:undefined | string,

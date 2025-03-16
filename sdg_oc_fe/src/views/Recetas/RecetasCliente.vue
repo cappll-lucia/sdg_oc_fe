@@ -59,7 +59,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         </Breadcrumb>
         <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
         <div class="pt-2">
-            <Tabs default-value="contacto" class="w-[100%]">
+            <Tabs default-value="recetados" class="w-[100%]">
                 <TabsList class="w-[100%]">
                     <TabsTrigger class="w-[50%]" value="recetados">
                         Anteojos Recetados

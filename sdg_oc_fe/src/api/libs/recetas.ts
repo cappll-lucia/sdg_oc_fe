@@ -15,6 +15,20 @@ const getAllGroupByCliente = async () => {
     }
 };
 
+const getOneRecetados = async (_id: number)=>{
+     try {
+        const resp = await http.get(`/receta-lentes-aereos/${_id}`);
+        const receta = resp.data.data as RecetasAereos;
+        receta.fecha = new Date(receta.fecha)
+        return receta
+    } catch (error) {
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+}
+
+
 const createRecetaAereos = async (_newReceta: NewRecetaType) => {
     try {
         const resp = await http.post('/receta-lentes-aereos', _newReceta);
@@ -26,8 +40,21 @@ const createRecetaAereos = async (_newReceta: NewRecetaType) => {
     }
 };
 
+const editRecetaAereos = async (_editedReceta: RecetasAereos) => {
+    try {
+        const resp = await http.patch(`/receta-lentes-aereos/${_editedReceta.id}`, _editedReceta );
+        return resp.data.data as RecetasAereos[];
+    } catch (error) {
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+};
+
 
 export const recetasApi ={
     getAllGroupByCliente: ()=> getAllGroupByCliente(),
+    getOneRecetados: (_id: number)=> getOneRecetados(_id),
     createRecetaAereos: (_newReceta: NewRecetaType)=> createRecetaAereos(_newReceta),
+    editRecetaAereosRecetaAereos: (_newReceta: RecetasAereos)=> editRecetaAereos(_newReceta),
 }
