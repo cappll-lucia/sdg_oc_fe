@@ -20,6 +20,11 @@ export const useUserStore = defineStore('UserStore', {
             }catch(error: any){
                 throw error
             }
+        },
+
+        async signOut(){
+            token.delete();
+			window.location.reload();
         }
     },
 

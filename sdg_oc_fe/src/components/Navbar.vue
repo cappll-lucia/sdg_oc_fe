@@ -19,6 +19,17 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
 import router from '@/router';
+import { useUserStore } from '@/stores/UsersStore';
+import { onMounted, ref } from 'vue';
+import { JwtUser } from '@/api/entities/jwtUser';
+
+const userStore = useUserStore();
+const userData = ref<JwtUser|null>();
+
+onMounted(async()=>{
+    userData.value = userStore.getMe
+})
+
 
 const ventasItems: { title: string, href: string, description?: string; }[] = [
     {
@@ -126,12 +137,9 @@ const parametrosItems: { title: string, href: string}[] = [
                     </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="mr-4 w-[8rem]">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuLabel>{{ userData?.username }}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem>
+                    <DropdownMenuItem @click="userStore.signOut()" >Cerrar sesión</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
