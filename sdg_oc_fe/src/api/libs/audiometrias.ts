@@ -50,10 +50,14 @@ const create = async (_audiometria: CreateAudiometriaValidator, _pdf: File | und
     }
 }
 
-const edit = async (_id: number, _audiometria: EditAudiometriaValidator, _pdf: FormData|undefined)=>{
+const edit = async (_id: number, _audiometria: EditAudiometriaValidator, _pdf: File|undefined)=>{
     try{
-        // TODO Formdata 
-        const resp = await http.patch(`/audiometria/${_id}`, _audiometria);
+        const formData = new FormData();
+        formData.append('audiometriaDTO', JSON.stringify(_audiometria));
+        if (_pdf) {
+            formData.append('pdf', _pdf);
+        }
+        const resp = await http_files.patch(`/audiometria/${_id}`, formData)
         return resp.data.data as Audiometria;
     }catch(error){
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -65,5 +69,5 @@ export const audiometriasApi = {
     getAllGroupByCliente: ()=> getAllGroupByCliente(),
     getOne: (_id: number)=> getOne(_id),
     create: (_audiometria: CreateAudiometriaValidator, _pdf: File)=> create(_audiometria, _pdf),
-    edit: (_id: number, _audiometria: EditAudiometriaValidator, _pdf?: FormData)=> edit(_id, _audiometria, _pdf)
+    edit: (_id: number, _audiometria: EditAudiometriaValidator, _pdf?: File)=> edit(_id, _audiometria, _pdf)
 }

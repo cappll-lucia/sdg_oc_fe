@@ -29,7 +29,7 @@ import router from '@/router/index';
 import {onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import AlertConfirm from '@/components/AlertConfirm.vue';
-import { VPdfViewer } from '@vue-pdf-viewer/viewer';
+
 
 const currentAudiometria = ref<Audiometria>();
 const route = useRoute();
@@ -75,7 +75,8 @@ onMounted(async()=>{
             }
         });
         currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme);
-        audiometriaURL.value = currentAudiometria.value.linkPDF;
+        //audiometriaURL.value = currentAudiometria.value.linkPDF;
+        audiometriaURL.value = 'http://localhost:3001/'+'uploads/audiometrias/audiometria-cliente-10-20140920.pdf';
     }
 })
 
@@ -91,8 +92,7 @@ const onSubmit = handleSubmit(async (values) => {
     try {
         if(currentAudiometria.value){
             if(newPDF){
-                const fromData = new FormData()
-                await audiometriasApi.edit( currentAudiometria.value?.id ,values, fromData )
+                await audiometriasApi.edit( currentAudiometria.value?.id ,values, audiometriaFile.value )
             }else{
                 await audiometriasApi.edit( currentAudiometria.value?.id ,values )
             }
@@ -228,9 +228,6 @@ const handleFileUpload = () => {
                         <div v-if="audiometriaURL" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
                             <iframe :src="audiometriaURL" class="w-full h-full border-none" frameborder="0"
                             allowfullscreen></iframe>
-                            
-
-                            <!-- <VPdfViewer  src="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf" /> -->
                         </div>
                         <div v-else class="flex justify-center items-center w-full h-full border rounded-md">
                             <span class="font-light color-secondary">Ningún PDF Seleccionado</span>
