@@ -40,7 +40,7 @@ export const createDetalleAereosCustomValidator = (_detalle:{
   const success = Object.values(isValid).every(Boolean);
   return {success, isValid};
 }
-export const editDetalleAereosCustomValidator = (_detalle:DetalleRecetaAereos | undefined) =>{
+export const editDetalleAereosCustomValidator = (_detalle:EditedDetalleType | undefined) =>{
   const validateEsferico = (value:unknown) => isValidNumber(value) && value >= -35 && value <= 35;
   const validateCilindrico = (value:unknown) => isValidNumber(value) && value >= -10 && value <= 10;
   const validateGrados = (value:unknown) => isValidNumber(value) && value >= 0 && value <= 180;
@@ -70,6 +70,17 @@ const isValidNumber = (value: unknown): value is number => {
 
 
 export type NewDetalleType = {
+  tipo_detalle: TipoReceta,
+  od_esferico: number | undefined, 
+  od_cilindrico: number | undefined, 
+  od_grados: number | undefined, 
+  oi_esferico: number | undefined, 
+  oi_cilindrico: number | undefined, 
+  oi_grados: number | undefined, 
+  dnp: number | undefined 
+}
+
+export type EditedDetalleType = {
   tipo_detalle: TipoReceta,
   od_esferico: number | undefined, 
   od_cilindrico: number | undefined, 

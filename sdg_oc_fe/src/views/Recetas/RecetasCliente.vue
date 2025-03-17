@@ -18,8 +18,10 @@ import { useRoute } from 'vue-router';
 import { clientesApi } from '@/api/libs/clientes';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
+import Button from '@/components/ui/button/Button.vue';
+import router from '@/router';
 
-const route = useRoute()
+const route = useRoute();
 const currentCliente = ref<Cliente>();
 const recetasClienteAereos = ref<RecetasAereos[]>();
 const recetasClienteContacto = ref<RecetaContacto[]>();
@@ -70,11 +72,17 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                 </TabsList>
                 <TabsContent class="bg-secondary min-h-[40rem] px-2 py-6 rounded" value="recetados">
                     <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" />
-                    <h2 v-else>El cliente no tiene recetas registradas para anteojos recetados </h2>
+                    <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
+                        <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">anteojos recetados </span> </h2>
+                        <Button @click="router.replace('/recetas/recetados/new')"> Registrar receta </Button>
+                    </div>
                 </TabsContent>
                 <TabsContent class="bg-secondary h-[75rem] px-2 py-6 rounded" value="contacto">
                     <ListadoRecetasContacto v-if="recetasClienteContacto && recetasClienteContacto.length > 0" :nombreCliente="nombreCliente" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" />
-                    <h2 v-else>El cliente no tiene recetas registradas para lentes de contato </h2>
+                    <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
+                        <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">lentes de contacto </span> </h2>
+                        <Button @click="router.replace('/recetas/contacto/new')"> Registrar receta </Button>
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

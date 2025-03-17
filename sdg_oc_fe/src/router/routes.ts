@@ -176,6 +176,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/recetas/recetados/edit/:id',
+            name: 'edit_receta_recetados',
+            component: () => import('../views/Recetas/RecetasRecetados.Edit.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/ventas',
             name:'ventas',
             component: ()=> import('../views/Ventas/Ventas.vue'),

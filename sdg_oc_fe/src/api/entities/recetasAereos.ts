@@ -39,10 +39,10 @@ export interface RecetasAereos extends BaseEntity{
     fecha: Date;
     tipoReceta: TipoReceta;
     oftalmologo:string;
-    cristal:string;
-    color:string;
+    cristal:TipoCristal;
+    color:ColorCristal;
+    tratamiento:TratamientoCristal;
     armazon:string;
-    tratamiento:string;
     cliente: Cliente;
     observaciones: string,
     detallesRecetaLentesAereos: DetalleRecetaAereos[],
@@ -115,4 +115,17 @@ export type NewRecetaType = {
     fecha: Date | undefined,
     cliente: { id: undefined | number }
     detallesRecetaLentesAereos: Array<NewDetalleType>
+}
+export type EditedRecetaType = {
+  id: number,
+  tipoReceta: TipoReceta, 
+  oftalmologo:undefined | string,
+  cristal:undefined | TipoCristal,
+  color:undefined | ColorCristal,
+  tratamiento:undefined | TratamientoCristal,
+  armazon:undefined | string,
+  observaciones:undefined | string,
+  fecha: Date | undefined,
+  cliente: { id: undefined | number }
+  detallesRecetaLentesAereos: Array<NewDetalleType>
 }

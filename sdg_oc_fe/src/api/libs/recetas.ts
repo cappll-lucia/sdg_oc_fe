@@ -2,7 +2,7 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
 import { ClienteRecetasCount } from '../entities/clientes';
-import { NewRecetaType, RecetasAereos } from '../entities/recetasAereos';
+import { EditedRecetaType, NewRecetaType, RecetasAereos } from '../entities/recetasAereos';
 
 const getAllGroupByCliente = async () => {
     try {
@@ -40,9 +40,9 @@ const createRecetaAereos = async (_newReceta: NewRecetaType) => {
     }
 };
 
-const editRecetaAereos = async (_editedReceta: RecetasAereos) => {
+const editRecetaAereos = async (_editedReceta: EditedRecetaType) => {
     try {
-        const resp = await http.patch(`/receta-lentes-aereos/${_editedReceta.id}`, _editedReceta );
+        const resp = await http.put(`/receta-lentes-aereos/${_editedReceta.id}`, _editedReceta );
         return resp.data.data as RecetasAereos[];
     } catch (error) {
         throw error instanceof AxiosError ?  
@@ -56,5 +56,5 @@ export const recetasApi ={
     getAllGroupByCliente: ()=> getAllGroupByCliente(),
     getOneRecetados: (_id: number)=> getOneRecetados(_id),
     createRecetaAereos: (_newReceta: NewRecetaType)=> createRecetaAereos(_newReceta),
-    editRecetaAereosRecetaAereos: (_newReceta: RecetasAereos)=> editRecetaAereos(_newReceta),
+    editRecetaAereosRecetaAereos: (_newReceta: EditedRecetaType)=> editRecetaAereos(_newReceta),
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DetalleRecetaAereos, editDetalleAereosCustomValidator } from '@/api/entities/detalleRecetaAereos';
+import { editDetalleAereosCustomValidator } from '@/api/entities/detalleRecetaAereos';
 import { ColorCristal, RecetasAereos, TipoCristal, TipoReceta, TratamientoCristal, editRecetaAereosCustomValidator } from '@/api/entities/recetasAereos';
 import { recetasApi } from '@/api/libs/recetas';
 import {
@@ -45,8 +45,45 @@ const errorMessage =ref<string>('');
 
 
 const currentReceta = ref<RecetasAereos>()
-const currentDetalleCerca = ref<DetalleRecetaAereos>()
-const currentDetalleLejos = ref<DetalleRecetaAereos>()
+
+const currentDetalleCerca = ref<{
+    tipo_detalle: TipoReceta,
+    od_esferico: number | undefined ,
+    od_cilindrico: number | undefined ,
+    od_grados: number | undefined ,
+    oi_esferico: number | undefined ,
+    oi_cilindrico: number | undefined ,
+    oi_grados: number | undefined ,
+    dnp: number | undefined ,
+}>({
+    tipo_detalle: TipoReceta.Cerca,
+    od_esferico:undefined ,
+    od_cilindrico:undefined ,
+    od_grados:undefined ,
+    oi_esferico:undefined ,
+    oi_cilindrico:undefined ,
+    oi_grados:undefined ,
+    dnp:undefined ,
+})
+const currentDetalleLejos = ref<{
+    tipo_detalle: TipoReceta,
+    od_esferico: number | undefined ,
+    od_cilindrico: number | undefined ,
+    od_grados: number | undefined ,
+    oi_esferico: number | undefined ,
+    oi_cilindrico: number | undefined ,
+    oi_grados: number | undefined ,
+    dnp: number | undefined ,
+}>({
+    tipo_detalle: TipoReceta.Lejos,
+    od_esferico:undefined ,
+    od_cilindrico:undefined ,
+    od_grados:undefined ,
+    oi_esferico:undefined ,
+    oi_cilindrico:undefined ,
+    oi_grados:undefined ,
+    dnp:undefined ,
+})
 
 
 const isValidReceta = ref<{
@@ -115,18 +152,26 @@ const fechaReceta = ref({
 
 
 
+
 onMounted(async()=>{
     currentReceta.value = await recetasApi.getOneRecetados(Number(route.params.id));
+    let detalleCerca, detalleLejos
     switch(currentReceta.value.tipoReceta){
         case TipoReceta.Cerca:
-            currentDetalleCerca.value = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
+            detalleCerca = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
+            if(detalleCerca) currentDetalleCerca.value = detalleCerca
             break;
         case TipoReceta.Lejos:
-            currentDetalleLejos.value = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
+            detalleLejos = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
+            if(detalleLejos) currentDetalleLejos.value = detalleLejos
+            
             break;
         case TipoReceta.Multifocal:
-            currentDetalleCerca.value = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
-            currentDetalleLejos.value = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
+            detalleCerca = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
+            if(detalleCerca) currentDetalleCerca.value = detalleCerca
+            detalleLejos = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
+            if(detalleLejos) currentDetalleLejos.value = detalleLejos
+
         break;
     }
     fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
@@ -137,22 +182,20 @@ onMounted(async()=>{
 const onSubmit = async()=>{
     if(!currentReceta.value) return
     try {
+        let editedRecetaObj 
         switch(currentReceta.value.tipoReceta){
             case TipoReceta.Lejos:
-                if(!currentDetalleLejos.value) return
-                currentReceta.value.detallesRecetaLentesAereos = [currentDetalleLejos.value]
+                editedRecetaObj={...currentReceta.value, detallesRecetaLentesAereos: [currentDetalleLejos.value] }
                 break;
             case TipoReceta.Cerca:
-                if(!currentDetalleCerca.value) return
-                currentReceta.value.detallesRecetaLentesAereos = [currentDetalleCerca.value]
+                editedRecetaObj={...currentReceta.value, detallesRecetaLentesAereos: [currentDetalleCerca.value] }
                 break;
             case TipoReceta.Multifocal:
-                if(!currentDetalleLejos.value || !currentDetalleCerca.value) return
-                currentReceta.value.detallesRecetaLentesAereos = [currentDetalleCerca.value, currentDetalleLejos.value]
+                editedRecetaObj={...currentReceta.value, detallesRecetaLentesAereos: [currentDetalleCerca.value, currentDetalleLejos.value] }
                 break;
         }
-        currentReceta.value.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-        await recetasApi.editRecetaAereosRecetaAereos(currentReceta.value)
+        editedRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
+        await recetasApi.editRecetaAereosRecetaAereos(editedRecetaObj)
         loading.value=false;
         toast({
             title: 'Receta actualizada con éxito',
@@ -170,12 +213,9 @@ const validateAndEdit = async()=>{
     loading.value = true;
     const validDetalle = validateDetalles();
     const resultReceta = editRecetaAereosCustomValidator(currentReceta.value, fechaReceta.value);
-    console.log(resultReceta)
-    console.log(validDetalle)
     isValidReceta.value = resultReceta.isValid
     if(validDetalle && resultReceta.success){
         await onSubmit();
-        console.log('ok')
     }
     loading.value = false;
 }
@@ -195,13 +235,9 @@ const validateDetalles = ()=>{
             return resultLejos.isValid
             break;
         case TipoReceta.Multifocal:
-            console.log('dl--> ', currentDetalleLejos.value)
             resultLejos = editDetalleAereosCustomValidator(currentDetalleLejos.value)
-            console.log(resultLejos)
             isValidDetalleLejos.value = resultLejos.isValid
-            console.log('dc--> ', currentDetalleCerca.value)
             resultCerca = editDetalleAereosCustomValidator(currentDetalleCerca.value)
-            console.log(resultCerca)
             isValidDetalleCerca.value = resultCerca.isValid
             return resultCerca?.isValid && resultLejos?.isValid
             break;
@@ -257,7 +293,7 @@ const validateDetalles = ()=>{
                                 </div>
 
                                 <!-- Fecha -->
-                                 <div class="h-[5rem] w-[30%] flex flex-col justify-start items-end mt-8">
+                                 <div class="h-[5rem] w-[35%] flex flex-col justify-start items-end mt-8">
                                     <div class="flex items-center justify-end w-full">
                                         <Label class="w-[25%]">Fecha Receta</Label>
                                         <div class="flex gap-2 w-[60%]">

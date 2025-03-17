@@ -199,7 +199,6 @@ const onSubmit = async()=>{
                 break;
         }
         newRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-        console.log(newRecetaObj)
         await recetasApi.createRecetaAereos(newRecetaObj)
         loading.value=false;
         toast({
@@ -210,7 +209,6 @@ const onSubmit = async()=>{
         errorMessage.value=err.message as string
         showError.value = true;
         loading.value=false;
-        console.log(err)
     };
 }
 
@@ -225,12 +223,9 @@ const validateAndSubmit = async()=>{
     loading.value = true;
     const validDetalle = validateDetalles()
     const resultReceta = createRecetaAereosCustomValidator(newReceta.value, fechaReceta.value);
-    console.log(resultReceta)
-    console.log(validDetalle)
     isValidReceta.value = resultReceta.isValid
     if(validDetalle && resultReceta.success){
         await onSubmit();
-        console.log('ok')
     }
     loading.value = false;
 }
