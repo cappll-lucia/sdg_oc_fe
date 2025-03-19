@@ -15,7 +15,6 @@ const getAll = async ()=>{
 const getAllGroupByCliente = async ()=>{
     try{
         const resp = await http.get('/cliente/audiometrias/fecha');
-        console.log(resp)
         return resp.data.data as ClienteAudiometriasFecha[];
     }catch(error){
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -30,10 +29,9 @@ const getOne = async (_id: number)=>{
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
 }
+
 const create = async (_audiometria: CreateAudiometriaValidator, _pdf: File | undefined)=>{
     try{
-        console.log(_audiometria)
-        console.log(_pdf)
         const formData = new FormData();
         formData.append('audiometriaDTO', JSON.stringify(_audiometria));
         if (_pdf) {

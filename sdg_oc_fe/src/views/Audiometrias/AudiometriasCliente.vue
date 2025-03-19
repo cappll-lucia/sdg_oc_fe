@@ -18,24 +18,29 @@ import { Audiometria } from '@/api/entities/audiometrias';
 import { Cliente } from '@/api/entities/clientes';
 import { formatDate } from '@/lib/utils.recetas';
 import { PlusIcon } from 'lucide-vue-next';
+import { uploadsApi } from '@/api/libs/uploads';
 import router from '@/router';
 
 const route = useRoute();
 const selectedAudiom = ref<undefined | Audiometria>();
 const currentCliente = ref<Cliente>();
-const audiometriasCliente = ref<Audiometria[]>([])
+const audiometriasCliente = ref<Audiometria[]>([]);
+const filePDF = ref()
 
 
 onMounted(async () => {
     currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente));
-    console.log(currentCliente.value)
     if(currentCliente.value){
         audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(Number(route.params.idCliente));
     }
-    selectedAudiom.value = audiometriasCliente.value[0]
+    selectedAudiom.value = audiometriasCliente.value[0];
+    filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`)
 })
 
-
+const changeSelectedAudiom = async(audiometria: Audiometria) =>{
+    selectedAudiom.value=audiometria;
+    filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`)
+}
 
 
 </script>
@@ -63,8 +68,7 @@ onMounted(async () => {
                 v-if="currentCliente && audiometriasCliente.length>0">
                 <div class="panel-index w-[23%] h-[100%] p-4">
                     <div class="flex justify-between items-center mr-2 h-10">
-                        <!-- TODO add link to create -->
-                        <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec] w-full mr-2">
+                        <Button @click="()=>router.replace('/audiometrias/create')" variant="outline" class="bg-transparent hover:bg-[#d7e5ec] w-full mr-2">
                                 Nueva Audiometria
                             <PlusIcon class="w-4 h-4" />
                         </Button>
@@ -79,7 +83,7 @@ onMounted(async () => {
                                 <p class="font-light  ">Audiometría</p>
                             </div>
                             <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]"
-                                @click="() => { selectedAudiom = audiom; console.log(selectedAudiom); }">
+                                @click="async() => { await changeSelectedAudiom(audiom) }">
                                 <ChevronRightIcon class="w-4 h-4" />
                             </Button>
                         </div>
@@ -96,7 +100,7 @@ onMounted(async () => {
                                     <span>{{ formatDate(selectedAudiom.fechaInforme.toString()) }}</span>
                                 </div>
                                 <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                                    @click="() => router.replace(`audiometrias/edit/${selectedAudiom?.id}`)">
+                                    @click="() => router.replace(`/audiometrias/edit/${selectedAudiom?.id}`)">
                                     Editar
                                     <Pencil1Icon class="w-4 h-4" />
                                 </Button>
@@ -108,11 +112,12 @@ onMounted(async () => {
                                 <span>{{ selectedAudiom.observaciones ?? '---'}}</span>
                             </div>
                         </div>
+
                         <Separator class="my-4" />
 
                         <div class="w-[100%] h-[calc(100%-5rem)] flex justify-center items-center">
                             <div v-if="selectedAudiom?.linkPDF" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
-                                <iframe :src="selectedAudiom.linkPDF" class="w-full h-full border-none" frameborder="0"
+                                <iframe :src="filePDF" class="w-full h-full border-none" frameborder="0"
                                     allowfullscreen></iframe>
                             </div>
                             <p v-else class="text-gray-500 mb-[20rem] ">No hay PDF Registrado.</p>

@@ -29,6 +29,7 @@ import router from '@/router/index';
 import {onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import AlertConfirm from '@/components/AlertConfirm.vue';
+import { uploadsApi } from '@/api/libs/uploads';
 
 
 const currentAudiometria = ref<Audiometria>();
@@ -40,6 +41,7 @@ const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 const loading = ref<boolean>(false);
 const submitted = ref<boolean>(false);
+const editedAudiometriaFile = ref<boolean>(false);
 const audiometriaURL = ref();
 const audiometriaFile = ref();
 const errorPDF =ref<string>('');
@@ -63,10 +65,10 @@ const {handleSubmit, setValues } = useForm({
 onMounted(async()=>{
     currentAudiometria.value = await audiometriasApi.getOne(Number(route.params.id));
     if(currentAudiometria.value){
-         const date = new Date(currentAudiometria.value.fechaInforme);
-        fechaInforme.value.day = date.getUTCDate().toString();
-        fechaInforme.value.month = (date.getUTCMonth() +1 ).toString();
-        fechaInforme.value.year = date.getUTCFullYear().toString();
+        currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme)
+        fechaInforme.value.day = currentAudiometria.value.fechaInforme.getDate().toString()
+        fechaInforme.value.month = (currentAudiometria.value.fechaInforme.getMonth()+1).toString()
+        fechaInforme.value.year = currentAudiometria.value.fechaInforme.getFullYear().toString()
         setValues({
             fechaInforme:{
                 day: fechaInforme.value.day,
@@ -75,8 +77,7 @@ onMounted(async()=>{
             }
         });
         currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme);
-        //audiometriaURL.value = currentAudiometria.value.linkPDF;
-        audiometriaURL.value = 'http://localhost:3001/'+'uploads/audiometrias/audiometria-cliente-10-20140920.pdf';
+        audiometriaFile.value = await uploadsApi.getFile(`audiometrias/${currentAudiometria.value?.linkPDF}`)
     }
 })
 
@@ -133,6 +134,7 @@ const handleFileUpload = () => {
             errorPDF.value = '';
             audiometriaFile.value = file;
             audiometriaURL.value = URL.createObjectURL(file);
+            editedAudiometriaFile.value = true;
         }
     }
 };
@@ -223,8 +225,16 @@ const handleFileUpload = () => {
                     </FormItem>
                     </FormField>
                 </div>
-                 <div class="flex flex-col w-[50%] h-full">
-                    <p>{{ audiometriaURL }}</p>
+                 <div class="flex flex-col w-[50%] h-full" v-if="!editedAudiometriaFile">
+                        <div v-if="audiometriaFile" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
+                            <iframe :src="audiometriaFile" class="w-full h-full border-none" frameborder="0"
+                            allowfullscreen></iframe>
+                        </div>
+                        <div v-else class="flex justify-center items-center w-full h-full border rounded-md">
+                            <span class="font-light color-secondary">Ningún PDF Seleccionado</span>
+                        </div>
+                </div>
+                 <div class="flex flex-col w-[50%] h-full" v-if="editedAudiometriaFile">
                         <div v-if="audiometriaURL" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
                             <iframe :src="audiometriaURL" class="w-full h-full border-none" frameborder="0"
                             allowfullscreen></iframe>
