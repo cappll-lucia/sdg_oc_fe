@@ -1,3 +1,4 @@
+import { isValidNumber } from "@/lib/utils";
 import { TipoReceta } from "./recetasAereos";
 
 export interface DetalleRecetaAereos {
@@ -58,15 +59,6 @@ export const editDetalleAereosCustomValidator = (_detalle:EditedDetalleType | un
   const success = Object.values(isValid).every(Boolean);
   return {success, isValid};
 }
-
-const isValidNumber = (value: unknown): value is number => {
-  if (typeof value === "number") return true;
-  if (typeof value === "string" && value.trim() !== "" && !isNaN(Number(value))) {
-    return true;
-  }
-  return false;
-};
-
 
 
 export type NewDetalleType = {

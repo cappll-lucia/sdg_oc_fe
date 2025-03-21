@@ -2,6 +2,7 @@ import { Cliente } from './clientes';
 import { z} from 'zod';
 import type {BaseEntity} from  './entities';
 import { DetalleRecetaAereos, NewDetalleType } from './detalleRecetaAereos';
+import { fechaValidator } from '@/lib/utils';
 
 export enum TipoReceta {
   Cerca = 'Cerca',
@@ -47,19 +48,6 @@ export interface RecetasAereos extends BaseEntity{
     observaciones: string,
     detallesRecetaLentesAereos: DetalleRecetaAereos[],
 }
-
-const fechaValidator= z
-    .object({
-      day: z.string(),
-      month: z.string(),
-      year: z.string(),
-    })
-    .transform(({ day, month, year }) => {
-      let dayNumber = Number(day) +1 ;
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${(dayNumber.toString()).padStart(2, '0')}T00:00:00.000Z`;
-      return formattedDate;
-    })
-    .refine((date) => !isNaN(Date.parse(date)));
 
 
 export const createRecetaAereosCustomValidator = (_newReceta: {

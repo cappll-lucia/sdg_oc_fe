@@ -39,6 +39,9 @@ import Accordion from '@/components/ui/accordion/Accordion.vue';
 import AccordionItem from '@/components/ui/accordion/AccordionItem.vue';
 import AccordionTrigger from '@/components/ui/accordion/AccordionTrigger.vue';
 import AccordionContent from '@/components/ui/accordion/AccordionContent.vue';
+import { createRecetaContactoCustomValidator } from '@/api/entities/recetasContacto';
+import { createPruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
+import { recetasApi } from '@/api/libs/recetas';
 
 
 const selectedCliente = ref<Cliente| null>(null);
@@ -134,7 +137,7 @@ const newPruebas = ref<{
     agudeza_visual: boolean,
     oi_edema: boolean,
     od_edema: boolean,
-    observaciones: string
+    observaciones: string,
 }[]>([])
 
 
@@ -158,7 +161,7 @@ const isValidReceta = ref<{
     oi_diametro: boolean,
     oi_marca: boolean,
     fecha: boolean,
-    cliente: {id: boolean}
+    cliente: boolean
 }>({
     oftalmologo: true,
     quet_m1_od: true,
@@ -179,11 +182,11 @@ const isValidReceta = ref<{
     oi_diametro: true,
     oi_marca: true,
     fecha: true,
-    cliente: {id: true}
+    cliente: true
 })
 
 const isValidPrueba = ref<{    
-    od_cb: true,
+    od_cb: boolean,
     od_esferico: boolean,
     od_cilindrico: boolean,
     od_eje: boolean,
@@ -214,7 +217,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
 }
 
 
-const addPrueba = ()=>{
+const addPrueba = () => {
     newPruebas.value.push({
         od_diametro: undefined,
         od_eje: undefined,
@@ -237,6 +240,7 @@ const addPrueba = ()=>{
         od_edema: false,
         observaciones: ''
     })
+
     isValidPrueba.value.push({
         od_cb: true,
         od_esferico: true,
@@ -249,9 +253,39 @@ const addPrueba = ()=>{
         oi_eje: true,
         oi_diametro: true,
     })
+};
+
+const validateAndSubmit = async()=>{
+    loading.value=true;
+    const resultReceta = createRecetaContactoCustomValidator(newReceta.value, fechaReceta.value)
+    isValidReceta.value = resultReceta.isValid;
+    const resultPruebas = createPruebaLentesContactoCustomValidator(newPruebas.value)
+    isValidPrueba.value = resultPruebas.isValid;
+    console.log(isValidPrueba.value)
+    console.log(isValidReceta.value)
+    if(resultPruebas.success && resultReceta.success){
+        await onSubmit();
+    }
+    loading.value=false;
 }
 
 
+const onSubmit = async()=>{
+    try{
+        const recetaObj = {...newReceta.value, pruebasLentesContacto: newPruebas.value}
+        recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
+        await recetasApi.createRecetaContacto(recetaObj)
+        loading.value=false;
+        toast({
+            title: 'Receta registrada con éxito',
+        })
+        router.replace('/recetas')
+    } catch (err: any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loading.value=false;
+    };
+}
 
 </script>
 
@@ -282,8 +316,7 @@ const addPrueba = ()=>{
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2 mb-4 " >
-            <form @submit.prevent="" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
-
+            <form @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
                     <h3 class="page-subtitle text-center">Nueva Recta - Lentes de contacto</h3>
                     <Separator class="my-10 w-full" />
@@ -291,7 +324,6 @@ const addPrueba = ()=>{
                 <div class="flex flex-col w-full justify-between items-start">
                     <div class="flex flex-col w-full">
                         <div class="flex flex-row w-full justify-center gap-x-20">
-                            <!-- Cliente -->
                             <div class="h-[3rem]  w-[25rem]">
                                     <div class="flex flex-row items-center justify-start">
                                         <Label class="form-label w-[5rem] text-left">Cliente</Label>
@@ -317,27 +349,26 @@ const addPrueba = ()=>{
                                             </TooltipProvider>
                                         </div>
                                     </div>
-                                </div>
+                            </div>
 
-                                <!-- Fecha -->
-                                 <div class="h-[3rem] w-[23rem] flex flex-col justify-start items-end ">
-                                    <div class="flex items-center justify-start w-full">
-                                        <Label class="w-[8rem]">Fecha Receta</Label>
-                                        <div class="flex gap-2 w-[60%]">
-                                            <Input type="text" v-model="fechaReceta.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
-                                            <Input type="text" v-model="fechaReceta.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
-                                            <Input type="text" v-model="fechaReceta.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
-                                        </div>
-                                        <TooltipProvider  v-if="!isValidReceta.fecha" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive "> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Ingresar una fecha válida</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                             <div class="h-[3rem] w-[23rem] flex flex-col justify-start items-end ">
+                                <div class="flex items-center justify-start w-full">
+                                    <Label class="w-[8rem]">Fecha Receta</Label>
+                                    <div class="flex gap-2 w-[60%]">
+                                        <Input type="text" v-model="fechaReceta.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
+                                        <Input type="text" v-model="fechaReceta.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
+                                        <Input type="text" v-model="fechaReceta.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
                                     </div>
+                                    <TooltipProvider  v-if="!isValidReceta.fecha" >
+                                        <Tooltip>
+                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                            <p>Ingresar una fecha válida</p>
+                                        </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
+                            </div>
 
                         </div>
                         <Separator class="my-10 w-full" />
@@ -355,7 +386,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 20</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -394,7 +425,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 180</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -407,7 +438,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 30</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -425,7 +456,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 20</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -464,7 +495,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 180</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -477,7 +508,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 30</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -502,10 +533,10 @@ const addPrueba = ()=>{
                                 <div class="flex flex-col justify-start w-100">
                                     <div class="flex h-10 items-center justify-start">
                                         <p class=" w-12 font-semibold text-left text-sm">O.D. </p>
-                                        <Input type="decimal" v-model="newReceta.quet_m1_od" :class="{'ml-4 w-14' : !isValidReceta.quet_m1_od, 'ml-4 w-14 mr-4': isValidReceta.quet_m1_od}"  />
+                                        <Input type="decimal" v-model="newReceta.quet_m1_od" :class="{'ml-2 w-14' : !isValidReceta.quet_m1_od, 'ml-2 w-14 mr-4': isValidReceta.quet_m1_od}"  />
                                         <TooltipProvider  v-if="!isValidReceta.quet_m1_od" >
                                             <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="9" /> </TooltipTrigger>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
                                                 <p>Rango permitido: 0 a 90</p>
                                             </TooltipContent>
@@ -514,10 +545,10 @@ const addPrueba = ()=>{
 
                                         <Separator orientation="vertical" class="mx-4" />
                                         
-                                        <Input type="decimal" v-model="newReceta.quet_m2_od" :class="{'ml-4 w-14' : !isValidReceta.quet_m2_od, 'ml-4 w-14 mr-4': isValidReceta.quet_m2_od}"  />
+                                        <Input type="decimal" v-model="newReceta.quet_m2_od" :class="{'ml-2 w-14' : !isValidReceta.quet_m2_od, 'ml-2 w-14 mr-4': isValidReceta.quet_m2_od}"  />
                                         <TooltipProvider  v-if="!isValidReceta.quet_m2_od" >
                                             <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive"> <AsteriskIcon :size="9" /> </TooltipTrigger>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
                                                 <p>Rango permitido: 0 a 90</p>
                                             </TooltipContent>
@@ -530,10 +561,10 @@ const addPrueba = ()=>{
 
                                     <div class=" flex h-10 items-center justify-start">
                                         <p class=" w-12 font-semibold text-left text-sm">O.I. </p>
-                                        <Input type="decimal" v-model="newReceta.quet_m1_oi" :class="{'ml-4 w-14' : !isValidReceta.quet_m1_oi, 'ml-4 w-14 mr-4': isValidReceta.quet_m1_oi}"  />
+                                        <Input type="decimal" v-model="newReceta.quet_m1_oi" :class="{'ml-2 w-14' : !isValidReceta.quet_m1_oi, 'ml-2 w-14 mr-4': isValidReceta.quet_m1_oi}"  />
                                         <TooltipProvider  v-if="!isValidReceta.quet_m1_oi" >
                                             <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive"> <AsteriskIcon :size="9" /> </TooltipTrigger>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
                                                 <p>Rango permitido: 0 a 90</p>
                                             </TooltipContent>
@@ -542,10 +573,10 @@ const addPrueba = ()=>{
 
                                         <Separator orientation="vertical" class="mx-4" />
                                         
-                                        <Input type="decimal" v-model="newReceta.quet_m2_oi" :class="{'ml-4 w-14' : !isValidReceta.quet_m2_oi, ' ml-4 w-14 mr-4': isValidReceta.quet_m2_oi}"  />
+                                        <Input type="decimal" v-model="newReceta.quet_m2_oi" :class="{'ml-2 w-14' : !isValidReceta.quet_m2_oi, ' ml-2 w-14 mr-4': isValidReceta.quet_m2_oi}"  />
                                         <TooltipProvider  v-if="!isValidReceta.quet_m2_oi" >
                                             <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive "> <AsteriskIcon :size="9" /> </TooltipTrigger>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
                                                 <p>Rango permitido: 0 a 90</p>
                                             </TooltipContent>
@@ -639,33 +670,51 @@ const addPrueba = ()=>{
                     <Separator orientation="vertical" class="mx-10 h-[43rem]" />
                     <div class="flex flex-col w-[70%] h-full   justify-between items-start">
                         <div class="flex flex-col w-[100%] justify-between items-start h-[18rem]">
-                            <div class="flex flex-col justify-start min-w-[15rem]  h-[9rem] ">
-                                <span class="form-label font-bold text-xl w-full mb-4">Marcas</span>                                
-                                <div class="flex flex-row justify-between items-center w-[100%]">
-                                    <div class="flex mr-20 h-10 items-center justify-start">
-                                        <p class=" w-12 font-semibold text-left text-lg">O.D. </p>                                        
-                                        <Input type="decimal" v-model="newReceta.od_marca" :class="{'ml-4 w-60' : !isValidReceta.od_marca, 'ml-4 w-60 mr-4': isValidReceta.od_marca}"  />
-                                        <TooltipProvider  v-if="!isValidReceta.od_marca" >
+                            <div class="flex flex-row justify-between w-full   h-[9rem] ">
+                                <div class="flex flex-col w-90 ">
+                                    <span class="form-label font-bold text-xl w-full mb-4">Marcas</span>                                
+                                    <div class="flex flex-row justify-between items-center w-[100%]">
+                                        <div class="flex mr-10 h-10 items-center justify-start">
+                                            <p class=" w-12 font-semibold text-left text-lg">O.D. </p>                                        
+                                            <Input type="decimal" v-model="newReceta.od_marca" :class="{'ml-4 w-45' : !isValidReceta.od_marca, 'ml-4 w-45 mr-4': isValidReceta.od_marca}"  />
+                                            <TooltipProvider  v-if="!isValidReceta.od_marca" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Ingresar marca</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </div>
+                                        <div class="flex w-50 h-10 items-center justify-start">
+                                            <p class=" w-12 font-semibold text-left text-lg">O.I. </p>                                        
+                                            <Input type="decimal" v-model="newReceta.oi_marca" :class="{'ml-4 w-45' : !isValidReceta.oi_marca, 'ml-4 w-45 mr-4': isValidReceta.oi_marca}"  />
+                                            <TooltipProvider  v-if="!isValidReceta.oi_marca" >
+                                                <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Ingresar marca</p>
+                                                </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col w-60">
+                                    <span class="form-label font-bold text-xl w-full mb-4">Oftalmólogo</span> 
+                                    <div class="flex flex-row">
+
+                                        <Input v-model="newReceta.oftalmologo"  />
+                                        <TooltipProvider  v-if="!isValidReceta.oftalmologo" >
                                             <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Ingresar marca</p>
-                                            </TooltipContent>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Ingresar oftalmólogo</p>
+                                                </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
                                     </div>
-                                    <div class="flex w-50 h-10 items-center justify-start">
-                                        <p class=" w-12 font-semibold text-left text-lg">O.I. </p>                                        
-                                        <Input type="decimal" v-model="newReceta.oi_marca" :class="{'ml-4 w-60' : !isValidReceta.oi_marca, 'ml-4 w-60 mr-4': isValidReceta.oi_marca}"  />
-                                        <TooltipProvider  v-if="!isValidReceta.oi_marca" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Ingresar marca</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
+                                        
                                 </div>
                             </div>
                             <div class="flex flex-col w-full mt-[2rem] justify-start items-start h-[15rem]">
@@ -681,7 +730,7 @@ const addPrueba = ()=>{
                                 <Accordion type="single" collapsible class="w-full" v-for="prueba, index in newPruebas">
                                 <AccordionItem :value="`item-${index+1}`">
                                 <AccordionTrigger>Prueba {{ index+1 }}</AccordionTrigger>
-                                    <AccordionContent class="ml-4 pl-4 border-l-[#E5E5E5]  border-l-[0.5px] mb-8 h-[16rem]">
+                                    <AccordionContent class="ml-4 pl-4 border-l-[#E5E5E5]  border-l-[0px] mb-8 h-[16rem]">
                                     <div class="flex flex-row min-h-10 justify-start items-center">
                                         <p class="font-bold w-16 text-sm">O.D.</p>
 
@@ -691,7 +740,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 20</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -730,7 +779,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 180</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -743,7 +792,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 30</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -758,7 +807,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 20</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -797,7 +846,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 180</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -810,7 +859,7 @@ const addPrueba = ()=>{
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>TODO</p>
+                                                    <p>Rango permitido: 0 a 30</p>
                                                 </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -884,7 +933,7 @@ const addPrueba = ()=>{
                                     </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
-                                <Button variant="outline" size="sm" class="mt-6 w-32 py-2 font-italic bg-secondary text-gray-600 border-b-2"  @click="addPrueba"> <PlusIcon /> Nueva Prueba</Button>
+                                <Button variant="outline" type="button" size="sm" class="mt-6 w-32 py-2 font-italic bg-secondary text-gray-600 border-b-2"  @click="addPrueba()"> <PlusIcon /> Nueva Prueba</Button>
                             </div>
                         </div>
                     </div>
