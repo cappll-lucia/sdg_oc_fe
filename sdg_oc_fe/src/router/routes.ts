@@ -184,6 +184,22 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/recetas/contacto/new',
+            name: 'new_receta_contacto',
+            component: () => import('../views/Recetas/RecetasContacto.Create.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/recetas/contacto/edit/:id',
+            name: 'edit_receta_contado',
+            component: () => import('../views/Recetas/RecetasContacto.Edit.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/ventas',
             name:'ventas',
             component: ()=> import('../views/Ventas/Ventas.vue'),
