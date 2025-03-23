@@ -37,7 +37,7 @@ export interface RecetaContacto extends BaseEntity{
 }
 
 
-export const createRecetaContactoCustomValidator = (_newReceta: {
+export const recetaContactoCustomValidator = (_newReceta: {
     cliente: { id: undefined | number }
     oftalmologo: string | undefined;
     quet_m1_od: number | undefined;
@@ -133,6 +133,41 @@ export type NewRecetaContactoType={
     oi_eje: number | undefined,
     oi_diametro: number | undefined,
     oi_marca: number | undefined,
+    observaciones: string | undefined,
+    pruebasLentesContacto: Array<NewPruebasContactoType>
+}
+
+export type EditedRecetaContactoType={
+    id: number
+    cliente: {
+        id: number
+    },
+    fecha: Date,
+    oftalmologo: string,
+    quet_m1_od: number,
+    quet_m2_od: number,
+    quet_m1_oi: number,
+    quet_m2_oi: number,
+    observaciones_queterometria: string,
+    maquillaje: boolean;
+    tonicidad: boolean;
+    hendidura_palpebral: boolean;
+    altura_palpebral: boolean;
+    buen_parpadeo_ritmo: boolean;
+    buen_parpadeo_amplitud: boolean;
+    estesiometria: string,
+    od_cb: number,
+    od_esferico: number,
+    od_cilindrico: number,
+    od_eje: number,
+    od_diametro: number,
+    od_marca: number,
+    oi_cb: number,
+    oi_esferico: number,
+    oi_cilindrico: number,
+    oi_eje: number,
+    oi_diametro: number,
+    oi_marca: number,
     observaciones: string | undefined,
     pruebasLentesContacto: Array<NewPruebasContactoType>
 }

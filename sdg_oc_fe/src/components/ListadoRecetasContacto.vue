@@ -19,6 +19,7 @@ import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
 import Input from './ui/input/Input.vue';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
+import router from '@/router';
 
 const props = defineProps<{
     historiaClinica: HistoriaClinica | undefined,
@@ -61,7 +62,7 @@ const printRecetas = () => {
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2">
                 <!-- TODO add link to create -->
-                <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
+                <Button variant="outline" @click="router.replace('/recetas/contacto/new')" class="bg-transparent hover:bg-[#d7e5ec]">
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
@@ -148,7 +149,7 @@ const printRecetas = () => {
                     </div>
                         <div class="flex flex-col ">
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                            @click="() => { console.log('editar historia clinica'); }">
+                            @click="() => { router.replace(`/recetas/contacto/edit/${currentRec?.id}`)}">
                             Editar
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>

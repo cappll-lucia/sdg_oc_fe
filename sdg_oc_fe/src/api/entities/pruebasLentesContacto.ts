@@ -25,7 +25,7 @@ export interface PruebaLentesContacto {
     observaciones: string;
 }
 
-export const createPruebaLentesContactoCustomValidator = (_pruebas: {
+export const pruebaLentesContactoCustomValidator = (_pruebas: {
     od_diametro: number | undefined;
     od_eje: number | undefined;
     od_cilindrico: number | undefined;

@@ -154,7 +154,7 @@ const fechaReceta = ref({
 
 
 onMounted(async()=>{
-    currentReceta.value = await recetasApi.getOneRecetados(Number(route.params.id));
+    currentReceta.value = await recetasApi.getOneAereos(Number(route.params.id));
     let detalleCerca, detalleLejos
     switch(currentReceta.value.tipoReceta){
         case TipoReceta.Cerca:
@@ -195,7 +195,7 @@ const onSubmit = async()=>{
                 break;
         }
         editedRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-        await recetasApi.editRecetaAereosRecetaAereos(editedRecetaObj)
+        await recetasApi.editRecetaAereos(editedRecetaObj)
         loading.value=false;
         toast({
             title: 'Receta actualizada con éxito',
@@ -282,7 +282,7 @@ const validateDetalles = ()=>{
                     <h3 class="page-subtitle text-center">Editar Recta - Anteojos Recetados</h3>
                     <Separator class="my-6 w-full" />
                 </div>
-                    <div class="flex flex-col w-full  justify-between items-start">
+                <div class="flex flex-col w-full  justify-between items-start">
                      <div class="flex flex-col w-full  justify-between items-start">
                          <div class="flex flex-col w-full">
                          <div class="flex flex-row w-full justify-between px-4">

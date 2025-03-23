@@ -11,7 +11,7 @@ import { SlashIcon, AsteriskIcon, PlusIcon} from 'lucide-vue-next';
 import { Separator } from '@/components/ui/separator';
 import { onMounted, ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
-import { RecetaContacto } from '@/api/entities/recetasContacto';
+import { RecetaContacto, recetaContactoCustomValidator } from '@/api/entities/recetasContacto';
 import { useRoute } from 'vue-router';
 import { recetasApi } from '@/api/libs/recetas';
 import Input from '@/components/ui/input/Input.vue';
@@ -33,6 +33,10 @@ import Checkbox from '@/components/ui/checkbox/Checkbox.vue';
 import Button from '@/components/ui/button/Button.vue';
 import router from '@/router';
 import AlertError from '@/components/AlertError.vue';
+import { PruebaLentesContacto, pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
+import { toast } from '@/components/ui/toast';
+import Textarea from '@/components/ui/textarea/Textarea.vue';
+import { Cross2Icon, ValueNoneIcon } from '@radix-icons/vue';
 
 const route = useRoute()
 
@@ -48,7 +52,6 @@ const errorMessage =ref<string>('');
 
 const currentReceta = ref<RecetaContacto>();
 const currentPruebas = ref<{
-    numeroPrueba: number
     od_diametro: number | undefined,
     od_eje: number | undefined,
     od_cilindrico: number | undefined,
@@ -114,7 +117,6 @@ const isValidReceta = ref<{
     cliente: true
 })
 const isValidPrueba = ref<{
-    numeroPrueba: boolean,    
     od_cb: boolean,
     od_esferico: boolean,
     od_cilindrico: boolean,
@@ -129,12 +131,29 @@ const isValidPrueba = ref<{
 
 onMounted(async()=>{
     currentReceta.value = await recetasApi.getOneContacto(Number(route.params.id))
-    currentPruebas.value = currentReceta.value.pruebasLentesContacto;
+    currentPruebas.value = currentReceta.value.pruebasLentesContacto.map((p: PruebaLentesContacto  )=>{
+        const { numeroPrueba: numero, ...prueba } = p;
+        return prueba
+    });
+    isValidPrueba.value.push({
+        od_cb: true,
+        od_esferico: true,
+        od_cilindrico: true,
+        od_eje: true,
+        od_diametro: true,
+        oi_cb: true,
+        oi_esferico: true,
+        oi_cilindrico: true,
+        oi_eje: true,
+        oi_diametro: true,
+    })
+    fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
+    fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
+    fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
 })
 
 const addPrueba = ()=>{
     currentPruebas.value.push({
-        numeroPrueba: currentPruebas.value.length+1,
         od_diametro: undefined,
         od_eje: undefined,
         od_cilindrico: undefined,
@@ -157,7 +176,6 @@ const addPrueba = ()=>{
         observaciones: ''
     })
     isValidPrueba.value.push({
-        numeroPrueba:true,
         od_cb: true,
         od_esferico: true,
         od_cilindrico: true,
@@ -172,9 +190,39 @@ const addPrueba = ()=>{
 }
 
 const validateAndSubmit = async()=>{
-    
+    if(currentReceta.value){   
+        loading.value=true;
+        const resultReceta = recetaContactoCustomValidator(currentReceta.value, fechaReceta.value)
+        isValidReceta.value = resultReceta.isValid;
+        const resultPruebas = pruebaLentesContactoCustomValidator(currentPruebas.value)
+        isValidPrueba.value = resultPruebas.isValid;
+        if(resultPruebas.success && resultReceta.success){
+            await onSubmit();
+        }
+        loading.value=false;
+    }
 }
 
+
+const onSubmit = async()=>{
+    try{
+        if(currentReceta.value){
+            const recetaObj = {...currentReceta.value, pruebasLentesContacto: currentPruebas.value}
+            recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
+            console.log(recetaObj)
+            await recetasApi.editRecetaContacto(recetaObj)
+            loading.value=false;
+            toast({
+                title: 'Receta registrada con éxito',
+            })
+            router.replace('/recetas')
+        }
+    } catch (err: any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loading.value=false;
+    };
+}
 
 </script>
 
@@ -210,7 +258,7 @@ const validateAndSubmit = async()=>{
                     <h3 class="page-subtitle text-center">Receta con id {{ route.params.id }} no encontrada</h3>
                 </div>
             </div>
-            <form v-else @submit.prevent="" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
+            <form v-else @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
                     <h3 class="page-subtitle text-center">Editar Recta - Lentes de contacto</h3>
                     <Separator class="my-10 w-full" />
@@ -541,8 +589,8 @@ const validateAndSubmit = async()=>{
                                     <span class="form-label font-bold text-xl w-full mb-4">Marcas</span>                                
                                     <div class="flex flex-row justify-between items-center w-[100%]">
                                         <div class="flex mr-10 h-10 items-center justify-start">
-                                            <p class=" w-12 font-semibold text-left text-lg">O.D. </p>                                        
-                                            <Input type="decimal" v-model="currentReceta.od_marca" :class="{'ml-4 w-45' : !isValidReceta.od_marca, 'ml-4 w-45 mr-4': isValidReceta.od_marca}"  />
+                                            <p class=" w-10 font-semibold text-left text-lg">O.D. </p>                                        
+                                            <Input type="decimal" v-model="currentReceta.od_marca" :class="{'ml-1 w-40' : !isValidReceta.od_marca, 'ml-1 w-40 mr-4': isValidReceta.od_marca}"  />
                                             <TooltipProvider  v-if="!isValidReceta.od_marca" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -553,8 +601,8 @@ const validateAndSubmit = async()=>{
                                             </TooltipProvider>
                                         </div>
                                         <div class="flex w-50 h-10 items-center justify-start">
-                                            <p class=" w-12 font-semibold text-left text-lg">O.I. </p>                                        
-                                            <Input type="decimal" v-model="currentReceta.oi_marca" :class="{'ml-4 w-45' : !isValidReceta.oi_marca, 'ml-4 w-45 mr-4': isValidReceta.oi_marca}"  />
+                                            <p class=" w-10 font-semibold text-left text-lg">O.I. </p>                                        
+                                            <Input type="decimal" v-model="currentReceta.oi_marca" :class="{'ml-1 w-40' : !isValidReceta.oi_marca, 'ml-1 w-40 mr-4': isValidReceta.oi_marca}"  />
                                             <TooltipProvider  v-if="!isValidReceta.oi_marca" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -569,7 +617,6 @@ const validateAndSubmit = async()=>{
                                 <div class="flex flex-col w-60">
                                     <span class="form-label font-bold text-xl w-full mb-4">Oftalmólogo</span> 
                                     <div class="flex flex-row">
-
                                         <Input v-model="currentReceta.oftalmologo"  />
                                         <TooltipProvider  v-if="!isValidReceta.oftalmologo" >
                                             <Tooltip>
@@ -593,15 +640,16 @@ const validateAndSubmit = async()=>{
                         <div class="flex flex-col w-[100%] justify-between items-start min-h-[18rem]">
                             <div class="flex flex-col justify-start w-full  min-h-[16rem] ">
                                 <span class="form-label font-bold text-xl w-full">Pruebas</span>
-                                <Accordion type="single" collapsible class="w-full" v-for="prueba, index in currentPruebas">
+                                <div v-for="prueba, index in currentPruebas" class="flex w-full flex-row justify-between items-start">
+                                <Accordion type="single" collapsible class="w-[45rem]">
                                 <AccordionItem :value="`item-${index+1}`">
-                                <AccordionTrigger>Prueba {{ prueba.numeroPrueba }}</AccordionTrigger>
-                                    <AccordionContent class="ml-4 pl-4 border-l-[#E5E5E5]  border-l-[0px] mb-8 h-[16rem]">
+                                <AccordionTrigger>Prueba {{ index+1 }}</AccordionTrigger>
+                                    <AccordionContent class="ml-4 pl-4 border-l-[#E5E5E5]  border-l-[0px] mb-8 min-h-[16rem]">
                                     <div class="flex flex-row min-h-10 justify-start items-center">
-                                        <p class="font-bold w-16 text-sm">O.D.</p>
+                                        <p class="font-bold w-14 text-sm">O.D.</p>
 
                                             <p class="text-sm w-12 text-right pr-4">C.B.: </p>
-                                            <Input type="decimal" v-model="prueba.od_cb" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.od_cb, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.od_cb}"  />
+                                            <Input type="decimal" v-model="prueba.od_cb" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_cb, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_cb}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.od_cb" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -614,7 +662,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
                                             
                                             <p class="text-sm w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" v-model="prueba.od_esferico" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.od_esferico, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.od_esferico}"  />
+                                            <Input type="decimal" v-model="prueba.od_esferico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_esferico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_esferico}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.od_esferico" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -627,7 +675,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
 
                                             <p class="text-sm w-12 text-right pr-4">Cil.: </p>
-                                            <Input type="decimal" v-model="prueba.od_cilindrico" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.od_cilindrico, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.od_cilindrico}"  />
+                                            <Input type="decimal" v-model="prueba.od_cilindrico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_cilindrico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_cilindrico}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.od_cilindrico" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -640,7 +688,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
 
                                             <p class="text-sm w-12 text-right pr-4">Eje: </p>
-                                            <Input type="decimal" v-model="prueba.od_eje" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.od_eje, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.od_eje}"  />
+                                            <Input type="decimal" v-model="prueba.od_eje" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_eje, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_eje}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.od_eje" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -653,7 +701,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
 
                                              <p class="text-sm w-12 text-right flex justify-start items-center"><ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span> </p>
-                                            <Input type="decimal" v-model="prueba.od_diametro" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.od_diametro, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.od_diametro}"  />
+                                            <Input type="decimal" v-model="prueba.od_diametro" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_diametro, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_diametro}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.od_diametro" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -665,10 +713,10 @@ const validateAndSubmit = async()=>{
                             
                                     </div>
                                     <div class="flex mt-2 flex-row min-h-10 justify-start items-center">
-                                        <p class="font-bold w-16 text-sm">O.I.</p>
+                                        <p class="font-bold w-14 text-sm">O.I.</p>
 
                                             <p class="text-sm w-12 text-right pr-4">C.B.: </p>
-                                            <Input type="decimal" v-model="prueba.oi_cb" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.oi_cb, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.oi_cb}"  />
+                                            <Input type="decimal" v-model="prueba.oi_cb" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_cb, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_cb}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.oi_cb" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -681,7 +729,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
                                             
                                             <p class="text-sm w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" v-model="prueba.oi_esferico" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.oi_esferico, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.oi_esferico}"  />
+                                            <Input type="decimal" v-model="prueba.oi_esferico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_esferico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_esferico}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.oi_esferico" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -694,7 +742,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
 
                                             <p class="text-sm w-12 text-right pr-4">Cil.: </p>
-                                            <Input type="decimal" v-model="prueba.oi_cilindrico" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.oi_cilindrico, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.oi_cilindrico}"  />
+                                            <Input type="decimal" v-model="prueba.oi_cilindrico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_cilindrico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_cilindrico}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.oi_cilindrico" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -707,7 +755,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
 
                                             <p class="text-sm w-12 text-right pr-4">Eje: </p>
-                                            <Input type="decimal" v-model="prueba.oi_eje" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.oi_eje, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.oi_eje}"  />
+                                            <Input type="decimal" v-model="prueba.oi_eje" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_eje, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_eje}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.oi_eje" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -720,7 +768,7 @@ const validateAndSubmit = async()=>{
                                             <Separator orientation="vertical" class="mx-2" />
 
                                              <p class="text-sm w-12 text-right flex justify-start items-center"><ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span> </p>
-                                            <Input type="decimal" v-model="prueba.oi_diametro" :class="{'w-16 text-xs h-8' : !isValidPrueba[index]?.oi_diametro, 'w-16 text-xs h-8 mr-4': isValidPrueba[index]?.oi_diametro}"  />
+                                            <Input type="decimal" v-model="prueba.oi_diametro" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_diametro, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_diametro}"  />
                                             <TooltipProvider  v-if="!isValidPrueba[index]?.oi_diametro" >
                                                 <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
@@ -799,6 +847,8 @@ const validateAndSubmit = async()=>{
                                     </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
+                                <Button variant="ghost" type="button" size="icon" class="ml-2 mt-2 text-red-400 "  @click="currentPruebas.splice(index, 1)"><Cross2Icon /></Button>
+                            </div>
                                 <Button variant="outline" type="button" size="sm" class="mt-6 w-32 py-2 font-italic bg-secondary text-gray-600 border-b-2"  @click="addPrueba()"> <PlusIcon /> Nueva Prueba</Button>
                             </div>
                         </div>
