@@ -71,17 +71,17 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent class="bg-secondary min-h-[40rem] px-2 py-6 rounded" value="recetados">
-                    <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" />
+                    <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" :id-cliente="Number(currentCliente?.id)" />
                     <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
                         <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">anteojos recetados </span> </h2>
-                        <Button @click="router.replace('/recetas/recetados/new')"> Registrar receta </Button>
+                        <Button @click="router.replace(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
                     </div>
                 </TabsContent>
                 <TabsContent class="bg-secondary h-[75rem] px-2 py-6 rounded" value="contacto">
-                    <ListadoRecetasContacto v-if="recetasClienteContacto && recetasClienteContacto.length > 0" :nombreCliente="nombreCliente" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" />
+                    <ListadoRecetasContacto v-if="recetasClienteContacto && recetasClienteContacto.length > 0" :nombreCliente="nombreCliente"  :id-cliente="Number(currentCliente?.id)" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" />
                     <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
                         <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">lentes de contacto </span> </h2>
-                        <Button @click="router.replace('/recetas/contacto/new')"> Registrar receta </Button>
+                        <Button @click="router.replace(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
                     </div>
                 </TabsContent>
             </Tabs>

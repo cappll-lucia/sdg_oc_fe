@@ -24,7 +24,8 @@ import router from '@/router';
 const props = defineProps<{
     historiaClinica: HistoriaClinica | undefined,
     recetas: RecetaContacto[],
-    nombreCliente: string
+    nombreCliente: string,
+    idCliente: number
 }>();
 
 const currentRec = ref<RecetaContacto|undefined>();
@@ -62,7 +63,7 @@ const printRecetas = () => {
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2">
                 <!-- TODO add link to create -->
-                <Button variant="outline" @click="router.replace('/recetas/contacto/new')" class="bg-transparent hover:bg-[#d7e5ec]">
+                <Button variant="outline" @click="router.replace(`/recetas/contacto/new?cliente=${props.idCliente}`)" class="bg-transparent hover:bg-[#d7e5ec]">
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>

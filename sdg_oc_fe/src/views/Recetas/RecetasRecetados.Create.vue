@@ -37,7 +37,9 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import AlertError from '@/components/AlertError.vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
 
 const selectedCliente = ref<Cliente | null>(null);
 const searchClienteOpen = ref<boolean>(false);
@@ -182,6 +184,11 @@ const fechaReceta = ref({
 onMounted(async()=>{
     // TODO pagination
     foundClientes.value = await clientesApi.getAll();
+    const query = route.query
+    if(query.cliente){
+        const foundCliente = await clientesApi.getOne(Number(query.cliente))
+        if(foundCliente) handleSelectCliente(foundCliente)
+    }
 })
 
 const onSubmit = async()=>{

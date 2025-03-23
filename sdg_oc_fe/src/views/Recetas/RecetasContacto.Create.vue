@@ -42,7 +42,9 @@ import AccordionContent from '@/components/ui/accordion/AccordionContent.vue';
 import { recetaContactoCustomValidator } from '@/api/entities/recetasContacto';
 import { pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
 import { recetasApi } from '@/api/libs/recetas';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 
 const selectedCliente = ref<Cliente| null>(null);
 const searchClienteOpen = ref<boolean>(false);
@@ -208,6 +210,11 @@ const fechaReceta = ref({
 onMounted(async()=>{
     // TODO pagination
     foundClientes.value = await clientesApi.getAll();
+    const query = route.query
+    if(query.cliente){
+        const foundCliente = await clientesApi.getOne(Number(query.cliente))
+        if(foundCliente) handleSelectCliente(foundCliente)
+    }
 })
 
 const handleSelectCliente = (cliente:Cliente)=>{
