@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
-import { CreateVentaValidator, Venta } from '../entities/venta';
+import { NewVentaType, Venta } from '../entities/venta';
 
 const getAll = async () => {
     try {
@@ -21,7 +21,7 @@ const getOne = async (_id: string) => {
 };
 
 
-const create = async(_venta: CreateVentaValidator ) =>{
+const create = async(_venta: NewVentaType ) =>{
     try {
         const resp = await http.post('/venta', _venta);
         return resp.data.data as Venta[];
@@ -34,5 +34,5 @@ const create = async(_venta: CreateVentaValidator ) =>{
 export const ventasApi = {
     getAll: ()=> getAll(),
     getOne: (_id: string)=> getOne(_id),
-    create: (_venta: CreateVentaValidator)=> create(_venta),
+    create: (_venta: NewVentaType)=> create(_venta),
 }

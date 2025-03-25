@@ -1,11 +1,13 @@
 import { Cliente } from "./clientes";
-import { BaseEntity, BaseEntitySt } from "./entities";
-import { createLineaVentaValidator, LineaVenta } from "./lineaVenta";
+import { createLineaVentaValidator, LineaVenta, NewLineaVentaType } from "./lineaVenta";
 import {number, z} from 'zod'
-import { createMedioDePagoValidator, MedioDePago } from "./mediosDePago";
+import { createMedioDePagoValidator, MedioDePago, NewMedioPagoType } from "./mediosDePago";
+import { isValidNumber } from "@/lib/utils";
 
-
-export interface Venta extends BaseEntitySt{
+export interface Venta{
+    id: string;
+	createdAt: string;
+	updatedAt: string;
     fecha: Date;
     descuentoPorcentaje: number;
     importe: number;
@@ -13,6 +15,16 @@ export interface Venta extends BaseEntitySt{
     lineasDeVenta: LineaVenta[];
     mediosDePago: MedioDePago[];
 }
+
+export enum CondicionIva {
+  RESPONSABLE_INSCRIPTO = 1,
+  EXENTO = 4,
+  CONSUMIDOR_FINAL = 5,
+  MONOTRIBUTISTA = 6,
+  GRAVADO = 7,
+  NO_GRAVADO = 8,
+}
+
 
 
 export const createVentaValidator = z.object({
@@ -37,7 +49,6 @@ export const createVentaValidator = z.object({
 
     const totalMediosPago = data.mediosDePago.reduce((total, medio) => {
     const importeValido = medio.importe ?? 0;  
-    console.log("Importe de medio de pago:", importeValido);
     return total + importeValido;
 }, 0);
 
@@ -50,3 +61,54 @@ export const createVentaValidator = z.object({
     }
 });
 export type CreateVentaValidator = z.infer<typeof createVentaValidator>
+
+
+export const createVentaCustomValidator = (_newVenta: {
+    cliente: {id: undefined | number},
+    fecha: Date,
+    descuentoPorcentaje: number | undefined,
+    condicionIvaVenta: CondicionIva | undefined,
+})=>{
+    const isValid = {
+        cliente: _newVenta.cliente.id===0 || Boolean(_newVenta.cliente.id),
+        fecha: _newVenta.fecha instanceof Date,
+        descuentoPorcentaje: isValidNumber(_newVenta.descuentoPorcentaje) && 0 <= _newVenta.descuentoPorcentaje && _newVenta.descuentoPorcentaje<=100 ,
+        condicionIvaVenta: _newVenta.condicionIvaVenta ? Object.values(CondicionIva).includes(_newVenta.condicionIvaVenta) :false,
+    }
+    const success = Object.values(isValid).every(Boolean);
+    return {success, isValid};
+}
+
+
+export const ventaObrasSocialesCustomValidator = (_ventasOS: {
+        obraSocialId:  undefined | number,
+        importe: number,
+        condicionIva:  CondicionIva | undefined
+    }[])=>{
+        const isValidArray = _ventasOS.map(_os=> ({
+            obraSocial: Boolean(_os.obraSocialId),
+            importe: isValidNumber(_os.importe) && _os.importe >0,
+            condicionIva: _os.condicionIva ? Object.values(CondicionIva).includes(Number(_os.condicionIva)) :false,
+        }))
+        const success = isValidArray.every(isValid => 
+            Object.values(isValid).every(Boolean)
+        );
+        return { success, isValid: isValidArray };
+}
+
+export type NewVentaOsType = {
+    obraSocialId:  undefined | number,
+    importe: number,
+    condicionIva: CondicionIva | undefined
+}
+
+export type NewVentaType ={
+    cliente: { id: undefined | number },
+    descuentoPorcentaje: number,
+    fecha: Date,
+    condicionIva: CondicionIva
+    lineasDeVenta : Array<NewLineaVentaType>,
+    mediosDePago: Array<NewMedioPagoType>,
+    ventaObraSocial: Array<NewVentaOsType>,
+    observaciones: string | undefined
+}
