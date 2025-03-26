@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
 const productos = ref<Producto[]>([]);
 const marcas = ref<Marca[]>([]);
@@ -35,11 +36,13 @@ const selectedMarcaId = ref<string>('');
 const selectedProveedorId =  ref<string>('');
 const selectedCategoria =  ref<string>('');
 const txtSearch = ref<string>('');
+const currentLimit = ref<string>('10');
+const currentOffset = ref<number>(0);
 
 const loadData = async()=>{
-    productos.value = await productosApi.getAll({});
+    await handleFilterProducts()
     marcas.value = await marcasApi.getAll();
-    proveedores.value =await proveedoresApi.getAll()
+    proveedores.value =await proveedoresApi.getAll();
 }
 
 onMounted(async () => {
@@ -52,8 +55,16 @@ const handleFilterProducts = async () => {
         proveedorId: selectedProveedorId.value,
         marcaId: selectedMarcaId.value,
         categoria: selectedCategoria.value,
-        descripcion: txtSearch.value
+        filtro: txtSearch.value,
+        offset: currentOffset.value,
+        limit: currentLimit.value
     });
+};
+
+const handlePageChange = async(offset: number) => {
+    if(currentOffset.value==0 && offset<0) return
+    currentOffset.value = currentOffset.value + offset
+    await handleFilterProducts()
 };
 
 </script>
@@ -76,9 +87,10 @@ const handleFilterProducts = async () => {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
+        <h1 class="page-title ">Productos</h1>
         <div class="pt-2">
             <div class="flex flex-row justify-between items-center py-4">
-                <div class="search flex w-[65rem]  flex-row justify-between">
+                <div class="search flex w-[65rem]  flex-row justify-start gap-x-4">
                     <Input class="max-w-sm " placeholder="Buscar Producto"
                         v-model="txtSearch" @keyup.enter="handleFilterProducts"
                     />
@@ -91,8 +103,6 @@ const handleFilterProducts = async () => {
                                 <SelectItem 
                                 v-for="proveedor in proveedores" 
                                 :value="proveedor.id.toString()"
-                                @update:model-value=""
-
                                 >{{ proveedor.razonSocial }}</SelectItem>
                             </SelectGroup>
                         </SelectContent>
@@ -106,22 +116,21 @@ const handleFilterProducts = async () => {
                                 <SelectItem 
                                 v-for="marca in marcas" 
                                 :value="marca.id.toString()"
-                                @update:model-value=""
-
                                 >{{ marca.nombre }}</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
                     <Select v-model="selectedCategoria" @update:model-value="handleFilterProducts" >
-                        <SelectTrigger class="w-[200px]">
+                        <SelectTrigger class="w-[200px] capitalize">
                             <SelectValue placeholder="Filtrar por Categoría" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
                                 <SelectItem 
-                                    v-for="categoria in CategoriaEnum" 
-                                    :value="categoria"
-                                >{{ categoria }}</SelectItem>
+                                    class="capitalize"
+                                    v-for="categoria in Object.entries(CategoriaEnum)" 
+                                    :value="categoria[0]"
+                                >{{ categoria[1].toLowerCase() }}</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
@@ -130,5 +139,27 @@ const handleFilterProducts = async () => {
             </div>
             <DataTable :columns="columns" :data="productos"  />
         </div>
+
+        <div class="mt-4 flex w-full justify-center">
+            <div class="flex items-center gap-1 text-gray-500 ">
+                <Button variant="outline" :disbled="currentOffset==0" class="w-8 h-8" @click="handlePageChange(-1)" > <ChevronLeft /> </Button> 
+                <Select v-model="currentLimit" @update:model-value="handleFilterProducts" >
+                    <SelectTrigger class="w-[80px] h-8">
+                    <SelectValue placeholder="Select a fruit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                        <SelectItem value="40">40</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                    </SelectGroup>
+                    </SelectContent>
+                </Select>
+                <Button variant="outline"  class="w-8 h-8"  @click="handlePageChange(1)" > <ChevronRight /> </Button>
+            </div>
+        </div>
+
     </div>
 </template>

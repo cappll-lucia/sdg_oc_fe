@@ -1,4 +1,4 @@
-import { Cliente } from '@/api/entities/clientes';
+import { Cliente, TipoDocumento } from '@/api/entities/clientes';
 import { h } from 'vue'
 import { ColumnDef } from '@tanstack/vue-table';
 import DropdownAction from './data-table-dropdown.vue'
@@ -11,14 +11,14 @@ export const columns: ColumnDef<Cliente>[] = [
   },
   {
     accessorKey: 'nombre',
-    header: () => h('div', 'Nombre'),
-    cell: info=> info.getValue(),
+    header: () => h('div', 'Apellido y Nombre'),
+    cell: ({row})=> `${row.original.apellido}, ${row.original.nombre} `
   },
   {
-    accessorKey: 'apellido',
-    header: () => h('div', 'Apellido'),
-    cell: info=> info.getValue(),
-  },
+    accessorKey: 'documento',
+    header: () => h('div', 'Tipo y Nro Documento'),
+    cell: ({row})=> `${TipoDocumento[row.original.tipoDocumento]} - ${row.original.nroDocumento} `,
+  },  
   {
     accessorKey: 'email',
     header: () => h('div', 'Email'),

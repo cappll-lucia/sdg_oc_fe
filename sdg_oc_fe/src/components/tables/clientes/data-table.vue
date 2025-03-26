@@ -40,12 +40,6 @@ const table = useVueTable({
 </script>
 
 <template>
-        <div class="flex flex-row justify-between items-center py-4">
-            <Input class="max-w-sm" placeholder="Buscar Cliente"
-                :model-value="table.getColumn('telefono')?.getFilterValue() as string"
-                @update:model-value=" table.getColumn('telefono')?.setFilterValue($event)" />
-            <Button class="text-xs"><a href="/clientes/create">Registrar Nuevo Cliente</a></Button>
-        </div>
     <div class="border rounded-md">
         <Table>
             <TableHeader>

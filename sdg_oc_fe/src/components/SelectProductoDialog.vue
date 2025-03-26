@@ -36,8 +36,7 @@ const selectProducto = (producto: Producto) => {
 
 const searchProducto = async()=>{
     foundProductos.value = await productosApi.getAll({
-        id: searchProdIdTxt.value,
-        descripcion: searchProdDscTxt.value
+        filtro: searchProdIdTxt.value+' '+searchProdDscTxt.value,
     })
 }
 

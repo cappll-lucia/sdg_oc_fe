@@ -35,7 +35,7 @@ const selectCliente = (cliente: Cliente) => {
 };
 
 const searchClientes = async()=>{
-    foundClientes.value = await clientesApi.getPaginated(searchClientesTxt.value)
+    foundClientes.value = await clientesApi.getAll({filtro: searchClientesTxt.value})
 }
 
 

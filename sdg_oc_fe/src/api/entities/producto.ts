@@ -3,10 +3,10 @@ import { Marca } from "./marca";
 import { Proveedor } from "./proveedor";
 
 export enum CategoriaEnum {
-  LENTES_DE_SOL = 'LENTES_DE_SOL',
-  LENTES_DE_CONTACTO = 'LENTES_DE_CONTACTO',
+  LENTES_DE_SOL = 'LENTES DE SOL',
+  LENTES_DE_CONTACTO = 'LENTES DE CONTACTO',
   HANDBAGS = 'HANDBAGS',
-  LENTES_AEREOS = 'LENTES_AEREOS',
+  LENTES_AEREOS = 'LENTES AEREOS',
   CRISTALES = 'CRISTALES',
   OTROS = 'OTROS',
 }

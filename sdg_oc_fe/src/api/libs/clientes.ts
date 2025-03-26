@@ -6,9 +6,28 @@ import { RecetaContacto } from '../entities/recetasContacto';
 import { HistoriaClinica } from '../entities/historiaClinica';
 import { Audiometria } from '../entities/audiometrias';
 
-const getAll = async () => {
+interface ClienteFilers{
+    filtro?: string | null;
+    sexo?: string | null;
+    localidadId?: string | null;
+    limit?: number | string;
+    offset?: number | string;
+}
+
+
+const getAll = async (filters: ClienteFilers={}) => {
     try {
-        const resp = await http.get('/cliente');
+        const params = new URLSearchParams();
+
+        if (filters.filtro) params.append("filtro", filters.filtro)
+        if (filters.sexo) params.append("sexo", filters.sexo)
+        if (filters.localidadId) params.append("localidadId", filters.localidadId)
+
+        params.append("limit", filters.limit?.toString() || "10");
+        params.append("offset", filters.offset?.toString() || "0");
+        
+        const url = `/cliente?${params.toString()}`;
+        const resp = await http.get(url);
         return resp.data.data.items as Cliente[];
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -19,16 +38,6 @@ const getOne = async (_id: number) => {
     try {
         const resp = await http.get(`/cliente/${_id}`);
         return resp.data.data as Cliente;
-    } catch (error) {
-        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
-    }
-};
-
-// TODO update endpoint
-const getPaginated = async (_txt:string) => {
-    try {
-        const clientes = await getAll();
-        return clientes.filter(c=> c.nombre.includes(_txt)) as Cliente[];
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -93,8 +102,7 @@ const remove = async(_id: number ) =>{
 }
 
 export const clientesApi = {
-    getAll: ()=> getAll(),
-    getPaginated : (txt: string)=> getPaginated(txt),
+    getAll: (_filters: ClienteFilers)=> getAll(_filters),
     getOne: (_id: number)=> getOne(_id),
     getRecetasByCliente: (_idCliente: number)=> getRecetasByCliente(_idCliente),
     getAudiometriasByCliente: (_idCliente: number)=> getAudiometriasByCliente(_idCliente),

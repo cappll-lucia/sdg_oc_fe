@@ -7,9 +7,9 @@ interface ProductoFilters {
     proveedorId?: string | null;
     marcaId?: string | null;
     categoria?: string | null;
-    descripcion?: string | null;
-    limit?: number;
-    offset?: number;
+    filtro?: string | null;
+    limit?: number | string;
+    offset?: number | string;
 }
 
 
@@ -20,7 +20,7 @@ const getAll = async (filters: ProductoFilters = {}) => {
         if (filters.proveedorId) params.append("proveedorId", filters.proveedorId);
         if (filters.marcaId) params.append("marcaId", filters.marcaId);
         if (filters.categoria) params.append("categoria", filters.categoria);
-        if (filters.descripcion) params.append("descripcion", filters.descripcion);
+        if (filters.filtro) params.append("descripcion", filters.filtro);
         
         params.append("limit", filters.limit?.toString() || "10");
         params.append("offset", filters.offset?.toString() || "0");
