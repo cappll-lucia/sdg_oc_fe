@@ -209,7 +209,6 @@ const onSubmit = async()=>{
         if(currentReceta.value){
             const recetaObj = {...currentReceta.value, pruebasLentesContacto: currentPruebas.value}
             recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-            console.log(recetaObj)
             await recetasApi.editRecetaContacto(recetaObj)
             loading.value=false;
             toast({

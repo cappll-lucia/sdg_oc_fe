@@ -44,7 +44,6 @@ const route = useRoute()
 const selectedCliente = ref<Cliente | null>(null);
 const searchClienteOpen = ref<boolean>(false);
 const loading = ref<boolean>(false);
-const foundClientes = ref<Cliente[]>([]);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -183,7 +182,6 @@ const fechaReceta = ref({
 
 onMounted(async()=>{
     // TODO pagination
-    foundClientes.value = await clientesApi.getAll();
     const query = route.query
     if(query.cliente){
         const foundCliente = await clientesApi.getOne(Number(query.cliente))

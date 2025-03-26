@@ -121,9 +121,7 @@ const addMedioPago=async()=>{
         redDePago: undefined,
         entidadBancaria: undefined
     })
-    console.log(isValidMediosPago.value)
     await nextTick();
-    console.log(isValidMediosPago.value)
 }
 
 const removeLineaVenta = (index: number) => {
@@ -181,8 +179,6 @@ const onSubmit = (async()=>{
             ventaObraSocial: ventaObrasSociales.value,
             observaciones: 'obs'
         }
-        console.log(JSON.stringify(newVenta))
-        console.log(newVenta)
         await ventasApi.create(newVenta)
 
     }catch (err: any) {

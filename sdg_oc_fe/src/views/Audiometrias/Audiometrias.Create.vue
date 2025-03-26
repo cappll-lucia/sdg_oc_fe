@@ -58,13 +58,12 @@ const {handleSubmit, setFieldValue} = useForm({
 
 onMounted(async()=>{
     // TODO pagination
-    foundClientes.value = await clientesApi.getAll();
+    foundClientes.value = await clientesApi.getAll({});
 })
 
 const onSubmit = handleSubmit(async (values) => {
     loading.value=true;
     errorPDF.value = '';
-    console.log(audiometriaFile.value)
     if (!audiometriaFile.value) {
         errorPDF.value = 'Suba el archivo del informe';
         audiometriaFile.value = null; 
