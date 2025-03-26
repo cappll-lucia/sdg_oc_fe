@@ -7,6 +7,13 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/productos/columns';
@@ -28,6 +35,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import router from '@/router';
 
 const productos = ref<Producto[]>([]);
 const marcas = ref<Marca[]>([]);
@@ -91,73 +99,76 @@ const handlePageChange = async(offset: number) => {
         <div class="pt-2">
             <div class="flex flex-row justify-between items-center py-4">
                 <div class="search flex w-[65rem]  flex-row justify-start gap-x-4">
-                    <Input class="max-w-sm " placeholder="Buscar Producto"
-                        v-model="txtSearch" @keyup.enter="handleFilterProducts"
-                    />
-                    <Select v-model="selectedProveedorId" @update:model-value="handleFilterProducts" >
+                    <Input class="max-w-sm " placeholder="Buscar Producto" v-model="txtSearch"
+                        @keyup.enter="handleFilterProducts" />
+                    <Select v-model="selectedProveedorId" @update:model-value="handleFilterProducts">
                         <SelectTrigger class="w-[200px]">
                             <SelectValue placeholder="Filtrar por Proveedor" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem 
-                                v-for="proveedor in proveedores" 
-                                :value="proveedor.id.toString()"
-                                >{{ proveedor.razonSocial }}</SelectItem>
+                                <SelectItem v-for="proveedor in proveedores" :value="proveedor.id.toString()">{{
+                                    proveedor.razonSocial }}</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <Select v-model="selectedMarcaId" @update:model-value="handleFilterProducts" >
+                    <Select v-model="selectedMarcaId" @update:model-value="handleFilterProducts">
                         <SelectTrigger class="w-[200px]">
                             <SelectValue placeholder="Filtrar por Marca" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem 
-                                v-for="marca in marcas" 
-                                :value="marca.id.toString()"
-                                >{{ marca.nombre }}</SelectItem>
+                                <SelectItem v-for="marca in marcas" :value="marca.id.toString()">{{ marca.nombre }}
+                                </SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <Select v-model="selectedCategoria" @update:model-value="handleFilterProducts" >
+                    <Select v-model="selectedCategoria" @update:model-value="handleFilterProducts">
                         <SelectTrigger class="w-[200px] capitalize">
                             <SelectValue placeholder="Filtrar por Categoría" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem 
-                                    class="capitalize"
-                                    v-for="categoria in Object.entries(CategoriaEnum)" 
-                                    :value="categoria[0]"
-                                >{{ categoria[1].toLowerCase() }}</SelectItem>
+                                <SelectItem class="capitalize" v-for="categoria in Object.entries(CategoriaEnum)"
+                                    :value="categoria[0]">{{ categoria[1].toLowerCase() }}</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                </div>    
-                <Button class="text-xs">Registrar Nuevo Producto</Button>
+                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger><Button class="w-[14rem]" >Registrar nuevos productos</Button></DropdownMenuTrigger>
+                    <DropdownMenuContent class="w-[14rem]" >
+                        <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/lote')"  >Registrar lote de productos</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/single')" >Registrar producto único</DropdownMenuLabel>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-            <DataTable :columns="columns" :data="productos"  />
+            <DataTable :columns="columns" :data="productos" />
         </div>
 
         <div class="mt-4 flex w-full justify-center">
             <div class="flex items-center gap-1 text-gray-500 ">
-                <Button variant="outline" :disbled="currentOffset==0" class="w-8 h-8" @click="handlePageChange(-1)" > <ChevronLeft /> </Button> 
-                <Select v-model="currentLimit" @update:model-value="handleFilterProducts" >
+                <Button variant="outline" :disbled="currentOffset==0" class="w-8 h-8" @click="handlePageChange(-1)">
+                    <ChevronLeft />
+                </Button>
+                <Select v-model="currentLimit" @update:model-value="handleFilterProducts">
                     <SelectTrigger class="w-[80px] h-8">
-                    <SelectValue placeholder="Select a fruit" />
+                        <SelectValue placeholder="Select a fruit" />
                     </SelectTrigger>
                     <SelectContent>
-                    <SelectGroup>
-                        <SelectItem value="10">10</SelectItem>
-                        <SelectItem value="20">20</SelectItem>
-                        <SelectItem value="30">30</SelectItem>
-                        <SelectItem value="40">40</SelectItem>
-                        <SelectItem value="50">50</SelectItem>
-                    </SelectGroup>
+                        <SelectGroup>
+                            <SelectItem value="10">10</SelectItem>
+                            <SelectItem value="20">20</SelectItem>
+                            <SelectItem value="30">30</SelectItem>
+                            <SelectItem value="40">40</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                        </SelectGroup>
                     </SelectContent>
                 </Select>
-                <Button variant="outline"  class="w-8 h-8"  @click="handlePageChange(1)" > <ChevronRight /> </Button>
+                <Button variant="outline" class="w-8 h-8" @click="handlePageChange(1)">
+                    <ChevronRight />
+                </Button>
             </div>
         </div>
 

@@ -120,6 +120,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/productos/create/lote',
+            name: 'productos_lote',
+            component: () => import('../views/Productos/Productos.Create.Lote.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/recetas',
             name: 'recetas',
             component: () => import('../views/Recetas/Recetas.vue'),
