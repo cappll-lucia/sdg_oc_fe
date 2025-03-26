@@ -212,8 +212,8 @@ const validateAndSubmit = async()=>{
 
     if(resultLineasVenta?.success && resultMedios?.success && resultVentasOS?.success && resultVenta.success){
         isValidImporteMedios.value = caluclateImportePago.value == importeIngresado.value;
-        isValidImporteObrasSociales.value = !(totalVentaNeto.value < montoObrasSociales.value);
-        if(isValidImporteMedios.value){
+        isValidImporteObrasSociales.value = !(totalVentaFinal.value < montoObrasSociales.value);
+        if(isValidImporteMedios.value && isValidImporteObrasSociales.value){
             await onSubmit();
         }
     }
@@ -227,6 +227,7 @@ onMounted(async () => {
 
 
 const handleSelectCliente = async(cliente:Cliente)=>{
+    availableCondicionIva.value = [CondicionIva.CONSUMIDOR_FINAL]
     if(cliente.categoriaFiscal!= CondicionIva.CONSUMIDOR_FINAL){
         availableCondicionIva.value.push(cliente.categoriaFiscal as CondicionIva);
         condicionIvaVenta.value=cliente.categoriaFiscal;
@@ -274,7 +275,16 @@ const totalVentaBruto = computed(()=>{
 })
 
 const montoDto = computed(()=>{
-    return totalVentaBruto.value * porcDto.value / 100
+    return totalVentaFinal.value * porcDto.value / 100
+})
+
+
+const totalVentaFinal = computed(()=>{
+    return totalVentaBruto.value - montoObrasSociales.value 
+})
+
+const caluclateImportePago = computed(()=>{
+    return totalVentaFinal.value - montoDto.value
 })
 
 const montoObrasSociales = computed(()=>{
@@ -283,19 +293,13 @@ const montoObrasSociales = computed(()=>{
     }, 0)
 })
 
-const totalVentaNeto = computed(()=>{
-    return totalVentaBruto.value - montoDto.value 
-})
-
 const importeIngresado = computed<number>(() => {
     return mediosDePago.value.reduce((total, medioPago) => {
         return total + (medioPago.importe || 0);
     }, 0);
 });
 
-const caluclateImportePago = computed(()=>{
-    return totalVentaNeto.value - montoObrasSociales.value
-})
+
 
 
 const autocompleteMedioPagoImporte=(index: number)=>{
@@ -516,33 +520,8 @@ const condicionIvaDisplay = computed(() => {
                         
                         <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
                             <div class="w-[50rem] 0  flex flex-col justify-start  items-start">
-                                <div class="border min-h-[3rem] p-4 w-full rounded-lg ">
-                                    <div class="w-full flex flex-row justify-between  items-center">
-                                        <h3 class="page-subtitle">Descuento</h3>
-                                        <Switch :model-value="dto" @update:model-value="dto=!dto"></Switch>
-                                    </div>
-                                    <div v-if="dto" class="flex flex-row items-center">
-                                        <Label class="w-[5.5rem]">Porcentaje: </Label>
-                                        <Input 
-                                        class="w-14 mr-2 text-center" 
-                                        :model-value="porcDto" 
-                                        @update:model-value="(value) => {
-                                            porcDto = Number(value) || 0;
-                                        }"
-                                        />
-                                        <Label>%</Label>
-                                        
-                                        <TooltipProvider  v-if="!isValidVenta.descuentoPorcentaje" >
-                                            <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Seleccionar cliente</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                </div>
-                                <div class="border rounded-lg w-full  min-h-[3rem] p-4 mt-4">
+
+                                <div class="border rounded-lg w-full  min-h-[3rem] p-4">
                                     <div class="w-full flex flex-row justify-between  items-center">
                                         <h3 class="page-subtitle">Obras Sociales</h3>
                                         <Switch 
@@ -656,19 +635,45 @@ const condicionIvaDisplay = computed(() => {
                                     
                                     </div>
                                 </div>
+                                <div class="border min-h-[3rem] p-4 w-full rounded-lg  mt-4">
+                                    <div class="w-full flex flex-row justify-between  items-center">
+                                        <h3 class="page-subtitle">Descuento</h3>
+                                        <Switch :model-value="dto" @update:model-value="dto=!dto"></Switch>
+                                    </div>
+                                    <div v-if="dto" class="flex flex-row items-center">
+                                        <Label class="w-[5.5rem]">Porcentaje: </Label>
+                                        <Input 
+                                        class="w-14 mr-2 text-center" 
+                                        :model-value="porcDto" 
+                                        @update:model-value="(value) => {
+                                            porcDto = Number(value) || 0;
+                                        }"
+                                        />
+                                        <Label>%</Label>
+                                        
+                                        <TooltipProvider  v-if="!isValidVenta.descuentoPorcentaje" >
+                                            <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Seleccionar cliente</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                </div>
                             </div>
                             <div class="w-[19rem] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-centerr">
-                                <div class=" flex  justify-center mt-4">
+                                <div v-if="(obrasSociales && montoObrasSociales > 0) || porcDto" class=" flex  justify-center mt-4">
                                     <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
                                     <Label class=" w-[7rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
-                                </div>
-                                <div v-if="porcDto" class=" flex  justify-center items-center mt-4">
-                                    <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
-                                    <Label class=" w-[7rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
                                 </div>
                                 <div v-if="obrasSociales && montoObrasSociales > 0" class=" flex  justify-center items-center mt-4">
                                     <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
                                     <Label class=" w-[7rem]  ">- $ {{ montoObrasSociales.toFixed(2) }}</Label>
+                                </div>
+                                <div v-if="porcDto" class=" flex  justify-center items-center mt-4">
+                                    <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
+                                    <Label class=" w-[7rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
                                 </div>
                                 <div class=" flex  justify-center mt-4">
                                     <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
@@ -819,7 +824,8 @@ const condicionIvaDisplay = computed(() => {
                         <Button size="icon" type="button"  variant="ghost" @click="removeMedioPago(index)"> <Cross2Icon /> </Button>
                         </div>        
                         <Button variant="outline"  type="button" class="mt-4"  @click="addMedioPago()">Agregar Medio de Pago <PlusIcon /></Button>
-                        <p v-if="!isValidImporteMedios" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago no cubren el importe final</p>               
+                        <p v-if="!isValidImporteMedios && caluclateImportePago > importeIngresado" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago no cubren el importe final</p>               
+                        <p v-if="!isValidImporteMedios  && caluclateImportePago < importeIngresado" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago ingresados superan el importe final</p>               
 
                     </div>
 

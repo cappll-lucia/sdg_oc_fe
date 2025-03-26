@@ -56,7 +56,6 @@ export const createMedioPagoCustomValidator= (_mediosPago: {
   const success = isValidArray.every(isValid => 
       Object.values(isValid).every(Boolean)
   );
-  console.log(success)
   return { success, isValid: isValidArray };
 }
 
