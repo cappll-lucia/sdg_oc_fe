@@ -37,27 +37,47 @@ export const createMedioDePagoValidator = z.object({
 })
 export type CreateMedioDePagoValidator = z.infer<typeof createMedioDePagoValidator>
 
-export const createMedioPagoCustomValidator= (_mediosPago: {
-  tipoMedioDePago: TipoMedioDePagoEnum | undefined,
+export const createMedioPagoCustomValidator = (_mediosPago: {
+  tipoMedioDePago: string | undefined,
   entidadBancaria: string | undefined,
-  redDePago: RedDePago|undefined,
+  redDePago: string | undefined,
   importe: number
-}[])=>{
-  const validateRedPago = (value:  RedDePago | undefined, tipo: TipoMedioDePagoEnum | undefined)=>  
-    tipo==undefined || tipo==TipoMedioDePagoEnum.EFECTIVO || tipo==TipoMedioDePagoEnum.CUENTA_CORRIENTE ? true : Object.keys(RedDePago).includes(value as RedDePago)
-  const validateEntidad = (value: unknown, tipo: TipoMedioDePagoEnum | undefined) => 
-    tipo === undefined || tipo === TipoMedioDePagoEnum.EFECTIVO || tipo === TipoMedioDePagoEnum.CUENTA_CORRIENTE ? true : Boolean(value);
-  const isValidArray = _mediosPago.map(_medio=> ({
-    tipoMedioDePago: _medio.tipoMedioDePago ? Object.keys(TipoMedioDePagoEnum).includes(_medio.tipoMedioDePago as TipoMedioDePagoEnum): false,
-    entidadBancaria: validateEntidad(_medio.entidadBancaria, _medio.tipoMedioDePago),
-    redDePago: validateRedPago(_medio.redDePago, _medio.tipoMedioDePago),
-    importe: _medio.importe > 0
-  }))
+}[]) => {
+  const tiposNoRedValidation = ['EFECTIVO', 'CUENTA_CORRIENTE'];
+
+  const tiposValidos = Object.keys(TipoMedioDePagoEnum);
+  const redesValidas = Object.keys(RedDePago);
+
+  const isValidArray = _mediosPago.map(_medio => {
+
+    const tipoValido = _medio.tipoMedioDePago 
+      ? tiposValidos.includes(_medio.tipoMedioDePago)
+      : false;
+
+    const entidadValida = !tipoValido || tiposNoRedValidation.includes(_medio.tipoMedioDePago!)
+      ? true
+      : !!_medio.entidadBancaria?.trim();
+
+    const redValida = !tipoValido || tiposNoRedValidation.includes(_medio.tipoMedioDePago!)
+      ? true
+      : !!_medio.redDePago && redesValidas.includes(_medio.redDePago);
+
+    const importeValido = _medio.importe > 0;
+
+    return {
+      tipoMedioDePago: tipoValido,
+      entidadBancaria: entidadValida,
+      redDePago: redValida,
+      importe: importeValido
+    };
+  });
+
   const success = isValidArray.every(isValid => 
-      Object.values(isValid).every(Boolean)
+    Object.values(isValid).every(Boolean)
   );
+
   return { success, isValid: isValidArray };
-}
+};
 
 export type NewMedioPagoType = {
   tipoMedioDePago: TipoMedioDePagoEnum | undefined,

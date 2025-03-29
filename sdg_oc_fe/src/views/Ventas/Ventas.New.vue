@@ -29,15 +29,14 @@ import Label from '@/components/ui/label/Label.vue';
 import { TipoMedioDePagoEnum, RedDePago, createMedioPagoCustomValidator } from '@/api/entities/mediosDePago';
 import { createLineaVentaCustomValidator } from '@/api/entities/lineaVenta';
 import { CondicionIva, createVentaCustomValidator, ventaObrasSocialesCustomValidator } from '@/api/entities/venta';
-import TooltipProvider from '@/components/ui/tooltip/TooltipProvider.vue';
-import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
-import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
-import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
 import { clientesApi } from '@/api/libs/clientes';
 import { ventasApi } from '@/api/libs/ventas';
 import { Textarea } from '@/components/ui/textarea';
+import router from '@/router';
+import { condicionIvaDisplay } from '@/lib/utils';
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -49,7 +48,7 @@ const loading = ref<boolean>(false);
 
 const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
 const mediosDePago = ref<{importe: number, tipoMedioDePago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
-const ventaObrasSociales = ref<{obraSocialId: number| undefined, importe: number, condicionIva: CondicionIva | undefined}[]>([]);
+const ventaObrasSociales = ref<{obraSocial: {id: number| undefined}, importe: number, condicionIva: CondicionIva | undefined}[]>([]);
 const porcDto = ref<number>(0);
 const dto=ref<boolean>(false);
 const obrasSociales=ref<boolean>(false);
@@ -159,7 +158,7 @@ const addVentaObraSocial = ()=>{
         condicionIva: true,
     })
     ventaObrasSociales.value.push({
-        obraSocialId: undefined,
+        obraSocial: {id: undefined},
         importe: 0,
         condicionIva: undefined
     })
@@ -180,7 +179,11 @@ const onSubmit = (async()=>{
             observaciones: 'obs'
         }
         await ventasApi.create(newVenta)
-
+        loading.value=false;
+        toast({
+            title: 'Venta registrada con éxito',
+        })
+        router.replace('/ventas')
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
@@ -202,6 +205,10 @@ const validateAndSubmit = async()=>{
 
     const resultMedios= createMedioPagoCustomValidator(mediosDePago.value)
     isValidMediosPago.value = resultMedios.isValid;
+    console.log(isValidMediosPago.value)
+    console.log(mediosDePago.value
+
+    )
 
     const resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
     isvalidVentaObraSocial.value = resultVentasOS.isValid;
@@ -228,9 +235,7 @@ const handleSelectCliente = async(cliente:Cliente)=>{
         availableCondicionIva.value.push(cliente.categoriaFiscal as CondicionIva);
         condicionIvaVenta.value=cliente.categoriaFiscal;
     }
-    // TODO remove getOne
-    selectedCliente.value=await clientesApi.getOne(cliente.id);
-    // selectedCliente.value=cliente; 
+    selectedCliente.value=cliente; 
     searchClienteOpen.value=false;
 }
 
@@ -238,7 +243,7 @@ const hanldeSelectProducto = (_producto: Producto)=>{
     const existingLinea = lineasDeVenta.value.find(linea => linea.producto.id === _producto.id);
     if(existingLinea){
         existingLinea.cantidad+=1;
-        removeLineaVenta(lineasDeVenta.value.length-- )
+        if(lineasDeVenta.value.length>1) removeLineaVenta(lineasDeVenta.value.length-- )
         toast({
             title: 'Producto ya seleccionado',
             description: 'Se agregó una unidad.',
@@ -295,6 +300,14 @@ const importeIngresado = computed<number>(() => {
     }, 0);
 });
 
+const moveToMediosPago =()=>{
+    isValidImporteObrasSociales.value = !(totalVentaBruto.value < montoObrasSociales.value);
+    if (isValidImporteObrasSociales.value){
+        addPagoDefault()
+        showMedioPago.value=true; 
+    }
+}
+
 
 
 
@@ -311,29 +324,6 @@ const tipoFactura = computed(()=>{
         return "B"
     }
 })
-
-const condicionIvaDisplay = computed(() => {
-    return (value: string) => {
-        switch (value) {
-            case '1':
-                return 'RESPONSABLE INSCRIPTO';
-            case '4':
-                return 'EXENTO';
-            case '5':
-                return 'CONSUMIDOR FINAL';
-            case '6':
-                return 'MONOTRIBUTISTA';
-            case '7':
-                return 'GRAVADO';
-            case '8':
-                return 'NO GRAVADO';
-            default:
-                return undefined;
-        }
-    };
-});
-
-
 
 </script>
 
@@ -405,7 +395,7 @@ const condicionIvaDisplay = computed(() => {
                                                         :key="condicion" 
                                                         :value="condicion.toString()"
                                                     >
-                                                        {{ condicionIvaDisplay(condicion.toString()) }}
+                                                        {{ condicionIvaDisplay(condicion) }}
                                                     </SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>
@@ -473,7 +463,8 @@ const condicionIvaDisplay = computed(() => {
                                 :class="{'rounded-lg cursor-default focus:outline-none  focus:border-none  text-center': (isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto),
                                         'rounded-lg cursor-default focus:outline-none  focus:border-none  text-center border-destructive' : !(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)
                                 }" 
-                            />
+                            /> 
+                            <!-- // TODO disable edition -->
                             <Input
                                 :model-value="linea.cantidad" 
                                 @update:model-value="(value)=>{
@@ -537,10 +528,10 @@ const condicionIvaDisplay = computed(() => {
                                             <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
                                                 <div class="flex flex-row w-[17rem] ">
                                                 <Select 
-                                                        :modelValue="os.obraSocialId?.toString()" 
+                                                        :modelValue="os.obraSocial.id?.toString()" 
                                                          @update:modelValue="(value:string) => {
                                                             if (ventaObrasSociales[index]) {
-                                                                ventaObrasSociales[index].obraSocialId = Number(value);
+                                                                ventaObrasSociales[index].obraSocial.id = Number(value);
                                                             }}"
                                                         >
                                                             <SelectTrigger class="text-black w-[14rem] ">
@@ -605,7 +596,7 @@ const condicionIvaDisplay = computed(() => {
                                                                             :key="condicion" 
                                                                             :value="condicion.toString()"
                                                                         >
-                                                                            {{ condicionIvaDisplay(condicion.toString()) }}
+                                                                            {{ condicionIvaDisplay(condicion) }}
                                                                         </SelectItem>
                                                                     </SelectGroup>
                                                                 </SelectContent>
@@ -621,7 +612,7 @@ const condicionIvaDisplay = computed(() => {
                                                 </div>
                                             <Button variant="ghost"  type="button" class="text-destructive"  @click="removeVentaObraSocial(index)"><Cross2Icon /></Button>
                                             </div>
-                                            <p v-if="!isValidImporteObrasSociales " class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe por obras sociales no puede ser superior al importe total</p>               
+                                            <p v-if="!isValidImporteObrasSociales " class="text-destructive text-md py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe por obras sociales no puede ser superior al importe total</p>               
                                             <Button variant="outline"  type="button" class="mt-8"  @click="addVentaObraSocial()">Agregar Obra Social <PlusIcon /></Button>
                                         </div>
                                         <div v-else>
@@ -634,7 +625,7 @@ const condicionIvaDisplay = computed(() => {
                                 <div class="border min-h-[3rem] p-4 w-full rounded-lg  mt-4">
                                     <div class="w-full flex flex-row justify-between  items-center">
                                         <h3 class="page-subtitle">Descuento</h3>
-                                        <Switch :model-value="dto" @update:model-value="dto=!dto"></Switch>
+                                        <Switch :model-value="dto" @update:model-value="()=>{dto=!dto; porcDto=0}"></Switch>
                                     </div>
                                     <div v-if="dto" class="flex flex-row items-center">
                                         <Label class="w-[5.5rem]">Porcentaje: </Label>
@@ -692,7 +683,8 @@ const condicionIvaDisplay = computed(() => {
                     </div>
 
                     <div  v-if="!showMedioPago" class="w-full flex justify-end mt-4">
-                        <Button @click="()=>{showMedioPago=true; addPagoDefault()}">Continuar <ArrowRightIcon /></Button>
+                        <Button @click="()=>{moveToMediosPago()}">Continuar <ArrowRightIcon /></Button>
+                        <!-- <Button @click="()=>{showMedioPago=true; addPagoDefault()}">Continuar <ArrowRightIcon /></Button> -->
                     </div>
 
 

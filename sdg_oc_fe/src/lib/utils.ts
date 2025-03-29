@@ -36,3 +36,40 @@ export const isValidNumber = (value: unknown): value is number => {
   }
   return false;
 };
+
+
+export const condicionIvaDisplay = (value: number) => {
+  return (
+    {
+      1: 'RESPONSABLE INSCRIPTO',
+      4: 'EXENTO',
+      5: 'CONSUMIDOR FINAL',
+      6: 'MONOTRIBUTISTA',
+      7: 'GRAVADO',
+      8: 'NO GRAVADO'
+    }[value] || undefined
+  );
+};
+
+
+export const tipoComprobanteDisplay = (value: number)=>{
+  return(
+    {
+      1: 'FACTURA A',
+      2: 'NOTA DEBITO A',
+      3: 'NOTA CREDITO A',
+
+      6: 'FACTURA B',
+      7: 'NOTA DEBITO B',
+      8: 'NOTA CREDITO B',
+
+      11: 'FACTURA C',
+      12: 'NOTA DEBITO C',
+      13: 'NOTA CREDITO C',
+
+      51: 'FACTURA M',
+      52: 'NOTA DEBITO M',
+      53: 'NOTA CREDITO M',
+    }[value] || undefined
+  )
+}

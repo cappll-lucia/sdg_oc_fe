@@ -3,18 +3,29 @@ import { createLineaVentaValidator, LineaVenta, NewLineaVentaType } from "./line
 import {number, z} from 'zod'
 import { createMedioDePagoValidator, MedioDePago, NewMedioPagoType } from "./mediosDePago";
 import { isValidNumber } from "@/lib/utils";
+import { BaseTransactionalEntity } from "./entities";
+import { ObraSocial } from "./obraSocial";
+import { Comprobante } from "./comprobante";
 
-export interface Venta{
-    id: string;
-	createdAt: string;
-	updatedAt: string;
+export interface Venta extends BaseTransactionalEntity{
     fecha: Date;
     descuentoPorcentaje: number;
     importe: number;
     cliente: Cliente;
     lineasDeVenta: LineaVenta[];
     mediosDePago: MedioDePago[];
+    comprobante: Comprobante,
+    observaciones: string;
+    ventaObraSocial: VentaObraSocial[];
 }
+
+export interface VentaObraSocial extends BaseTransactionalEntity{
+    venta: Venta;
+    obraSocial: ObraSocial;
+    importe: number;
+    condicionIva: CondicionIva;
+}
+
 
 export enum CondicionIva {
   RESPONSABLE_INSCRIPTO = 1,
@@ -81,12 +92,12 @@ export const createVentaCustomValidator = (_newVenta: {
 
 
 export const ventaObrasSocialesCustomValidator = (_ventasOS: {
-        obraSocialId:  undefined | number,
+        obraSocial:{id:  undefined | number},
         importe: number,
         condicionIva:  CondicionIva | undefined
     }[])=>{
         const isValidArray = _ventasOS.map(_os=> ({
-            obraSocial: Boolean(_os.obraSocialId),
+            obraSocial: Boolean(_os.obraSocial.id),
             importe: isValidNumber(_os.importe) && _os.importe >0,
             condicionIva: _os.condicionIva ? Object.values(CondicionIva).includes(Number(_os.condicionIva)) :false,
         }))
@@ -97,7 +108,7 @@ export const ventaObrasSocialesCustomValidator = (_ventasOS: {
 }
 
 export type NewVentaOsType = {
-    obraSocialId:  undefined | number,
+    obraSocial: {id: undefined | number},
     importe: number,
     condicionIva: CondicionIva | undefined
 }
