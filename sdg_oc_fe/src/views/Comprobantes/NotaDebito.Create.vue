@@ -9,14 +9,6 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon} from '@radix-icons/vue';
 import { ref } from 'vue';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Cliente } from '@/api/entities/clientes';
@@ -26,7 +18,7 @@ import Label from '@/components/ui/label/Label.vue';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { condicionIvaDisplay, tipoComprobanteDisplay } from '@/lib/utils';
 import SelectFacturaDialog from '@/components/SelectFacturaDialog.vue';
-import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
+import { AsteriskIcon } from 'lucide-vue-next';
 import router from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
@@ -55,7 +47,7 @@ const handleSelectCliente = async(cliente:Cliente)=>{
 
 const handleSelectFactura = async(factura:Comprobante)=>{
     selectedFactura.value=factura; 
-    tipoComprobante.value = getTipoNotaCredito(factura.tipoComprobante);
+    tipoComprobante.value = getTipoNotaDebito(factura.tipoComprobante);
     searchFacturaOpen.value=false;
 }
 
@@ -77,12 +69,19 @@ const isValidComprobante = ref<{
 const validateAndSubmit = async ()=>{
     loading.value=true;
     isValidComprobante.value.cliente= Boolean(selectedCliente.value?.id);
-    isValidComprobante.value.importeTotal=  selectedFactura.value ? importeComprobante.value <= selectedFactura.value.importeTotal : false;
+    isValidComprobante.value.importeTotal=  Boolean(importeComprobante.value);
     isValidComprobante.value.motivo= Boolean(motivoComprobante.value);
     isValidComprobante.value.facturaRelacionada=Boolean(selectedFactura.value?.numeroComprobante);
-    isValidComprobante.value.tipoComprobante = tipoComprobante.value ? [3, 8, 13, 53].includes(tipoComprobante.value) : false;
+    isValidComprobante.value.tipoComprobante = tipoComprobante.value ? [2, 7, 12, 52].includes(tipoComprobante.value) : false;
     if(isValidComprobante.value.cliente && isValidComprobante.value.facturaRelacionada && isValidComprobante.value.importeTotal && isValidComprobante.value.motivo && isValidComprobante.value.tipoComprobante){
         await onSubmit()
+    }else{
+        console.log(isValidComprobante.value.cliente)
+        console.log(isValidComprobante.value.importeTotal)
+        console.log(isValidComprobante.value.motivo)
+        console.log(isValidComprobante.value.facturaRelacionada)
+        console.log(isValidComprobante.value.tipoComprobante)
+
     }
     loading.value=false;
 }
@@ -102,7 +101,7 @@ const onSubmit = async()=>{
         loading.value=false;
         router.replace(`/nota-credito-debito/view/${createdNC.id}`)
         toast({
-            title: 'Nota de crédito emitida con éxito',
+            title: 'Nota de débito emitida con éxito',
         })
     }catch (err: any) {
         errorMessage.value = err.message as string;
@@ -110,13 +109,13 @@ const onSubmit = async()=>{
   }
 }
 
-const getTipoNotaCredito = (tipoFactura: number)=>{
+const getTipoNotaDebito = (tipoFactura: number)=>{
     return (
         {
-            1: 3,   // facturaA : ncA
-            6: 8,   // facturaB : ncB
-            11: 13, // facturaC : ncC
-            51: 53, // facturaM : ncm
+            1: 2,   // facturaA : ndA
+            6: 7,   // facturaB : ndB
+            11: 12, // facturaC : ndC
+            51: 52, // facturaM : ndm
 
         }[tipoFactura]
     )
@@ -146,11 +145,11 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Nota de Crédito</BreadcrumbPage>
+                    <BreadcrumbPage>Nota de Débito</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title">Nueva Nota de Crédito</h1>
+        <h1 class="page-title">Nueva Nota de Débito</h1>
         <div class="pt-2">
             <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4 ">
                 <div class="rounded-[0.5rem] w-[55rem] h-auto flex flex-col justify-start items-start">
@@ -167,7 +166,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                                     />
                                     <SelectClienteDialog
                                         v-model="searchClienteOpen"
-                                        title="Nueva Nota de Crédito: Seleccionar Cliente"
+                                        title="Nueva Nota de Débito: Seleccionar Cliente"
                                         @select-cliente="handleSelectCliente"
                                     />
                                     <TooltipProvider  v-if="!isValidComprobante.cliente" >
@@ -191,7 +190,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                                          <SelectFacturaDialog
                                          v-model="searchFacturaOpen"
                                          :nro-documento="selectedCliente?.nroDocumento"
-                                         title="Nueva Nota de Crédito: Seleccionar factura relacionada"
+                                         title="Nueva Nota de Débito: Seleccionar factura relacionada"
                                          @select-factura="handleSelectFactura"
                                          />
                                          <TooltipProvider  v-if="!isValidComprobante.facturaRelacionada" >
@@ -211,7 +210,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
                                 <div class="flex flex-col w-[8rem] h-[6rem] border justify-center items-center rounded-lg">
-                                    <span>Nota Credito</span>
+                                    <span>Nota Debito</span>
                                     <span v-if="tipoComprobante" class="text-[3rem] leading-[3rem]">{{ tipoComprobanteDisplay(tipoComprobante)?.letra}}</span>
                                 </div>
                                 <Label class="text-[1rem]">Fecha: {{ fechaComprobante.toLocaleDateString('es-ES') }}</Label>
@@ -227,24 +226,15 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
                             <Label class="w-[13rem] text-md">Concepto emisión</Label>
-                            <Select v-model="motivoComprobante" >
-                                <SelectTrigger class="w-[17rem]">
-                                    <SelectValue placeholder="Seleccionar" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="Anulación" >Anulación</SelectItem>
-                                        <SelectItem value="Descuento" >Descuento</SelectItem>
-                                        <SelectItem value="Devolución" >Devolucion</SelectItem>
-                                        <SelectItem value="Diferencia de Precio">Diferencia de precio</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
+                             <Input
+                                class="w-[17rem]"
+                                v-model="motivoComprobante"
+                            />
                             <TooltipProvider  v-if="!isValidComprobante.motivo" >
                              <Tooltip>
                                  <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                  <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                     <p>Seleccionar concepto</p>
+                                     <p>Indicar concepto</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
@@ -267,11 +257,10 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
-                        <p v-if="selectedFactura && importeComprobante > selectedFactura?.importeTotal" class="text-destructive text-sm py-2 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe de la Nota de Crédito no puede superar el importe de la factura original</p>               
                     </div>
                     <div class="w-full flex justify-end mt-4">
                         <Button variant="outline" class="w-[12rem] mr-5" @click="router.replace('/ventas')">Cancelar</Button>
-                        <Button type="submit" class="w-[12rem]">Emitir Nota de Crédito</Button>
+                        <Button type="submit" class="w-[12rem]">Emitir Nota de Débito</Button>
                     </div>
                 </div>
             </form>

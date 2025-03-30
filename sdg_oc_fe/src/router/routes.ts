@@ -240,6 +240,14 @@ export const routerRoutes = [
             }
         },
         {
+            path: '/nota-debito/new',
+            name:'nd-new',
+            component: ()=> import('../views/Comprobantes/NotaDebito.Create.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
             path: '/nota-credito-debito/view/:id',
             name:'nc-view',
             component: ()=> import('../views/Comprobantes/NotaCreditoDebito.View.vue'),
