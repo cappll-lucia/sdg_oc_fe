@@ -7,8 +7,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { SlashIcon, PlusIcon, Cross2Icon, ArrowRightIcon, MagicWandIcon } from '@radix-icons/vue';
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { SlashIcon} from '@radix-icons/vue';
+import { ref } from 'vue';
 import {
     Select,
     SelectContent,
@@ -17,20 +17,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Cliente } from '@/api/entities/clientes';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
-import { clientesApi } from '@/api/libs/clientes';
-import { Comprobante, TipoComprobante } from '@/api/entities/comprobante';
+import { Comprobante } from '@/api/entities/comprobante';
 import Label from '@/components/ui/label/Label.vue';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { condicionIvaDisplay } from '@/lib/utils';
+import { condicionIvaDisplay, tipoComprobanteDisplay } from '@/lib/utils';
 import SelectFacturaDialog from '@/components/SelectFacturaDialog.vue';
 import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
 import router from '@/router';
-import { validate } from 'vee-validate';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
 
@@ -42,7 +39,6 @@ const selectedCliente = ref<Cliente>();
 const selectedFactura = ref<Comprobante>();
 const searchClienteOpen =ref<boolean>(false);
 const searchFacturaOpen =ref<boolean>(false);
-const showMedioPago = ref<boolean>(false);
 const loading = ref<boolean>(false);
 
 const fechaComprobante = ref<Date>(new Date());
@@ -99,14 +95,15 @@ const onSubmit = async()=>{
                 id: selectedFactura.value?.id
             },
             tipoComprobante: tipoComprobante.value,
-          //  motivo: motivoComprobante.value,
+            motivo: motivoComprobante.value,
+            condicionIvaCliente: selectedFactura.value?.condicionIvaCliente
         }
-        await comprobantesApi.create(newComprobante)
+        const createdNC = await comprobantesApi.create(newComprobante)
         loading.value=false;
+        router.replace(`/nota-credito-debito/view/${createdNC.id}`)
         toast({
             title: 'Nota de crédito emitida con éxito',
         })
-        router.replace('/comprobantes')
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
@@ -149,7 +146,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Nota d Crédito</BreadcrumbPage>
+                    <BreadcrumbPage>Nota de Crédito</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
@@ -193,7 +190,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                                      <div v-if="selectedCliente">
                                          <SelectFacturaDialog
                                          v-model="searchFacturaOpen"
-                                         :cliente-id="selectedCliente?.id"
+                                         :nro-documento="selectedCliente?.nroDocumento"
                                          title="Nueva Nota de Crédito: Seleccionar factura relacionada"
                                          @select-factura="handleSelectFactura"
                                          />
@@ -209,13 +206,13 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                                 </div>
                                 <div class="flex h-14 flex-row justify-start items-center w-full">
                                     <Label class="form-label w-[12rem]  h-10 pt-3 text-md">Condición Fiscal</Label>
-                                    <Label class="form-label w-[15rem]  h-10 mt-6 text-md">{{ selectedFactura ? condicionIvaDisplay(selectedFactura?.conidcionIvaCliente) : '--' }}</Label>
+                                    <Label class="form-label w-[15rem]  h-10 mt-6 text-md">{{ selectedFactura ? condicionIvaDisplay(selectedFactura?.condicionIvaCliente) : '--' }}</Label>
                                 </div>
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
                                 <div class="flex flex-col w-[8rem] h-[6rem] border justify-center items-center rounded-lg">
                                     <span>Nota Credito</span>
-                                    <span class="text-[3rem] leading-[3rem] ">A</span>
+                                    <span v-if="tipoComprobante" class="text-[3rem] leading-[3rem]">{{ tipoComprobanteDisplay(tipoComprobante)?.letra}}</span>
                                 </div>
                                 <Label class="text-[1rem]">Fecha: {{ fechaComprobante.toLocaleDateString('es-ES') }}</Label>
                             </div>
@@ -229,7 +226,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                            
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
-                            <Label class="w-[13rem] text-md">Motivo emisión</Label>
+                            <Label class="w-[13rem] text-md">Concepto emisión</Label>
                             <Select v-model="motivoComprobante" >
                                 <SelectTrigger class="w-[17rem]">
                                     <SelectValue placeholder="Seleccionar" />
