@@ -39,7 +39,6 @@ const currentOffset = ref<number>(0);
 
 const loadData = async()=>{
     await handleFilterClientes()
-    console.log(clientes.value)
     localidades.value = await localidadesApi.getAll();
 }
 

@@ -32,7 +32,6 @@ import { CondicionIva, createVentaCustomValidator, ventaObrasSocialesCustomValid
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
-import { clientesApi } from '@/api/libs/clientes';
 import { ventasApi } from '@/api/libs/ventas';
 import { Textarea } from '@/components/ui/textarea';
 import router from '@/router';
@@ -187,7 +186,7 @@ const onSubmit = (async()=>{
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
-  }
+    }
 })
 
 const validateAndSubmit = async()=>{

@@ -29,6 +29,10 @@ export const fechaValidator= z
     })
     .refine((date) => !isNaN(Date.parse(date)));
 
+export const emailValidator = 
+    z.string().email();
+
+
 export const isValidNumber = (value: unknown): value is number => {
   if (typeof value === "number") return true;
   if (typeof value === "string" && value.trim() !== "" && !isNaN(Number(value))) {
@@ -55,21 +59,21 @@ export const condicionIvaDisplay = (value: number) => {
 export const tipoComprobanteDisplay = (value: number)=>{
   return(
     {
-      1: 'FACTURA A',
-      2: 'NOTA DEBITO A',
-      3: 'NOTA CREDITO A',
+      1:  {nombre: 'Factura', letra: 'A'},
+      2:  {nombre: 'Nota de Débito', letra: 'A'},
+      3:  {nombre: 'Nota de Crédito', letra: 'A'},
 
-      6: 'FACTURA B',
-      7: 'NOTA DEBITO B',
-      8: 'NOTA CREDITO B',
+      6:  {nombre: 'Factura', letra: 'B'},
+      7:  {nombre: 'Nota de Débito', letra: 'B'},
+      8:  {nombre: 'Nota de Crédito', letra: 'B'},
 
-      11: 'FACTURA C',
-      12: 'NOTA DEBITO C',
-      13: 'NOTA CREDITO C',
+      11: {nombre: 'Factura', letra: 'C'},
+      12: {nombre: 'Nota de Débito', letra: 'C'},
+      13: {nombre: 'Nota de Crédito', letra: 'C'},
 
-      51: 'FACTURA M',
-      52: 'NOTA DEBITO M',
-      53: 'NOTA CREDITO M',
-    }[value] || undefined
+      51: {nombre: 'Factura', letra: 'M'},
+      52: {nombre: 'Nota de Débito', letra: 'M'},
+      53: {nombre: 'Nota de Crédito', letra: 'M'},
+    }[value]
   )
 }

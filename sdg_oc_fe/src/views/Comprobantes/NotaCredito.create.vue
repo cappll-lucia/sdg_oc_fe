@@ -59,7 +59,6 @@ const handleSelectFactura = async(factura:Comprobante)=>{
     searchFacturaOpen.value=false;
 }
 
-
 const isValidComprobante = ref<{
     cliente: boolean,
     importeTotal: boolean,

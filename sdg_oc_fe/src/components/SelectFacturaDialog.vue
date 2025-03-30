@@ -98,7 +98,6 @@ const handleDateRangeChange = (newRange: DateRange) => {
         <DialogContent class="w-[60rem] h-[40rem] max-w-[60rem] px-8">
             <DialogHeader>
                 <DialogTitle class="text-center">{{ title }}</DialogTitle>
-                <p>{{ nroDocumento }}</p>
             </DialogHeader>
             <Separator  class="my-2" />
             <div v-if="foundFacturas.length==0" class="flex h-[30rem] pt-20 justify-center">

@@ -10,7 +10,7 @@ export interface Comprobante extends BaseTransactionalEntity{
     facturaRelacionada: Comprobante;
     importeTotal: number;
     motivo: string | undefined;
-    conidcionIvaCliente: CondicionIva;
+    condicionIvaCliente: CondicionIva;
 }
 
 export enum TipoComprobante {
