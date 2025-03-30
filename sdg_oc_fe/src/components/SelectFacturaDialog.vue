@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import Label from './ui/label/Label.vue';
 import { RangeCalendar } from '@/components/ui/range-calendar'
@@ -29,7 +29,7 @@ import { tipoComprobanteDisplay } from '@/lib/utils';
 const foundFacturas = ref<Comprobante[]>([]);
 
 const props = defineProps<{
-  clienteId: number;
+  nroDocumento: number;
     modelValue: boolean;
   title: string;
 }>();
@@ -51,13 +51,38 @@ const df = new DateFormatter('en-US', {
   dateStyle: 'medium',
 })
 
-onMounted(async()=>{
-    foundFacturas.value = await comprobantesApi.getFacturasByCliente(props.clienteId);
-    console.log(foundFacturas.value)
-});
+const loadFacturas = async () => {
+  foundFacturas.value = await comprobantesApi.getFacturasByCliente(props.nroDocumento);
+};
+
+
+onMounted(loadFacturas);
+
+
+watch(
+  () => props.nroDocumento,
+  () => {
+    if (props.modelValue) {
+      loadFacturas();
+    }
+  }
+);
+
+
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (isOpen) { 
+      loadFacturas();
+    } else { 
+      foundFacturas.value = [];
+    }
+  }
+);
 
 const selectFactura = (factura: Comprobante)=>{
     emit('selectFactura', factura);
+    foundFacturas.value=[];
 }
 
 const handleDateRangeChange = (newRange: DateRange) => {
@@ -73,6 +98,7 @@ const handleDateRangeChange = (newRange: DateRange) => {
         <DialogContent class="w-[60rem] h-[40rem] max-w-[60rem] px-8">
             <DialogHeader>
                 <DialogTitle class="text-center">{{ title }}</DialogTitle>
+                <p>{{ nroDocumento }}</p>
             </DialogHeader>
             <Separator  class="my-2" />
             <div v-if="foundFacturas.length==0" class="flex h-[30rem] pt-20 justify-center">
@@ -119,7 +145,7 @@ const handleDateRangeChange = (newRange: DateRange) => {
                         class="cursor-pointer search-area-item rounded-sm hover:bg-secondary px-4 py-2 w-[49rem] h-16 flex flex-row justify-between items-center"
                     >
                         <div class="w-[30rem]  flex flex-row justify-start items-center">
-                            <Label class=" w-[6rem]  bg-secondary rounded-lg py-2  text-xs text-center">{{ tipoComprobanteDisplay(fac.tipoComprobante) }}</Label>
+                            <Label class=" w-[6rem]  bg-secondary rounded-lg py-2  text-xs text-center">{{ tipoComprobanteDisplay(fac.tipoComprobante)?.nombre }} {{ tipoComprobanteDisplay(fac.tipoComprobante)?.letra }}</Label>
                             <Label class=" w-[10rem] text-sm text-center">{{ fac.numeroComprobante }}</Label>
                             <Label class="text-sm text-center">-</Label>
                             <Label class="ml-6 text-sm font-thin">{{ formatDate(fac.fechaEmision) }}</Label>
