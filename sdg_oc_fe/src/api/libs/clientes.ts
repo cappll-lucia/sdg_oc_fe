@@ -28,7 +28,7 @@ const getAll = async (filters: ClienteFilers={}) => {
         
         const url = `/cliente?${params.toString()}`;
         const resp = await http.get(url);
-        return resp.data.data.items as Cliente[];
+        return resp.data.data as {items: Cliente[], nextPage: number|null, previousPage: number|null};
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -60,7 +60,7 @@ const getRecetasSummaryByCliente = async(_idCLiente:number)=>{
         try {
         const resp = await getRecetasByCliente(_idCLiente);
         const recetasAereos = resp.recetasLentesAereos.map(r=> ({id: r.id, clase: 'Recetados', tipo: r.tipoReceta , fecha: new Date(r.fecha) }));
-        const recetasContacto = resp.recetasLentesContacto.map(r=> ({id: r.id, clase: 'Contacto', fecha: new Date(r.fecha) }));
+        const recetasContacto = resp.recetasLentesContacto.map(r=> ({id: r.id, clase: 'Lentes Contacto', fecha: new Date(r.fecha) }));
         const recetas = [...recetasAereos, ...recetasContacto].sort(
             (a, b) => b.fecha.getTime() - a.fecha.getTime()
         );
