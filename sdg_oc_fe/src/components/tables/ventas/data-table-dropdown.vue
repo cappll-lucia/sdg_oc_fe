@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-vue-next';
 import router from '@/router/index';
 
@@ -24,9 +24,7 @@ defineProps<{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="()=>router.replace(`/ventas/view/${venta.id}`)">Ver Detalle</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Ver Factura</DropdownMenuItem>
+            <DropdownMenuItem @click="()=>router.push(`/ventas/view/${venta.id}`)">Ver Detalle</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

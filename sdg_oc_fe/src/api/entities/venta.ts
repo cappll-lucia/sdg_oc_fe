@@ -14,7 +14,7 @@ export interface Venta extends BaseTransactionalEntity{
     cliente: Cliente;
     lineasDeVenta: LineaVenta[];
     mediosDePago: MedioDePago[];
-    comprobante: Comprobante,
+    factura: Comprobante,
     observaciones: string;
     ventaObraSocial: VentaObraSocial[];
 }
@@ -80,11 +80,12 @@ export const createVentaCustomValidator = (_newVenta: {
     descuentoPorcentaje: number | undefined,
     condicionIvaVenta: CondicionIva | undefined,
 })=>{
+    console.log(_newVenta)
     const isValid = {
         cliente: _newVenta.cliente.id===0 || Boolean(_newVenta.cliente.id),
         fecha: _newVenta.fecha instanceof Date,
         descuentoPorcentaje: isValidNumber(_newVenta.descuentoPorcentaje) && 0 <= _newVenta.descuentoPorcentaje && _newVenta.descuentoPorcentaje<=100 ,
-        condicionIvaVenta: _newVenta.condicionIvaVenta ? Object.values(CondicionIva).includes(_newVenta.condicionIvaVenta) :false,
+        condicionIvaVenta: _newVenta.condicionIvaVenta ? Object.values(CondicionIva).includes(Number(_newVenta.condicionIvaVenta)) :false,
     }
     const success = Object.values(isValid).every(Boolean);
     return {success, isValid};

@@ -32,7 +32,22 @@ onMounted(async()=>{
     }
 })
 
-
+const printComprobante = async(_id: string)=>{
+    try {
+        const resp = await comprobantesApi.print(_id);
+        const blob = new Blob([resp.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'comprobante.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error('Error al descargar el PDF:', error);
+    }
+}
 
 </script>
 
@@ -107,7 +122,7 @@ onMounted(async()=>{
                     </div>
                     <div class="w-full flex justify-end mt-4">
                         <Button variant="outline" class="w-[10rem] mr-5" @click="router.replace('/ventas')">Volver</Button>
-                        <Button type="submit" class="w-[10rem]">Imprimir</Button>
+                        <Button type="submit" class="w-[10rem]" @click="printComprobante(currentComprobante.id)" >Imprimir</Button>
                     </div>
                 </div>
             </div>

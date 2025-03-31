@@ -648,22 +648,22 @@ const tipoFactura = computed(()=>{
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-[19rem] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-centerr">
+                            <div class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-centerr">
                                 <div v-if="(obrasSociales && montoObrasSociales > 0) || porcDto" class=" flex  justify-center mt-4">
                                     <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
-                                    <Label class=" w-[7rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
+                                    <Label class=" w-[9rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
                                 </div>
                                 <div v-if="obrasSociales && montoObrasSociales > 0" class=" flex  justify-center items-center mt-4">
                                     <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
-                                    <Label class=" w-[7rem]  ">- $ {{ montoObrasSociales.toFixed(2) }}</Label>
+                                    <Label class=" w-[9rem]  ">- $ {{ montoObrasSociales.toFixed(2) }}</Label>
                                 </div>
                                 <div v-if="porcDto" class=" flex  justify-center items-center mt-4">
                                     <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
-                                    <Label class=" w-[7rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
+                                    <Label class=" w-[9rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
                                 </div>
                                 <div class=" flex  justify-center mt-4">
                                     <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
-                                    <Label class="page-subtitle  w-[7rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
+                                    <Label class="page-subtitle  w-[9rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
                                 </div>
                             </div>
                             
