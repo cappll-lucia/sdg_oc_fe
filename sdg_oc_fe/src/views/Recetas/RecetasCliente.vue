@@ -59,7 +59,13 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
+        <div class=" flex flex-row justify-between w-full mb-4">
+            <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
+            <div>
+                <Button class="text-xs mr-2 " @click="router.replace('/recetas/recetados/new')" >Nueva Receta Anteojos Recetados </Button>
+                <Button class="text-xs" @click="router.replace('/recetas/contacto/new')" >Nueva Receta Lentes de Contacto </Button>
+            </div>
+        </div>
         <div class="pt-2">
             <Tabs default-value="recetados" class="w-[100%]">
                 <TabsList class="w-[100%]">

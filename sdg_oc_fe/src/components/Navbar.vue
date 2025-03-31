@@ -68,11 +68,11 @@ const parametrosItems: { title: string, href: string}[] = [
 <template>
     <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
         <NavigationMenuList>
-            <NavigationMenuItem>
+            <!-- <NavigationMenuItem>
                 <NavigationMenuLink href="/recetas" :class="navigationMenuTriggerStyle()">
                     Recetas
                 </NavigationMenuLink>
-            </NavigationMenuItem>
+            </NavigationMenuItem> -->
             <NavigationMenuItem>
                 <NavigationMenuTrigger >Ventas</NavigationMenuTrigger>
                 <NavigationMenuContent>

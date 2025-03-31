@@ -127,14 +127,14 @@ export const routerRoutes = [
 			    auth: true,
 		    },
         },
-        {
-            path: '/recetas',
-            name: 'recetas',
-            component: () => import('../views/Recetas/Recetas.vue'),
-            meta: {
-			    auth: true,
-		    },},      
-
+        // {
+        //     path: '/recetas',
+        //     name: 'recetas',
+        //     component: () => import('../views/Recetas/Recetas.vue'),
+        //     meta: {
+		// 	    auth: true,
+		//     },
+        // },      
         {
             path: '/audiometrias',
             name: 'recetas_audiometria',
