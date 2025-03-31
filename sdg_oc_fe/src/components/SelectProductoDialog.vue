@@ -35,13 +35,15 @@ const selectProducto = (producto: Producto) => {
 };
 
 const searchProducto = async()=>{
-    foundProductos.value = await productosApi.getAll({
+    const resp = await productosApi.getAll({
         filtro: searchProdIdTxt.value+' '+searchProdDscTxt.value,
     })
+    foundProductos.value = resp.items;
 }
 
 onMounted(async ()=>{
-    foundProductos.value = await productosApi.getAll({})
+    const resp = await productosApi.getAll({})
+    foundProductos.value = resp.items;
 })
 
 </script>

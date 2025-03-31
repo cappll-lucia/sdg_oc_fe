@@ -28,7 +28,7 @@ const getAll = async (filters: ProductoFilters = {}) => {
 
         const url = `/producto?${params.toString()}`;
         const resp = await http.get(url);
-        return resp.data.data.items as Producto[];
+        return resp.data.data as {items: Producto[],  nextPage: number|null, previousPage: number|null};
     } catch (error) {
         throw error instanceof AxiosError ?  
             new Error(error?.response?.data?.message) : 

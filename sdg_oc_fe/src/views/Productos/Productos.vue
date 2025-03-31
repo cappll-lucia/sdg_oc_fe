@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SlashIcon } from '@radix-icons/vue';
+import { ReloadIcon, SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/productos/columns';
 import DataTable from '@/components/tables/productos/data-table.vue';
@@ -47,6 +47,9 @@ const txtSearch = ref<string>('');
 const currentLimit = ref<string>('10');
 const currentOffset = ref<number>(0);
 
+const nextPage=ref<number | null>();
+const previousPage=ref<number | null>(null);
+
 const loadData = async()=>{
     await handleFilterProducts()
     marcas.value = await marcasApi.getAll();
@@ -59,7 +62,7 @@ onMounted(async () => {
 
 
 const handleFilterProducts = async () => {
-    productos.value = await productosApi.getAll({
+    const resp = await productosApi.getAll({
         proveedorId: selectedProveedorId.value,
         marcaId: selectedMarcaId.value,
         categoria: selectedCategoria.value,
@@ -67,6 +70,9 @@ const handleFilterProducts = async () => {
         offset: currentOffset.value,
         limit: currentLimit.value
     });
+    productos.value = resp.items;
+    nextPage.value = resp.nextPage;
+    previousPage.value =resp.previousPage;
 };
 
 const handlePageChange = async(offset: number) => {
@@ -75,6 +81,16 @@ const handlePageChange = async(offset: number) => {
     await handleFilterProducts()
 };
 
+
+const clearFilters = async()=>{
+    selectedProveedorId.value =''
+    selectedMarcaId.value =''
+    selectedCategoria.value =''
+    txtSearch.value =''
+    currentOffset.value = 0
+    currentLimit.value='10'
+    await handleFilterProducts()
+}
 </script>
 
 
@@ -95,7 +111,17 @@ const handlePageChange = async(offset: number) => {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <h1 class="page-title ">Productos</h1>
+        <div class="flex flex-row w-full justify-between">
+            <h1 class="page-title ">Productos</h1>
+            <DropdownMenu>
+                <DropdownMenuTrigger><Button class="w-[14rem]" >Registrar nuevos productos</Button></DropdownMenuTrigger>
+                <DropdownMenuContent class="w-[14rem]" >
+                    <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/lote')"  >Registrar lote de productos</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/single')" >Registrar producto único</DropdownMenuLabel>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
         <div class="pt-2">
             <div class="flex flex-row justify-between items-center py-4">
                 <div class="search flex w-[65rem]  flex-row justify-start gap-x-4">
@@ -135,21 +161,15 @@ const handlePageChange = async(offset: number) => {
                         </SelectContent>
                     </Select>
                 </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger><Button class="w-[14rem]" >Registrar nuevos productos</Button></DropdownMenuTrigger>
-                    <DropdownMenuContent class="w-[14rem]" >
-                        <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/lote')"  >Registrar lote de productos</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/single')" >Registrar producto único</DropdownMenuLabel>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Button variant="ghost" @click="clearFilters" class="text-gray-500 mt-1 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline"> <ReloadIcon /> </Button>
+
             </div>
             <DataTable :columns="columns" :data="productos" />
         </div>
 
         <div class="mt-4 flex w-full justify-center">
             <div class="flex items-center gap-1 text-gray-500 ">
-                <Button variant="outline" :disbled="currentOffset==0" class="w-8 h-8" @click="handlePageChange(-1)">
+                <Button variant="outline" :class="{'w-8 h-8': previousPage, 'w-8 h-8 pointer-events-none opacity-50': !previousPage}" @click="handlePageChange(-1)">
                     <ChevronLeft />
                 </Button>
                 <Select v-model="currentLimit" @update:model-value="handleFilterProducts">
@@ -166,7 +186,7 @@ const handlePageChange = async(offset: number) => {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                <Button variant="outline" class="w-8 h-8" @click="handlePageChange(1)">
+                <Button variant="outline" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)">
                     <ChevronRight />
                 </Button>
             </div>

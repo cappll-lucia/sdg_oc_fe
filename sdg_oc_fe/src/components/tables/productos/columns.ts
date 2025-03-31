@@ -5,11 +5,11 @@ import { Producto } from "@/api/entities/producto";
 import { CategoriaEnum } from "@/api/entities/producto";
 
 export const columns: ColumnDef<Producto>[] = [
-    {
-        accessorKey: 'id',
-        header: () => h('div', 'ID'),
-        cell: info=> info.getValue()
-    },
+    // {
+    //     accessorKey: 'codProv',
+    //     header: () => h('div', 'Código'),
+    //     cell: info=> info.getValue()
+    // },
     {
         accessorKey: 'descripcion',
         header: () => h('div', 'Descripción'),
@@ -19,6 +19,7 @@ export const columns: ColumnDef<Producto>[] = [
         accessorKey: 'categoria',
         header: () => h('div', 'Categoría'),
         cell: ({row})=>h('div', { class: 'capitalize'}, CategoriaEnum[row.original.categoria as keyof typeof CategoriaEnum].toLowerCase() || row.original.categoria.toLowerCase()),
+        // cell: ({row})=>h('div', { class: 'capitalize'},  row.original.categoria.toLowerCase()),
     },
     {
         accessorKey: 'marca',

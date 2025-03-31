@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { SlashIcon } from '@radix-icons/vue';
+import { ReloadIcon, SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
 import {columns} from '@/components/tables/clientes/columns'
 import DataTable from '@/components/tables/clientes/data-table.vue';
@@ -47,6 +47,15 @@ const loadData = async()=>{
 onMounted(async () => {
     await loadData()
 });
+
+const clearFilters = async()=>{
+    txtSearch.value=''
+    selectedSexo.value=''
+    selectedLocalidadId.value='';
+    currentOffset.value=0;
+    currentLimit.value='10';
+    await handleFilterClientes()
+}
 
 const handleFilterClientes = async()=>{
     const res= await clientesApi.getAll({
@@ -94,7 +103,7 @@ const handlePageChange = async(offset: number) => {
                         <Input class="max-w-sm " placeholder="Buscar cliente por nombre, apellido o documento  "
                             v-model="txtSearch" @keyup.enter="handleFilterClientes"
                         />
-                        <!-- <Select v-model="selectedLocalidadId" @update:model-value="handleFilterClientes" >
+                        <Select v-model="selectedLocalidadId" @update:model-value="handleFilterClientes" >
                             <SelectTrigger class="w-[200px]">
                                 <SelectValue placeholder="Filtrar por localidad" />
                             </SelectTrigger>
@@ -106,7 +115,7 @@ const handlePageChange = async(offset: number) => {
                                     >{{ localidad.localidad }}, {{ localidad.provincia.provincia }}</SelectItem>
                                 </SelectGroup>
                             </SelectContent>
-                        </Select> -->
+                        </Select>
                         <!-- <Select v-model="selectedLocalidadId" @update:model-value="handleFilterClientes" >
                             <SelectTrigger class="w-[200px]">
                                 <SelectValue placeholder="Filtrar por localidad" />
@@ -131,6 +140,7 @@ const handlePageChange = async(offset: number) => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select> -->
+                        <Button variant="ghost" @click="clearFilters" class="text-gray-500 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline " > <ReloadIcon /> </Button>
                     </div>  
                 <Button class="text-xs"><a href="/clientes/create">Registrar Nuevo Cliente</a></Button>
             </div>
@@ -153,7 +163,7 @@ const handlePageChange = async(offset: number) => {
                     </SelectGroup>
                     </SelectContent>
                 </Select>
-                <Button variant="outline" :disbled="nextPage" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)" > <ChevronRight /> </Button>
+                <Button variant="outline" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)" > <ChevronRight /> </Button>
             </div>
         </div>
     </div>
