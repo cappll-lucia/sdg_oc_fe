@@ -167,6 +167,7 @@ const addVentaObraSocial = ()=>{
 
 const onSubmit = (async()=>{
     try{
+
         const newVenta ={
             cliente: {id: selectedCliente.value?.id},
             fecha: fechaVenta.value,
@@ -198,16 +199,13 @@ const validateAndSubmit = async()=>{
         condicionIvaVenta: condicionIvaVenta.value
     })
     isValidVenta.value =resultVenta.isValid;
+    console.log(resultVenta)
 
     const resultLineasVenta = createLineaVentaCustomValidator(lineasDeVenta.value);
     isvalidLineasVenta.value= resultLineasVenta.isValid;
 
     const resultMedios= createMedioPagoCustomValidator(mediosDePago.value)
     isValidMediosPago.value = resultMedios.isValid;
-    console.log(isValidMediosPago.value)
-    console.log(mediosDePago.value
-
-    )
 
     const resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
     isvalidVentaObraSocial.value = resultVentasOS.isValid;
@@ -350,6 +348,8 @@ const tipoFactura = computed(()=>{
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title">Nueva Venta</h1>
+        {{ ventaObrasSociales }}
+        {{ selectedCliente?.clienteObrasSociales }}
         <div class="pt-2">
             <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4 ">
                 <div class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start">
@@ -529,6 +529,7 @@ const tipoFactura = computed(()=>{
                                                 <Select 
                                                         :modelValue="os.obraSocial.id?.toString()" 
                                                          @update:modelValue="(value:string) => {
+                                                            console.log('+++' , value)
                                                             if (ventaObrasSociales[index]) {
                                                                 ventaObrasSociales[index].obraSocial.id = Number(value);
                                                             }}"
@@ -540,8 +541,8 @@ const tipoFactura = computed(()=>{
                                                                 <SelectGroup>
                                                                     <SelectItem 
                                                                     v-for="os in selectedCliente?.clienteObrasSociales" 
-                                                                    :key="os.id" 
-                                                                    :value="os.id.toString()"
+                                                                    :key="os.obraSocial.id" 
+                                                                    :value="os.obraSocial.id.toString()"
                                                                     >
                                                                     {{ os.obraSocial.nombre  }}
                                                                 </SelectItem>
@@ -583,7 +584,7 @@ const tipoFactura = computed(()=>{
                                                 <div class="flex flex-row w-[16rem]">
                                                     <Select 
                                                             :modelValue="os.condicionIva?.toString() ?? undefined" 
-                                                            @update:model-value="(value) => os.condicionIva = value as unknown as CondicionIva"
+                                                            @update:model-value="(value) => os.condicionIva = Number(value)"
                                                         >
                                                                 <SelectTrigger class="text-black w-[14rem] ">
                                                                     <SelectValue   />

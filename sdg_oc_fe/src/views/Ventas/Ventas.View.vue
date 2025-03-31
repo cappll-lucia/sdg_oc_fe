@@ -9,24 +9,44 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon} from '@radix-icons/vue';
 import { computed, onMounted, ref } from 'vue';
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import Label from '@/components/ui/label/Label.vue';
 import { TipoMedioDePagoEnum, RedDePago } from '@/api/entities/mediosDePago';
-import { Venta } from '@/api/entities/venta';
+import { CondicionIva, Venta } from '@/api/entities/venta';
 import { ventasApi } from '@/api/libs/ventas';
 import { useRoute } from 'vue-router';
-import { condicionIvaDisplay } from '@/lib/utils';
+import { condicionIvaDisplay, tipoComprobanteDisplay } from '@/lib/utils';
+import { Comprobante, TipoComprobante } from '@/api/entities/comprobante';
+import { clientesApi } from '@/api/libs/clientes';
+import { formatDate } from '@/lib/utils.recetas';
+import Button from '@/components/ui/button/Button.vue';
+import { InspectIcon, PrinterIcon } from 'lucide-vue-next';
+import router from '@/router';
+import { comprobantesApi } from '@/api/libs/comprobantes';
+import { toast } from '@/components/ui/toast';
 
 const route = useRoute()
-const currentVenta = ref<Venta>()
+const currentVenta = ref<Venta>();
+const comprobantesVenta = ref<Comprobante[]>([]);
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 onMounted(async () => {
     const id = route.params.id?.toString();
     if(id){
-        currentVenta.value = await ventasApi.getOne(id);
-        currentVenta.value.fecha = new Date(currentVenta.value.fecha)
+        const res = await ventasApi.getOne(id);
+        currentVenta.value = res.venta
+        comprobantesVenta.value = res.comprobantesRelacionados;
+        currentVenta.value.fecha = new Date(currentVenta.value.fecha);
+        currentVenta.value.cliente = await clientesApi.getOne(currentVenta.value.cliente.id)
     }
-    console.log(currentVenta.value)
 });
 
 const totalVentaBruto = computed(()=>{
@@ -58,6 +78,52 @@ const montoDto = computed(()=>{
 
 const caluclateImportePago = computed(()=>{
     return totalVentaFinal.value - montoDto.value
+});
+
+const printComprobante = async(_id: string)=>{
+    try {
+        const resp = await comprobantesApi.print(_id);
+        const blob = new Blob([resp.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'comprobante.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error('Error al descargar el PDF:', error);
+    }
+}
+
+const emitirFactura = async()=>{
+    try{
+        if(currentVenta.value){
+            const newFactura ={
+                importeTotal: currentVenta.value?.importe,
+                tipoComprobante: tipoFactura(Number(currentVenta.value?.cliente.categoriaFiscal)),
+                motivo: currentVenta.value?.observaciones,
+                condicionIvaCliente: Number(currentVenta.value?.cliente.categoriaFiscal)
+            }
+            const factura = await comprobantesApi.create(newFactura)  ;
+            currentVenta.value.factura = factura
+            toast({
+                title: 'Factura emitida',
+            })
+        }
+    }catch (err: any) {
+        errorMessage.value = err.message as string;
+        showError.value = true;
+    }
+}
+
+const tipoFactura = ((condicionIva: CondicionIva)=>{
+    if(condicionIva==CondicionIva.MONOTRIBUTISTA || condicionIva == CondicionIva.RESPONSABLE_INSCRIPTO){
+        return TipoComprobante.FACTURA_A
+    }else{
+        return TipoComprobante.FACTURA_B
+    }
 })
 
 
@@ -87,116 +153,188 @@ const caluclateImportePago = computed(()=>{
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title">Venta</h1>
-            <div v-if="currentVenta" class=" w-full pt-6 rounded-lg h-[40rem] flex flex-row justify-between items-start ">
-                <div class="rounded-lg h-full w-[55rem] flex flex-col justify-start items-start">
-                    <div class="w-full flex flex-row items-center justify-start ">
-                        <div class="w-[26rem] flex flex-col items-center justify-start">
-                                <div class="flex  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[11rem] text-md font-bold ">Cliente: </Label>
-                                    <Label class="form-label w-[15rem] text-md">{{ currentVenta?.cliente.apellido }}, {{ currentVenta?.cliente.nombre }}</Label>
-                                </div>
-                                <div class="flex  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[11rem] text-md font-bold">Condicion Fiscal: </Label>
-                                    <!-- //TODO update por categFiscal de la venta -->
-                                    <Label class="form-label w-[15rem] text-md">{{ condicionIvaDisplay(currentVenta.cliente.categoriaFiscal) }}</Label>
-                                </div>
-                                <div class="flex  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[11rem] text-md font-bold">Fecha: </Label>
-                                    <Label class="form-label w-[15rem] text-md">{{ currentVenta?.fecha.toLocaleDateString('es-ES') }}</Label>
-                                </div>
+        <div v-if="currentVenta" class=" w-full pt-6 rounded-lg flex flex-col justify-between items-start ">
+            <div class="rounded-lg h-full w-full flex flex-col justify-start items-start">
+                <div class="w-full flex flex-row items-center justify-start ">
+                    <div class="w-[26rem] flex flex-col items-center justify-start">
+                        <div class="flex  flex-row justify-start items-center w-full">
+                            <Label class="form-label w-[11rem] text-md font-bold ">Cliente: </Label>
+                            <Label class="form-label w-[15rem] text-md">{{ currentVenta?.cliente.apellido }}, {{
+                                currentVenta?.cliente.nombre }}</Label>
                         </div>
-                        <div class=" flex flex-col items-center justify-end">
-                            <div class="flex flex-col w-[6rem] h-[5rem] border justify-center items-center rounded-lg">
-                                <span class="text-[1rem]">Factura</span>
-                                <span class="text-[2rem] leading-[2rem] ">A</span>
+                        <div class="flex  flex-row justify-start items-center w-full">
+                            <Label class="form-label w-[11rem] text-md font-bold">Condicion Fiscal: </Label>
+                            <!-- //TODO update por categFiscal de la venta -->
+                            <Label class="form-label w-[15rem] text-md">{{
+                                condicionIvaDisplay(currentVenta.cliente.categoriaFiscal) }}</Label>
+                        </div>
+                        <div class="flex  flex-row justify-start items-center w-full">
+                            <Label class="form-label w-[11rem] text-md font-bold">Fecha: </Label>
+                            <Label class="form-label w-[15rem] text-md">{{
+                                currentVenta?.fecha.toLocaleDateString('es-ES') }}</Label>
+                        </div>
+                    </div>
+                    <div class=" flex flex-col items-center justify-end">
+                        <div class="flex flex-col w-[6rem] h-[5rem] border justify-center items-center rounded-lg">
+                            <span class="text-[1rem]">{{ tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.nombre }}</span>
+                            <span class="text-[2rem] leading-[2rem] ">{{ tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.letra }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col w-full justify-start items-start mt-10">
+                    <h3 class="page-subtitle">Detalle</h3>
+
+                    <div class="linea-venta-header bg-secondary mt-4 rounded-t-lg">
+                        <span>ID</span>
+                        <span class="text-left">DESCRIPCIÓN</span>
+                        <span>IMPORTE UNITARIO</span>
+                        <span>CANTIDAD</span>
+                        <span>IMPORTE TOTAL</span>
+                        <span></span>
+                    </div>
+
+                    <div v-for="(linea, index) in currentVenta?.lineasDeVenta" :key="index"
+                        class="linea-venta-item border-x border-b">
+                        <span class="text-center id-input">{{ linea.producto.id }}</span>
+                        <span class="text-left descripcion-input">{{ linea.producto.descripcion }}</span>
+                        <span class="text-center">$ {{ linea.precioIndividual.toFixed(2) }}</span>
+                        <span class="text-center">{{ linea.cantidad }}</span>
+                        <span class="text-center">$ {{ (linea.cantidad*linea.precioIndividual).toFixed(2) }}</span>
+                    </div>
+
+
+
+
+                    <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
+                        <div class="w-[30rem] rounded-lg border p-4  flex flex-col justify-start  items-start">
+
+                            <div class="rounded-lg w-[28rem] min-h-[4rem]">
+                                <h3 class="text-md font-bold ">Obras Sociales</h3>
+                                <span v-if="currentVenta.ventaObraSocial.length==0" class="text-sm">No aplica</span>
+                                <div v-else v-for="vos in currentVenta.ventaObraSocial"
+                                    class="w-full flex flex-row justify-start my-2 items-center ">
+                                    <span class="text-sm w-[12rem]">{{ vos.obraSocial.nombre }}</span>
+                                    <span class="text-sm w-[7rem]">$ {{ vos.importe.toFixed(2) }}</span>
+                                    <span class="text-sm">{{ condicionIvaDisplay(vos.condicionIva) }}</span>
+                                </div>
+                            </div>
+                            <div class="rounded-lg w-full min-h-[3rem] ">
+                                <h3 class="text-md font-bold ">Descuento</h3>
+                                <span v-if="!currentVenta.descuentoPorcentaje" class="text-sm">No aplica</span>
+                                <span v-else class="text-sm w-[12rem]">Dto Aplicado: {{ currentVenta.descuentoPorcentaje
+                                    }} %</span>
+                            </div>
+
+                        </div>
+                        <div v-if="currentVenta"
+                            class="w-[19rem] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center">
+                            <div v-if="currentVenta.ventaObraSocial.length>0 || currentVenta.descuentoPorcentaje"
+                                class=" flex  justify-center">
+                                <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
+                                <Label class=" w-[7rem]">$ {{ totalVentaBruto?.toFixed(2) }}</Label>
+                            </div>
+                            <div v-if="currentVenta.ventaObraSocial.length > 0"
+                                class=" flex  justify-center items-center mt-4">
+                                <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
+                                <Label class=" w-[7rem]  ">- $ {{ montoObrasSociales?.toFixed(2) }}</Label>
+                            </div>
+                            <div v-if="currentVenta.descuentoPorcentaje"
+                                class=" flex  justify-center items-center mt-4">
+                                <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
+                                <Label class=" w-[7rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
+                            </div>
+                            <div class=" flex  justify-center mt-4">
+                                <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
+                                <Label class="page-subtitle  w-[7rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
                             </div>
                         </div>
                     </div>
-                    <div class="flex flex-col w-full justify-start items-start mt-10">
-                        <h3 class="page-subtitle">Detalle</h3>
+                </div>
+                <div class="mt-6 w-full">
+                    <div
+                        class="w-full flex flex-row justify-start  items-start py-2 bg-secondary font-bold rounded-t-lg p-[0.75rem] px-[2rem]">
+                        <span class="text-[0.8rem] w-[15rem]">MEDIO DE PAGO</span>
+                        <span class="text-[0.8rem] w-[10rem]">IMPORTE</span>
+                        <span class="text-[0.8rem] w-[10rem] ">RED DE PAGO</span>
+                        <span class="text-[0.8rem] w-[10rem] ">ENTIDAD BANCARIA</span>
+                    </div>
+                    <div v-for="medio in currentVenta.mediosDePago"
+                        class="w-full flex flex-row justify-start items-center px-[2rem] py-[0.5rem] border-x border-b ">
+                        <span class="text-[0.8rem] w-[15rem]">{{ TipoMedioDePagoEnum[medio.tipoMedioDePago as keyof
+                            typeof TipoMedioDePagoEnum]}}</span>
+                        <span class="text-[0.8rem] w-[10rem]">$ {{ medio.importe.toFixed(2) }}</span>
+                        <span class="text-[0.8rem] w-[10rem] ">{{ RedDePago[medio.redDePago as keyof typeof RedDePago]
+                            }}</span>
+                        <span class="text-[0.8rem] w-[10rem]">{{ medio.entidadBancaria }}</span>
+                    </div>
+                </div>
+                <div class="w-full mt-8 ">
+                    <h3 class="text-md font-bold">Observaciones</h3>
+                    <span class="text-sm">{{ currentVenta?.observaciones ?? "---" }}</span>
+                </div>
+            </div>
+            <div class=" w-full min-h-[10rem] flex flex-col justify-start my-12 items-start">
+                <div class="flex flex-row w-full mb-4 justify-between ">
 
-                        <div class="linea-venta-header bg-secondary mt-4 rounded-t-lg">
-                            <span>ID</span>
-                            <span class="text-left">DESCRIPCIÓN</span>
-                            <span>IMPORTE UNITARIO</span>
-                            <span>CANTIDAD</span>
-                            <span>IMPORTE TOTAL</span>
-                            <span></span>
-                        </div>
-
-                        <div v-for="(linea, index) in currentVenta?.lineasDeVenta" :key="index" class="linea-venta-item border-x border-b">
-                            <span class="text-center id-input">{{ linea.producto.id }}</span>
-                            <span class="text-left descripcion-input">{{ linea.producto.descripcion }}</span>
-                            <span class="text-center">$ {{ linea.precioIndividual.toFixed(2) }}</span>
-                            <span class="text-center">{{ linea.cantidad }}</span>
-                            <span class="text-center">$ {{ (linea.cantidad*linea.precioIndividual).toFixed(2) }}</span>
-                        </div>
-
-                
-
+                    <h3 class="page-subtitle">Comprobantes</h3>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger><Button variant="outline" class="w-[14rem]">Emitir nuevo
+                                comprobante</Button></DropdownMenuTrigger>
+                        <DropdownMenuContent class="w-[14rem]">
+                            <DropdownMenuLabel class="cursor-pointer"
+                                @click="router.replace(`/nota-credito/new?venta=${currentVenta.id}`)">Nueva nota
+                                de crédito</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel class="cursor-pointer"
+                                @click="router.replace(`/nota-debito/new?venta=${currentVenta.id}`)">Nueva nota
+                                de débito</DropdownMenuLabel>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+                <div class="flex flex-col justify-start w-full ">
+                    <div
+                        class="w-full flex flex-row justify-start  items-start py-2 bg-secondary font-bold rounded-t-lg p-[0.75rem] px-8">
+                        <span class="text-xs w-[9rem]">FECHA</span>
+                        <span class="text-xs w-[12rem]">TIPO COMPROBANTE</span>
+                        <span class="text-xs w-[15rem] ">NUMERO COMPROBANTE</span>
+                        <!-- <span class="text-xs w-[6rem] ">ENTIDAD BANCARIA</span> -->
+                    </div>
+                    <div class="border-x">
+                        <div v-if="currentVenta.factura"
+                        class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
+                        <span class=" text-md w-[8rem] ">{{ formatDate(currentVenta.factura.fechaEmision) }}</span>
+                        <span class=" text-md mx-4 w-[11rem]">{{
+                            tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.nombre }} {{
+                                tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.letra }}</span>
+                        <span class=" text-md font-thin w-[15rem]">{{ currentVenta.factura.numeroComprobante }}</span>
+                        <Button variant="ghost" @click="printComprobante(currentVenta.factura.id)">
+                            <PrinterIcon />
+                        </Button>
+                    </div>
+                    <div v-else class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
+                        <span class=" text-md mr-4">Factura no emitida</span>
+                        <Button variant="ghost" @click="emitirFactura()">
+                           Emitir
+                        </Button>
                         
-                        <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
-                            <div class="w-[30rem] rounded-lg border p-4  flex flex-col justify-start  items-start">
-
-                                <div class="rounded-lg w-[28rem] min-h-[4rem]">
-                                    <h3 class="text-md font-bold ">Obras Sociales</h3>
-                                    <span v-if="currentVenta.ventaObraSocial.length==0" class="text-sm">No aplica</span>
-                                    <div v-else v-for="vos in currentVenta.ventaObraSocial" class="w-full flex flex-row justify-start my-2 items-center ">
-                                            <span class="text-sm w-[12rem]">{{ vos.obraSocial.nombre }}</span>
-                                            <span class="text-sm w-[7rem]">$ {{ vos.importe.toFixed(2) }}</span>
-                                            <span class="text-sm">{{ condicionIvaDisplay(vos.condicionIva) }}</span>
-                                    </div>
-                                </div>
-                                <div class="rounded-lg w-full min-h-[3rem] ">
-                                    <h3 class="text-md font-bold ">Descuento</h3>
-                                    <span v-if="!currentVenta.descuentoPorcentaje" class="text-sm">No aplica</span>
-                                    <span v-else class="text-sm w-[12rem]">Dto Aplicado: {{ currentVenta.descuentoPorcentaje }} %</span>
-                                </div>
-
-                            </div>
-                            <div v-if="currentVenta" class="w-[19rem] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center">
-                                <div v-if="currentVenta.ventaObraSocial.length>0 || currentVenta.descuentoPorcentaje" class=" flex  justify-center">
-                                    <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
-                                    <Label class=" w-[7rem]">$ {{ totalVentaBruto?.toFixed(2) }}</Label>
-                                </div>
-                                <div v-if="currentVenta.ventaObraSocial.length > 0" class=" flex  justify-center items-center mt-4">
-                                    <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
-                                    <Label class=" w-[7rem]  ">- $ {{ montoObrasSociales?.toFixed(2) }}</Label>
-                                </div>
-                                <div v-if="currentVenta.descuentoPorcentaje" class=" flex  justify-center items-center mt-4">
-                                    <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
-                                    <Label class=" w-[7rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
-                                </div>
-                                <div class=" flex  justify-center mt-4">
-                                    <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
-                                    <Label class="page-subtitle  w-[7rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
-                                </div>
-                            </div>
-                        </div> 
-                    </div>   
-                        <div class="mt-6 w-full">
-                            <div class="w-full flex flex-row justify-start  items-start py-2 bg-secondary font-bold rounded-t-lg p-[0.75rem] px-[2rem]">
-                                <span class="text-[0.8rem] w-[15rem]">MEDIO DE PAGO</span>
-                                <span class="text-[0.8rem] w-[10rem]">IMPORTE</span>
-                                <span class="text-[0.8rem] w-[10rem] ">RED DE PAGO</span>
-                                <span class="text-[0.8rem] w-[10rem] ">ENTIDAD BANCARIA</span>
-                            </div>
-                            <div  v-for="medio in currentVenta.mediosDePago" class="w-full flex flex-row justify-start items-center px-[2rem] py-[0.5rem] border-x border-b ">
-                                <span class="text-[0.8rem] w-[15rem]">{{ TipoMedioDePagoEnum[medio.tipoMedioDePago as keyof typeof TipoMedioDePagoEnum]}}</span>
-                                <span class="text-[0.8rem] w-[10rem]">$ {{ medio.importe.toFixed(2) }}</span>
-                                <span class="text-[0.8rem] w-[10rem] ">{{ RedDePago[medio.redDePago as keyof typeof RedDePago] }}</span>
-                                <span class="text-[0.8rem] w-[10rem]">{{ medio.entidadBancaria }}</span>
-                            </div>
-                        </div>
-                    <div class="w-full mt-8 ">
-                        <h3 class="text-md font-bold">Observaciones</h3>
-                        <span class="text-sm">{{ currentVenta?.observaciones ?? "---" }}</span>
+                    </div>
+                    <div v-for="comprobante in comprobantesVenta"
+                    class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
+                    <span class=" text-md w-[8rem] ">{{ formatDate(comprobante.fechaEmision) }}</span>
+                    <span class=" text-md mx-4 w-[11rem]">{{
+                        tipoComprobanteDisplay(comprobante.tipoComprobante)?.nombre }} {{
+                            tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
+                        <span class=" text-md font-thin w-[15rem]">{{ comprobante.numeroComprobante }}</span>
+                        <Button variant="ghost" @click="printComprobante(currentVenta.factura.id)">
+                            <PrinterIcon />
+                        </Button>
+                        <Button variant="ghost" @click="router.replace(`/nota-credito-debito/view/${comprobante.id}`)">
+                            <InspectIcon />
+                        </Button>
                     </div>
                 </div>
-                <div class=" w-[21rem] rounded-lg border h-full flex flex-col justify-start p-4 items-start">
-                        <h3 class="text-md mb-4 font-bold">Comprobantes</h3>
-                    <p> ACA TIENE QUE IR LA LISTA DE TODOS LOS COMPROBANTES ASOCIADOS A LA VENTA</p>
                 </div>
+            </div>
         </div>
     </div>
 </template>
@@ -269,3 +407,4 @@ const caluclateImportePago = computed(()=>{
 
 </style>
 
+mr-4

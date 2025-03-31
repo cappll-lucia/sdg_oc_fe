@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon} from '@radix-icons/vue';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import {
     Select,
     SelectContent,
@@ -30,8 +30,11 @@ import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
 import router from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
+import { Venta } from '@/api/entities/venta';
+import { useRoute } from 'vue-router';
+import { ventasApi } from '@/api/libs/ventas';
 
-
+const route = useRoute();
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -45,6 +48,18 @@ const fechaComprobante = ref<Date>(new Date());
 const motivoComprobante = ref<string>();
 const importeComprobante = ref<number>(0);
 const tipoComprobante = ref<number>();
+const prevVenta= ref<Venta>();
+
+
+onMounted(async()=>{
+    const query = route.query;
+    if(query.venta){
+        const res = await ventasApi.getOne(query.venta.toString());
+        prevVenta.value = res.venta;
+            handleSelectCliente(prevVenta.value.cliente)
+        handleSelectFactura(prevVenta.value.factura)
+    }
+})
 
 
 const handleSelectCliente = async(cliente:Cliente)=>{

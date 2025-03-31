@@ -47,13 +47,14 @@ onMounted(async () => {
 });
 
 const handleFilterClientes = async()=>{
-    clientes.value = await clientesApi.getAll({
+    const cli= await clientesApi.getAll({
         filtro: txtSearch.value,
         sexo: selectedSexo.value,
         localidadId: selectedLocalidadId.value,
         offset: currentOffset.value,
         limit: currentLimit.value
-    })
+    });
+    clientes.value = cli.filter(c=> c.id!=0);
 };
 
 const handlePageChange = async(offset: number) => {
