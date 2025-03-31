@@ -38,7 +38,8 @@ const selectCliente = (cliente: Cliente) => {
 };
 
 const searchClientes = async()=>{
-    foundClientes.value = await clientesApi.getAll({filtro: searchClientesTxt.value});
+    const res = await clientesApi.getAll({filtro: searchClientesTxt.value});
+    foundClientes.value = res.items;
     showCreateForm.value=false;
 }
 
@@ -74,8 +75,8 @@ const handleCreateCliente = (cliente: Cliente)=>{
                 </Button>
             </div>
             <div v-if="!showCreateForm" class="flex justify-center">
-                    <ScrollArea class="h-[30rem] w-[51rem] pl-4 mt-4">
-                        <div v-for="cliente in foundClientes" 
+                <ScrollArea class="h-[30rem] w-[30rem] pl-4 mt-4">
+                    <div v-for="cliente in foundClientes" 
                         :key="cliente.id" 
                         @click="selectCliente(cliente)"
                         class="cursor-pointer search-area-item hover:bg-secondary px-4 py-2 w-[49rem] flex flex-row justify-start items-center"

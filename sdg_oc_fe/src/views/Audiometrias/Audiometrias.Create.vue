@@ -58,7 +58,8 @@ const {handleSubmit, setFieldValue} = useForm({
 
 onMounted(async()=>{
     // TODO pagination
-    foundClientes.value = await clientesApi.getAll({});
+    const res= await clientesApi.getAll({});
+    foundClientes.value = res.items
 })
 
 const onSubmit = handleSubmit(async (values) => {

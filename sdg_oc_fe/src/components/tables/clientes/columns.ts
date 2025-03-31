@@ -5,11 +5,6 @@ import DropdownAction from './data-table-dropdown.vue'
 
 export const columns: ColumnDef<Cliente>[] = [
   {
-    accessorKey: 'id',
-    header: () => h('div', 'ID'),
-    cell: info=> info.getValue()
-  },
-  {
     accessorKey: 'nombre',
     header: () => h('div', 'Apellido y Nombre'),
     cell: ({row})=> `${row.original.apellido}, ${row.original.nombre} `
