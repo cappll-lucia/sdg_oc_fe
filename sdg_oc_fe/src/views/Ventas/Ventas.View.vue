@@ -66,7 +66,7 @@ const montoObrasSociales = computed(()=>{
 })
 
 const totalVentaFinal = computed(()=>{
-    return totalVentaBruto.value - montoObrasSociales.value 
+    return totalVentaBruto.value - montoObrasSociales.value
 })
 
 const montoDto = computed(()=>{
@@ -104,10 +104,11 @@ const emitirFactura = async()=>{
                 importeTotal: currentVenta.value?.importe,
                 tipoComprobante: tipoFactura(Number(currentVenta.value?.cliente.categoriaFiscal)),
                 motivo: currentVenta.value?.observaciones,
-                condicionIvaCliente: Number(currentVenta.value?.cliente.categoriaFiscal)
+                condicionIvaCliente: Number(currentVenta.value?.cliente.categoriaFiscal),
+                venta: {id: currentVenta.value.id}
             }
             const factura = await comprobantesApi.create(newFactura)  ;
-            currentVenta.value.factura = factura
+            currentVenta.value.factura = factura;
             toast({
                 title: 'Factura emitida',
             })
@@ -175,9 +176,12 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         </div>
                     </div>
                     <div class=" flex flex-col items-center justify-end">
-                        <div class="flex flex-col w-[6rem] h-[5rem] border justify-center items-center rounded-lg">
+                        <div v-if="currentVenta.factura" class="flex flex-col w-[6rem] h-[5rem] border justify-center items-center rounded-lg">
                             <span class="text-[1rem]">{{ tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.nombre }}</span>
                             <span class="text-[2rem] leading-[2rem] ">{{ tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.letra }}</span>
+                        </div>
+                        <div v-else class="flex flex-col w-[6rem] h-[5rem] border justify-center items-center rounded-lg">
+                            <span class="text-[0.9rem] text-center">Factura no emitida</span>
                         </div>
                     </div>
                 </div>
@@ -316,7 +320,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         <Button variant="ghost" @click="emitirFactura()">
                            Emitir
                         </Button>
-                        
+
                     </div>
                     <div v-for="comprobante in comprobantesVenta"
                     class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
@@ -352,7 +356,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
     text-align: center;
     padding: 0.75rem;
     width: 100%;
-    font-size: 0.8rem; 
+    font-size: 0.8rem;
 }
 
 
@@ -364,7 +368,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
     text-align: center;
     padding: 0.5rem 0.75rem;
     width: 100%;
-    font-size: 0.8rem; 
+    font-size: 0.8rem;
 }
 
 .linea-venta-item:last-child{

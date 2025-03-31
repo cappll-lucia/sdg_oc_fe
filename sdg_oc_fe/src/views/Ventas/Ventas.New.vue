@@ -348,8 +348,6 @@ const tipoFactura = computed(()=>{
             </BreadcrumbList>
         </Breadcrumb>
         <h1 class="page-title">Nueva Venta</h1>
-        {{ ventaObrasSociales }}
-        {{ selectedCliente?.clienteObrasSociales }}
         <div class="pt-2">
             <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4 ">
                 <div class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start">
@@ -505,7 +503,7 @@ const tipoFactura = computed(()=>{
 
                         
                         <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
-                            <div class="w-[50rem] 0  flex flex-col justify-start  items-start">
+                            <div class="w-[70%]  flex flex-col justify-start  items-start">
 
                                 <div class="border rounded-lg w-full  min-h-[3rem] p-4">
                                     <div class="w-full flex flex-row justify-between  items-center">
@@ -525,21 +523,21 @@ const tipoFactura = computed(()=>{
                                     <div v-if="obrasSociales" class="flex flex-row items-center">
                                         <div v-if=" selectedCliente && selectedCliente?.clienteObrasSociales.length > 0">
                                             <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
-                                                <div class="flex flex-row w-[17rem] ">
+                                                <div class="flex flex-row w-[15rem] ">
                                                 <Select 
                                                         :modelValue="os.obraSocial.id?.toString()" 
                                                          @update:modelValue="(value:string) => {
-                                                            console.log('+++' , value)
                                                             if (ventaObrasSociales[index]) {
                                                                 ventaObrasSociales[index].obraSocial.id = Number(value);
                                                             }}"
                                                         >
-                                                            <SelectTrigger class="text-black w-[14rem] ">
+                                                            <SelectTrigger class="text-black w-[12rem] text-xs ">
                                                                 <SelectValue   />
                                                             </SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectGroup>
                                                                     <SelectItem 
+                                                                    class="text-xs"
                                                                     v-for="os in selectedCliente?.clienteObrasSociales" 
                                                                     :key="os.obraSocial.id" 
                                                                     :value="os.obraSocial.id.toString()"
@@ -558,7 +556,7 @@ const tipoFactura = computed(()=>{
                                                         </Tooltip>
                                                 </TooltipProvider>
                                                 </div>
-                                                <div class="flex flex-row w-[12rem] items-center ">
+                                                <div class="flex flex-row w-[11rem] items-center ">
                                                     <Label>$</Label>
                                                     <Input
                                                         :model-value="os.importe" 
@@ -568,7 +566,7 @@ const tipoFactura = computed(()=>{
                                                             }
                                                         }"
                                                         v-decimal
-                                                        class="w-[7rem] ml-2"
+                                                        class="w-[7rem] ml-2 text-xs"
                                                         placeholder="Importe"
                                                         type="decimal"
                                                     /> 
@@ -581,17 +579,18 @@ const tipoFactura = computed(()=>{
                                                         </Tooltip>
                                                     </TooltipProvider>
                                                 </div>
-                                                <div class="flex flex-row w-[16rem]">
+                                                <div class="flex flex-row w-[15rem]">
                                                     <Select 
                                                             :modelValue="os.condicionIva?.toString() ?? undefined" 
                                                             @update:model-value="(value) => os.condicionIva = Number(value)"
                                                         >
-                                                                <SelectTrigger class="text-black w-[14rem] ">
+                                                                <SelectTrigger class="text-black w-[13rem] text-xs ">
                                                                     <SelectValue   />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectGroup>
                                                                         <SelectItem 
+                                                                            class="text-xs"
                                                                             v-for="condicion in Object.values(CondicionIva).filter(val => typeof val === 'number') as CondicionIva[]" 
                                                                             :key="condicion" 
                                                                             :value="condicion.toString()"

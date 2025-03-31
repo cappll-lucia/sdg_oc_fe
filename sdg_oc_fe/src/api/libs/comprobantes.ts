@@ -88,10 +88,10 @@ const getOne = async(_id: string)=>{
 
 const create = async(_comprobante: any ) =>{
     try {
-        console.log(_comprobante)
         const resp = await http.post('/comprobante', _comprobante);
-        console.log(resp)
-        return resp.data.data as Comprobante;
+        const comprobante = resp.data.data.comprobanteGuardado as Comprobante;
+        comprobante.fechaEmision = new Date(comprobante.fechaEmision)
+        return comprobante
     } catch (error: any) {
         console.log(error)
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la obra social')
