@@ -256,6 +256,14 @@ export const routerRoutes = [
             }
         },
         {
+            path: '/comprobantes',
+            name:'comprobantes',
+            component: ()=> import('../views/Comprobantes/Comprobantes.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
             path: '/clientes/dashboard/:id',
             name:'dashboard_cliente',
             component: ()=> import('../views/Clientes/Clientes.Individual.Dashboard.vue'),

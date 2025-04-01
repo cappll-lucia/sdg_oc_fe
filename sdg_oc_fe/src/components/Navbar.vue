@@ -39,12 +39,6 @@ const ventasItems: { title: string, href: string, description?: string; }[] = [
     {
         title: 'Historial de Ventas',
         href: '/ventas',
-    },
-    {
-        title: 'Facturación Electrónica',
-        href: '/docs/components/progress',
-        description:
-            'Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.',
     }
 ];
 
@@ -68,11 +62,6 @@ const parametrosItems: { title: string, href: string}[] = [
 <template>
     <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
         <NavigationMenuList>
-            <!-- <NavigationMenuItem>
-                <NavigationMenuLink href="/recetas" :class="navigationMenuTriggerStyle()">
-                    Recetas
-                </NavigationMenuLink>
-            </NavigationMenuItem> -->
             <NavigationMenuItem>
                 <NavigationMenuTrigger >Ventas</NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -90,6 +79,11 @@ const parametrosItems: { title: string, href: string}[] = [
                         </li>
                     </ul>
                 </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink href="/comprobantes" :class="navigationMenuTriggerStyle()">
+                    Comprobantes
+                </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink href="/clientes" :class="navigationMenuTriggerStyle()">

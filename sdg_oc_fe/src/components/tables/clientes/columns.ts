@@ -19,11 +19,16 @@ export const columns: ColumnDef<Cliente>[] = [
     header: () => h('div', 'Email'),
     cell: info=> info.getValue()
   },
-    {
+  {
     accessorKey: 'telefono',
     header: () => h('div', 'Telefono'),
     cell: info=> info.getValue()
   },
+  {
+    accessorKey: 'localidad',
+    header: () => h('div', 'Localidad'),
+    cell: ({row})=> `${row.original.localidad.localidad}, ${row.original.localidad.provincia.provincia}`,
+  },  
   {
     id: 'actions',
     enableHiding: false,

@@ -25,6 +25,7 @@ const currentComprobante = ref<Comprobante>();
 
 
 onMounted(async()=>{
+    console.log('a')
     if (typeof route.params.id === 'string') {
         console.log(route.params.id)
         currentComprobante.value = await comprobantesApi.getOne(route.params.id);
@@ -35,8 +36,10 @@ onMounted(async()=>{
 const printComprobante = async(_id: string)=>{
     try {
         const resp = await comprobantesApi.print(_id);
-        const blob = new Blob([resp.data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
+        const bufferData = resp.data.data;
+        const uint8Array = new Uint8Array(bufferData);
+        const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(pdfBlob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'comprobante.pdf';

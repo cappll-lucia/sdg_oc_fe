@@ -172,14 +172,6 @@ const getObraSocialName = (id:number)=> {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                        Parámetros
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
                     <BreadcrumbLink href="/clientes">
                         Clientes
                     </BreadcrumbLink>
@@ -405,10 +397,10 @@ const getObraSocialName = (id:number)=> {
                                                         <SelectTrigger class="w-60">
                                                             <SelectValue 
                                                             :class="{
-    'text-black': (selectedObrasSociales[index]?.obraSocial.id || 0) !== 0,
-    'text-gray-500': (selectedObrasSociales[index]?.obraSocial.id || 0) === 0
-  }"
-   :placeholder="getObraSocialName(selectedObrasSociales[index]?.obraSocial.id || 0)" />
+                                                                'text-black': (selectedObrasSociales[index]?.obraSocial.id || 0) !== 0,
+                                                                'text-gray-500': (selectedObrasSociales[index]?.obraSocial.id || 0) === 0
+                                                            }"
+                                                            :placeholder="getObraSocialName(selectedObrasSociales[index]?.obraSocial.id || 0)" />
                                                         </SelectTrigger>
                                                         <SelectContent class="w-60">
                                                             <SelectGroup>

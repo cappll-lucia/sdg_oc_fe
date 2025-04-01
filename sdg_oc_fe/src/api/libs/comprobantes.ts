@@ -28,7 +28,8 @@ const getAll = async (filters: ComprobanteFilters) => {
         
         const url = `/comprobante?${params.toString()}`;
         const resp = await http.get(url);
-        return resp.data.data.items as Comprobante[];
+
+        return resp.data.data as {items: Comprobante[],  nextPage: number|null, previousPage: number|null};
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }

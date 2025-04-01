@@ -7,11 +7,6 @@ import { ClienteAudiometriasFecha } from "@/api/entities/audiometrias";
 import { formatDate } from '@/lib/utils.recetas';
 
 export const columns: ColumnDef<ClienteAudiometriasFecha>[] = [
-    {
-    accessorKey: 'clienteId',
-    header: () => h('div', 'ID'),
-    cell: info=> info.getValue()
-  },
   {
     accessorKey: 'nombre',
     header: () => h('div', 'Nombre'),
