@@ -167,7 +167,6 @@ const addVentaObraSocial = ()=>{
 
 const onSubmit = (async()=>{
     try{
-
         const newVenta ={
             cliente: {id: selectedCliente.value?.id},
             fecha: fechaVenta.value,
@@ -178,12 +177,12 @@ const onSubmit = (async()=>{
             ventaObraSocial: ventaObrasSociales.value,
             observaciones: 'obs'
         }
-        await ventasApi.create(newVenta)
+        const createdVenta = await ventasApi.create(newVenta)
         loading.value=false;
         toast({
             title: 'Venta registrada con éxito',
         })
-        router.replace('/ventas')
+        router.push(`/ventas/view/${createdVenta.venta.id}`)
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
@@ -641,7 +640,7 @@ const tipoFactura = computed(()=>{
                                             <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Seleccionar cliente</p>
+                                                    <p>Porcentaje Inválido</p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>

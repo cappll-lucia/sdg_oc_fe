@@ -22,6 +22,8 @@ import router from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { onMounted, ref } from 'vue';
 import { JwtUser } from '@/api/entities/jwtUser';
+import { GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
+
 
 const userStore = useUserStore();
 const userData = ref<JwtUser|null>();
@@ -29,18 +31,6 @@ const userData = ref<JwtUser|null>();
 onMounted(async()=>{
     userData.value = userStore.getMe
 })
-
-
-const ventasItems: { title: string, href: string, description?: string; }[] = [
-    {
-        title: 'Nueva Venta',
-        href: '/ventas/new',
-    },
-    {
-        title: 'Historial de Ventas',
-        href: '/ventas',
-    }
-];
 
 const parametrosItems: { title: string, href: string}[] = [
     {
@@ -63,50 +53,43 @@ const parametrosItems: { title: string, href: string}[] = [
     <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
         <NavigationMenuList>
             <NavigationMenuItem>
-                <NavigationMenuTrigger >Ventas</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                    <ul class=" grid w-[300px] gap-3 p-4 md:w-[300px] md:grid-cols-1 lg:w-[300px] item-venta ">
-                        <li v-for="item in ventasItems" :key="item.title">
-                            <NavigationMenuLink as-child>
-                                <a :href="item.href"
-                                    class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                                    <div class="text-sm font-medium leading-none">{{ item.title }}</div>
-                                    <p v-if="item.description" class="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                        {{ item.description }}
-                                    </p>
-                                </a>
-                            </NavigationMenuLink>
-                        </li>
-                    </ul>
-                </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuLink href="/comprobantes" :class="navigationMenuTriggerStyle()">
-                    Comprobantes
+                <NavigationMenuLink href="/" :class="navigationMenuTriggerStyle()">
+                    <HomeIcon class="w-5 h-5 mr-2" />
+                    Inicio
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink href="/clientes" :class="navigationMenuTriggerStyle()">
+                    <UserIcon class="w-5 h-5 mr-2"  />
                     Clientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
+                <NavigationMenuLink href="/ventas" :class="navigationMenuTriggerStyle()">
+                    <ShoppingBag class="w-5 h-5 mr-2" />
+                    Ventas
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+                <NavigationMenuLink href="/comprobantes" :class="navigationMenuTriggerStyle()">
+                    <Receipt class="w-5 h-5 mr-2"/>
+                    Comprobantes
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
                 <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">
+                    <Wallet2Icon  class="w-5 h-5 mr-2" />
                     Cuentas Corrientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
                 <NavigationMenuLink href="/productos" :class="navigationMenuTriggerStyle()">
+                    <GlassesIcon  class="w-5 h-5 mr-2" />
                     Productos
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-                <NavigationMenuLink href="/audiometrias" :class="navigationMenuTriggerStyle()">
-                    Audiometrías
-                </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuTrigger>Parámetros</NavigationMenuTrigger>
+                <NavigationMenuTrigger> <SettingsIcon  class="w-5 h-5 mr-2" /> Parámetros</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
                         <li v-for="item in parametrosItems" :key="item.title">

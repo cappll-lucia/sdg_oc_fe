@@ -62,8 +62,8 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         <div class=" flex flex-row justify-between w-full mb-4">
             <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
             <div>
-                <Button class="text-xs mr-2 " @click="router.replace('/recetas/recetados/new')" >Nueva Receta Anteojos Recetados </Button>
-                <Button class="text-xs" @click="router.replace('/recetas/contacto/new')" >Nueva Receta Lentes de Contacto </Button>
+                <Button class="text-xs mr-2 " @click="router.replace(`/recetas/recetados/new?cliente=${currentCliente?.id}`)" >Nueva Receta Anteojos Recetados </Button>
+                <Button class="text-xs" @click="router.replace(`/recetas/contacto/new?cliente=${currentCliente?.id}`)" >Nueva Receta Lentes de Contacto </Button>
             </div>
         </div>
         <div class="pt-2">

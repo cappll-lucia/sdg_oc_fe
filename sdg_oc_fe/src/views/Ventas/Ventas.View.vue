@@ -80,11 +80,19 @@ const caluclateImportePago = computed(()=>{
     return totalVentaFinal.value - montoDto.value
 });
 
+
+
 const printComprobante = async(_id: string)=>{
     try {
         const resp = await comprobantesApi.print(_id);
-        const blob = new Blob([resp.data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
+        
+
+        const bufferData = resp.data.data;
+
+        const uint8Array = new Uint8Array(bufferData);
+
+        const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(pdfBlob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'comprobante.pdf';
@@ -329,7 +337,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         tipoComprobanteDisplay(comprobante.tipoComprobante)?.nombre }} {{
                             tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
                         <span class=" text-md font-thin w-[15rem]">{{ comprobante.numeroComprobante }}</span>
-                        <Button variant="ghost" @click="printComprobante(currentVenta.factura.id)">
+                        <Button variant="ghost" @click="printComprobante(comprobante.id)">
                             <PrinterIcon />
                         </Button>
                         <Button variant="ghost" @click="router.replace(`/nota-credito-debito/view/${comprobante.id}`)">

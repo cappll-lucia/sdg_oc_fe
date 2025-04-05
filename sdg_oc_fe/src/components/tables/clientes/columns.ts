@@ -1,7 +1,9 @@
 import { Cliente, TipoDocumento } from '@/api/entities/clientes';
 import { h } from 'vue'
 import { ColumnDef } from '@tanstack/vue-table';
-import DropdownAction from './data-table-dropdown.vue'
+import Button from '@/components/ui/button/Button.vue';
+import router from '@/router';
+import { ChevronRightIcon } from 'lucide-vue-next';
 
 export const columns: ColumnDef<Cliente>[] = [
   {
@@ -30,13 +32,15 @@ export const columns: ColumnDef<Cliente>[] = [
     cell: ({row})=> `${row.original.localidad.localidad}, ${row.original.localidad.provincia.provincia}`,
   },  
   {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      const cliente = row.original
-      return h('div', { class: 'relative text-right right-10  ' }, h(DropdownAction, {
-        cliente: { ...cliente, id: cliente.id.toString() },
-      }))
-    },
-}
+    accessorKey: 'actions',
+    header: () => h('div', ''),
+    cell: ({ row }) =>
+      h(Button, {
+        variant: 'outline',
+        size: 'icon',
+        onClick: () => {
+         router.replace( `/clientes/dashboard/${row.original.id}`)
+        }
+      }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
+  }
 ]
