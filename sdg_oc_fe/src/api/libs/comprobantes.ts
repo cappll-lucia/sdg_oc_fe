@@ -37,16 +37,16 @@ const getAll = async (filters: ComprobanteFilters) => {
 
 const getAllByCliente = async (_nroDoc: number) => {
     try {
-        const resp = await http.get(`/comprobante?nroDocumento=${_nroDoc}`);
-        return resp.data.data.items as Comprobante[];
+        const resp = await http.get(`/comprobante/cliente/${_nroDoc}`);
+        return resp.data.data as Comprobante[];
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
 };
 
-const getFacturasByCliente = async (_nroDoc: number) => {
+const getFacturasByCliente = async (_id: number) => {
     try {
-        const resp = await http.get(`/comprobante/facturas?nroDocumento=${_nroDoc}`);
+        const resp = await http.get(`/comprobante/facturas?nroDocumento=${_id}`);
         return resp.data.data.items as Comprobante[];
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -102,7 +102,7 @@ const create = async(_comprobante: any ) =>{
 
 export const comprobantesApi = {
     getAll: (filters: ComprobanteFilters)=> getAll(filters),
-    getAllByCliente: (_nroDoc: number)=> getAllByCliente(_nroDoc),
+    getAllByCliente: (_id: number)=> getAllByCliente(_id),
     getOne: (_id: string)=> getOne(_id),
     print: (_id: string)=> print(_id),
     getFacturasByCliente: (_nroDoc: number)=> getFacturasByCliente(_nroDoc),

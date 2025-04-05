@@ -59,9 +59,8 @@ const getOne = async (_id: string) => {
 const create = async(_venta: NewVentaType ) =>{
     try {
         const resp = await http.post('/venta', _venta);
-        return resp.data.data as Venta[];
+        return resp.data.data as {venta: Venta, factura: Comprobante};
     } catch (error: any) {
-        console.log(error)
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la obra social')
     }
 }
