@@ -20,6 +20,7 @@ import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import Button from '@/components/ui/button/Button.vue';
 import router from '@/router';
+import { LayoutDashboard } from 'lucide-vue-next';
 
 const route = useRoute();
 const currentCliente = ref<Cliente>();
@@ -60,7 +61,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
             </BreadcrumbList>
         </Breadcrumb>
         <div class=" flex flex-row justify-between w-full mb-4">
-            <h1 class="page-title ">Recetas: {{ nombreCliente }}</h1>
+            <h1 class="page-title ">Recetas: {{ nombreCliente }} <Button variant="ghost" @click="router.push(`/clientes/dashboard/${currentCliente?.id}`)" ><LayoutDashboard :size="24" /> </Button> </h1>
             <div>
                 <Button class="text-xs mr-2 " @click="router.replace(`/recetas/recetados/new?cliente=${currentCliente?.id}`)" >Nueva Receta Anteojos Recetados </Button>
                 <Button class="text-xs" @click="router.replace(`/recetas/contacto/new?cliente=${currentCliente?.id}`)" >Nueva Receta Lentes de Contacto </Button>

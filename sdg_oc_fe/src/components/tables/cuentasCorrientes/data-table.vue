@@ -31,6 +31,7 @@ const table = useVueTable({
 
 </script>
 
+
 <template>
     <div class="border rounded-md">
         <Table>
@@ -54,7 +55,7 @@ const table = useVueTable({
                 <template v-else>
                     <TableRow>
                         <TableCell :colspan="columns.length" class="h-24 text-center">
-                            Ninguna venta coincide con los criterios de búsqueda
+                            Cliente no encontrado
                         </TableCell>
                     </TableRow>
                 </template>

@@ -77,7 +77,7 @@ const parametrosItems: { title: string, href: string}[] = [
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem class="mr-[1rem]">
-                <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">
+                <NavigationMenuLink href="/cuentas-corrientes" :class="navigationMenuTriggerStyle()">
                     <Wallet2Icon  class="w-5 h-5 mr-2" />
                     Cuentas Corrientes
                 </NavigationMenuLink>
@@ -115,8 +115,8 @@ const parametrosItems: { title: string, href: string}[] = [
             <Button class="text-xs" @click="router.replace('/ventas/new')" >Nueva Venta</Button>
             <DropdownMenu>
                 <DropdownMenuTrigger>
-                    <Avatar>
-                        <AvatarImage src="https://github.com/radix-vue.png" alt="@radix-vue" />
+                    <Avatar class="border border-gray-950">
+                        <AvatarImage src="/favicon.svg" alt="@radix-vue" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>

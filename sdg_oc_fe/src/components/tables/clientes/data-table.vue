@@ -1,6 +1,5 @@
 <script setup lang="ts" generic="TData, TValue">
-import { ref } from 'vue'
-import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
+import type { ColumnDef } from '@tanstack/vue-table';
 import {
     Table,
     TableBody,
@@ -15,9 +14,6 @@ import {
     useVueTable,
     getFilteredRowModel, 
 } from '@tanstack/vue-table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button';
-import { valueUpdater } from '@/lib/utils.recetas'
 
 
 const props = defineProps<{
@@ -25,17 +21,12 @@ const props = defineProps<{
     data: TData[];
 }>();
 
-const columnFilters = ref<ColumnFiltersState>([])
 
 const table = useVueTable({
     get data() { return props.data; },
     get columns() { return props.columns; },
     getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: updaterOrValue =>valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
-    state:{
-        get columnFilters() {return columnFilters.value}
-    }
 })
 </script>
 
