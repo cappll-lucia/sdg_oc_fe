@@ -30,7 +30,6 @@ const getAll = async (filter: VentaFilters) => {
 
         const url = `/venta?${params.toString()}`;
         const resp = await http.get(url);
-
         return resp.data.data as {items: Venta[],  nextPage: number|null, previousPage: number|null};
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');

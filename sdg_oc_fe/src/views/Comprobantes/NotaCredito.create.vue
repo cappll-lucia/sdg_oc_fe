@@ -105,7 +105,7 @@ const onSubmit = async()=>{
        try{
         const newComprobante ={
             importeTotal: importeComprobante.value,
-            facturaRelacionada: {
+            transaccionRelacionadaId: {
                 id: selectedFactura.value?.id
             },
             tipoComprobante: tipoComprobante.value,
@@ -114,7 +114,7 @@ const onSubmit = async()=>{
         }
         const createdNC = await comprobantesApi.create(newComprobante)
         loading.value=false;
-        router.replace(`/nota-credito-debito/view/${createdNC.id}`)
+        router.push(`/nota-credito-debito/view/${createdNC.id}`)
         toast({
             title: 'Nota de crédito emitida con éxito',
         })

@@ -91,13 +91,6 @@ const validateAndSubmit = async ()=>{
     isValidComprobante.value.tipoComprobante = tipoComprobante.value ? [2, 7, 12, 52].includes(tipoComprobante.value) : false;
     if(isValidComprobante.value.cliente && isValidComprobante.value.facturaRelacionada && isValidComprobante.value.importeTotal && isValidComprobante.value.motivo && isValidComprobante.value.tipoComprobante){
         await onSubmit()
-    }else{
-        console.log(isValidComprobante.value.cliente)
-        console.log(isValidComprobante.value.importeTotal)
-        console.log(isValidComprobante.value.motivo)
-        console.log(isValidComprobante.value.facturaRelacionada)
-        console.log(isValidComprobante.value.tipoComprobante)
-
     }
     loading.value=false;
 }

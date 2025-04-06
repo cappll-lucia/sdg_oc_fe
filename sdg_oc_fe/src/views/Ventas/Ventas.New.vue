@@ -175,14 +175,14 @@ const onSubmit = (async()=>{
             mediosDePago: mediosDePago.value,
             lineasDeVenta: lineasDeVenta.value,
             ventaObraSocial: ventaObrasSociales.value,
-            observaciones: 'obs'
+            observaciones: observaciones.value
         }
         const createdVenta = await ventasApi.create(newVenta)
         loading.value=false;
+        router.push(`/ventas/view/${createdVenta.venta.id}`)
         toast({
             title: 'Venta registrada con éxito',
         })
-        router.push(`/ventas/view/${createdVenta.venta.id}`)
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
@@ -198,7 +198,6 @@ const validateAndSubmit = async()=>{
         condicionIvaVenta: condicionIvaVenta.value
     })
     isValidVenta.value =resultVenta.isValid;
-    console.log(resultVenta)
 
     const resultLineasVenta = createLineaVentaCustomValidator(lineasDeVenta.value);
     isvalidLineasVenta.value= resultLineasVenta.isValid;

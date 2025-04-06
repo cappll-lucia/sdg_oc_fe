@@ -68,8 +68,6 @@ const handleFilterClientes = async()=>{
     clientes.value = res.items.filter(c=> c.id!=0);
     nextPage.value = res.nextPage;
     previousPage.value =res.previousPage;
-    console.log(previousPage.value)
-    console.log(nextPage.value)
 };
 
 const handlePageChange = async(offset: number) => {

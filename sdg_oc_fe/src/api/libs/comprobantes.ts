@@ -55,7 +55,6 @@ const getFacturasByCliente = async (_id: number) => {
 
 const getComprobantesByVenta = async(_ventaId: string)=>{
     try {
-        console.log('---', _ventaId)
         const resp = await http.get(`/comprobante/venta/${_ventaId}`);
         return resp.data.data.items as Comprobante[];
     } catch (error) {
@@ -73,24 +72,38 @@ const getOne = async(_id: string)=>{
     }
 }
 
-    const print = async(_id: string)=>{
-        try {
-            console.log(_id)
-            const resp = await http.post(`/comprobante/imprimir`, {
-                id: _id
-            }); 
-            console.log(resp)
-            return resp;
-        } catch (error) {
-            console.log(error)
-            throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
-        }
+const print = async(_id: string)=>{
+    try {
+        const resp = await http.post(
+            `/comprobante/imprimir`, 
+            { id: _id},
+            {responseType: 'arraybuffer'}
+        ); 
+        return resp;
+    } catch (error) {
+        console.log(error)
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
+}
+
+const email = async(_id: string)=>{
+    try {
+        const resp = await http.post(`/comprobante/email`, {
+            comprobante: {
+                id: _id
+            }
+        }); 
+        return resp;
+    } catch (error) {
+        console.log(error)
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+}
 
 const create = async(_comprobante: any ) =>{
     try {
         const resp = await http.post('/comprobante', _comprobante);
-        const comprobante = resp.data.data.comprobanteGuardado as Comprobante;
+        const comprobante = resp.data.data as Comprobante;
         comprobante.fechaEmision = new Date(comprobante.fechaEmision)
         return comprobante
     } catch (error: any) {
@@ -105,6 +118,7 @@ export const comprobantesApi = {
     getAllByCliente: (_id: number)=> getAllByCliente(_id),
     getOne: (_id: string)=> getOne(_id),
     print: (_id: string)=> print(_id),
+    email: (_id: string)=> email(_id),
     getFacturasByCliente: (_nroDoc: number)=> getFacturasByCliente(_nroDoc),
     getComprobantesByVenta: (_ventaId: string)=> getComprobantesByVenta(_ventaId),
     create: (_comprobante: any)=> create(_comprobante),

@@ -25,24 +25,23 @@ const currentComprobante = ref<Comprobante>();
 
 
 onMounted(async()=>{
-    console.log('a')
     if (typeof route.params.id === 'string') {
-        console.log(route.params.id)
         currentComprobante.value = await comprobantesApi.getOne(route.params.id);
-        console.log(currentComprobante.value)
     }
 })
 
 const printComprobante = async(_id: string)=>{
     try {
         const resp = await comprobantesApi.print(_id);
-        const bufferData = resp.data.data;
+        const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
         const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(pdfBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'comprobante.pdf';
+        a.download = currentComprobante.value 
+            ? `${currentComprobante.value.facturaRelacionada.venta.cliente.apellido}_${tipoComprobanteDisplay(currentComprobante.value.tipoComprobante)?.nombre}_${currentComprobante.value.fechaEmision.toString().split('T')[0]}.pdf`
+            : 'comprobante.pdf';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);

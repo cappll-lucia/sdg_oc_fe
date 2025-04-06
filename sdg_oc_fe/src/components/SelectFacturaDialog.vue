@@ -47,7 +47,7 @@ const toDateValue = (date: CalendarDate): DateValue => {
 
 const emit = defineEmits(['update:modelValue', 'selectFactura']);
 
-const df = new DateFormatter('en-US', {
+const df = new DateFormatter('es-AR', {
   dateStyle: 'medium',
 })
 

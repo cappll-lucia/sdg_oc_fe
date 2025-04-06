@@ -26,7 +26,7 @@ import { Comprobante, TipoComprobante } from '@/api/entities/comprobante';
 import { clientesApi } from '@/api/libs/clientes';
 import { formatDate } from '@/lib/utils.recetas';
 import Button from '@/components/ui/button/Button.vue';
-import { InspectIcon, PrinterIcon } from 'lucide-vue-next';
+import { InspectIcon, MailIcon, PrinterIcon } from 'lucide-vue-next';
 import router from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
@@ -82,26 +82,33 @@ const caluclateImportePago = computed(()=>{
 
 
 
-const printComprobante = async(_id: string)=>{
+const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=>{
     try {
-        const resp = await comprobantesApi.print(_id);
-        
-
-        const bufferData = resp.data.data;
-
+        const resp = await comprobantesApi.print(id);
+        const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
-
         const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(pdfBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'comprobante.pdf';
+        a.download = `${currentVenta.value?.cliente.apellido}_${tipoComprobanteDisplay(tipoComprobante)?.nombre}_${fecha.toString().split('T')[0]}.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     } catch (error) {
         console.error('Error al descargar el PDF:', error);
+    }
+}
+
+const emailComprobante = async(_id: string)=>{
+    try {
+        const resp = await comprobantesApi.email(_id);
+        toast({
+            title: 'Comprobante enviado por email'
+        })
+    } catch (error) {
+        console.error('Error al enviar el comprobante:', error);
     }
 }
 
@@ -113,10 +120,11 @@ const emitirFactura = async()=>{
                 tipoComprobante: tipoFactura(Number(currentVenta.value?.cliente.categoriaFiscal)),
                 motivo: currentVenta.value?.observaciones,
                 condicionIvaCliente: Number(currentVenta.value?.cliente.categoriaFiscal),
-                venta: {id: currentVenta.value.id}
+                transaccionRelacionadaId: {id: currentVenta.value.id}
             }
             const factura = await comprobantesApi.create(newFactura)  ;
-            currentVenta.value.factura = factura;
+            currentVenta.value.factura=factura;
+            comprobantesVenta.value.push(factura);
             toast({
                 title: 'Factura emitida',
             })
@@ -312,23 +320,12 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         <!-- <span class="text-xs w-[6rem] ">ENTIDAD BANCARIA</span> -->
                     </div>
                     <div class="border-x">
-                        <div v-if="currentVenta.factura"
+                    <div v-if="!currentVenta.factura"
                         class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
-                        <span class=" text-md w-[8rem] ">{{ formatDate(currentVenta.factura.fechaEmision) }}</span>
-                        <span class=" text-md mx-4 w-[11rem]">{{
-                            tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.nombre }} {{
-                                tipoComprobanteDisplay(currentVenta.factura.tipoComprobante)?.letra }}</span>
-                        <span class=" text-md font-thin w-[15rem]">{{ currentVenta.factura.numeroComprobante }}</span>
-                        <Button variant="ghost" @click="printComprobante(currentVenta.factura.id)">
-                            <PrinterIcon />
-                        </Button>
-                    </div>
-                    <div v-else class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
                         <span class=" text-md mr-4">Factura no emitida</span>
-                        <Button variant="ghost" @click="emitirFactura()">
+                        <Button variant="outline" @click="emitirFactura()">
                            Emitir
                         </Button>
-
                     </div>
                     <div v-for="comprobante in comprobantesVenta"
                     class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
@@ -337,10 +334,16 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         tipoComprobanteDisplay(comprobante.tipoComprobante)?.nombre }} {{
                             tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
                         <span class=" text-md font-thin w-[15rem]">{{ comprobante.numeroComprobante }}</span>
-                        <Button variant="ghost" @click="printComprobante(comprobante.id)">
+                        <Button variant="ghost" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision)">
                             <PrinterIcon />
                         </Button>
-                        <Button variant="ghost" @click="router.replace(`/nota-credito-debito/view/${comprobante.id}`)">
+                        <Button variant="ghost" @click="emailComprobante(comprobante.id)">
+                            <MailIcon />
+                        </Button>
+                        <Button variant="ghost" v-if="[1, 6].includes(comprobante.tipoComprobante)" @click="router.replace(`/ventas/view/${comprobante.venta.id}`)">
+                            <InspectIcon />
+                        </Button>
+                        <Button variant="ghost" v-else @click="router.replace(`/nota-credito-debito/view/${comprobante.id}`)">
                             <InspectIcon />
                         </Button>
                     </div>

@@ -80,7 +80,6 @@ export const createVentaCustomValidator = (_newVenta: {
     descuentoPorcentaje: number | undefined,
     condicionIvaVenta: CondicionIva | undefined,
 })=>{
-    console.log(_newVenta)
     const isValid = {
         cliente: _newVenta.cliente.id===0 || Boolean(_newVenta.cliente.id),
         fecha: _newVenta.fecha instanceof Date,

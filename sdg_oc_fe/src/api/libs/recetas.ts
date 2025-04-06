@@ -53,8 +53,6 @@ const editRecetaAereos = async (_editedReceta: EditedRecetaType) => {
 
 const createRecetaContacto = async (_newReceta: NewRecetaContactoType) => {
     try {
-        console.log('=== ')
-        console.log(_newReceta)
         const resp = await http.post('/receta-lentes-contacto', _newReceta);
         return resp.data.data as RecetaContacto[];
     } catch (error) {
@@ -67,7 +65,6 @@ const createRecetaContacto = async (_newReceta: NewRecetaContactoType) => {
 
 const editRecetaContacto = async (_editedReceta: EditedRecetaContactoType) => {
     try {
-        console.log(_editedReceta)
         const resp = await http.put(`/receta-lentes-contacto/${_editedReceta.id}`, _editedReceta );
         return resp.data.data as RecetaContacto [];
     } catch (error) {

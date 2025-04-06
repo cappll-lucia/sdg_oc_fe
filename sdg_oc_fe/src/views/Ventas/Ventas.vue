@@ -65,7 +65,6 @@ const handleFilterVentas = async()=>{
         offset: currentOffset.value,
         limit: currentLimit.value,
     });
-    console.log(resp)
     ventas.value = resp.items;
     nextPage.value = resp.nextPage;
     previousPage.value =resp.previousPage;
@@ -101,7 +100,7 @@ const handlePageChange = async(offset: number) => {
     await handleFilterVentas()
 };
 
-const df = new DateFormatter('en-US', {
+const df = new DateFormatter('es-AR', {
   dateStyle: 'medium',
 })
 
@@ -110,7 +109,6 @@ const handleDateRangeChange = async(newRange: DateRange) => {
     dateRange.value.start = newRange.start
     dateRange.value.end = newRange.end
   }
-  console.log(dateRange.value.start)
   await handleFilterVentas()
 }
 
