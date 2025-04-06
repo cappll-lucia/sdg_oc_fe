@@ -30,13 +30,10 @@ import {
   CalendarDate,
   DateFormatter,
   getLocalTimeZone,
-  parseDate,
-  type DateValue
 } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 import type { DateRange } from 'reka-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { date } from 'zod';
 
 
 const selectedTipoFactura = ref<string>('');
@@ -134,7 +131,7 @@ const handleDateRangeChange = async(newRange: DateRange) => {
         <h1 class="page-title ">Comprobantes</h1>
         <div class="pt-2">
             <div class="flex flex-row justify-between items-center py-4">
-                <div class="search flex w-[65rem]  flex-row justify-start gap-x-4">
+                <div class="search flex w-[65rem]  flex-row justify-start items-center gap-x-4">
                     <Input class="max-w-sm " placeholder="Buscar cliente" v-model="txtSearch"
                         @keyup.enter="handleFilterComprobantes" />
                     <Select v-model="selectedTipoFactura" @update:model-value="handleFilterComprobantes">
@@ -152,8 +149,6 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                </div>
-                <div class="flex flex-row justify-between px-6 h-6 mb-4">
                         <Popover>
                             <PopoverTrigger as-child>
                             <Button
@@ -183,11 +178,10 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                                 :number-of-months="2"
                                 @update:model-value="handleDateRangeChange"
                             />
-                            </PopoverContent>
-                        </Popover>
+                        </PopoverContent>
+                    </Popover>
+                    <Button variant="ghost" @click="clearFilters" class="text-gray-500 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline"> <ReloadIcon /> </Button>
                 </div>
-                <Button variant="ghost" @click="clearFilters" class="text-gray-500 mt-1 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline"> <ReloadIcon /> </Button>
-
             </div>
             <DataTable :columns="columns" :data="comprobantes" />
         </div>

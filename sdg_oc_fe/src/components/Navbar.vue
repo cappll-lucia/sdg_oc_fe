@@ -22,7 +22,7 @@ import router from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { onMounted, ref } from 'vue';
 import { JwtUser } from '@/api/entities/jwtUser';
-import { GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
+import { ArrowDownUpIcon, BanknoteIcon, GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
 
 
 const userStore = useUserStore();
@@ -52,43 +52,50 @@ const parametrosItems: { title: string, href: string}[] = [
 <template>
     <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
         <NavigationMenuList>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuLink href="/" :class="navigationMenuTriggerStyle()">
                     <HomeIcon class="w-5 h-5 mr-2" />
                     Inicio
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]" >
                 <NavigationMenuLink href="/clientes" :class="navigationMenuTriggerStyle()">
                     <UserIcon class="w-5 h-5 mr-2"  />
                     Clientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuLink href="/ventas" :class="navigationMenuTriggerStyle()">
                     <ShoppingBag class="w-5 h-5 mr-2" />
                     Ventas
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuLink href="/comprobantes" :class="navigationMenuTriggerStyle()">
                     <Receipt class="w-5 h-5 mr-2"/>
                     Comprobantes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">
                     <Wallet2Icon  class="w-5 h-5 mr-2" />
                     Cuentas Corrientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuLink href="/productos" :class="navigationMenuTriggerStyle()">
                     <GlassesIcon  class="w-5 h-5 mr-2" />
                     Productos
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/caja" :class="navigationMenuTriggerStyle()">
+                    <BanknoteIcon class="w-6 h-6" />
+                    <ArrowDownUpIcon  class="w-4 h-4 mr-2" />
+                    Caja
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuTrigger> <SettingsIcon  class="w-5 h-5 mr-2" /> Parámetros</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">

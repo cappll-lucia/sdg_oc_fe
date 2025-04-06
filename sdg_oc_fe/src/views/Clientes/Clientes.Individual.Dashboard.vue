@@ -112,7 +112,6 @@ const loadData = async()=>{
         venta:c.venta,
         clase: 'comprobante',
     })))
-    console.log("movs: ", ctaCorriente.value.movimientos)
     const itemsMovimientos = ctaCorriente.value.movimientos.map(mov=>({
         id: mov.id.toString(),
         fecha: new Date(mov.fechaMovimiento),
@@ -124,19 +123,18 @@ const loadData = async()=>{
     }))
     movimientosAndComprobantes.value = [...itemsMovimientos, ...itemsComprobantes];
     movimientosAndComprobantes.value.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
-    console.log(movimientosAndComprobantes.value)
 }
 
-const printComprobante = async(_id: string)=>{
+const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=>{
     try {
-        const resp = await comprobantesApi.print(_id);
-        const bufferData = resp.data.data;
+        const resp = await comprobantesApi.print(id);
+        const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
         const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(pdfBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'comprobante.pdf';
+        a.download = `${currentCliente.value?.apellido}_${tipoComprobanteDisplay(tipoComprobante)?.nombre}_${fecha.toISOString().split('T')[0]}.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -146,6 +144,17 @@ const printComprobante = async(_id: string)=>{
     }
 }
 
+
+const emailComprobante = async(_id: string)=>{
+    try {
+        const resp = await comprobantesApi.email(_id);
+        toast({
+            title: 'Comprobante enviado por email'
+        })
+    } catch (error) {
+        console.error('Error al enviar el comprobante:', error);
+    }
+}
 
 const validateAndSubmit = async()=>{
     const resultNewMovimiento = createMovimientoCtaCte(newMovimiento.value);
@@ -479,16 +488,16 @@ const onSubmit = async()=>{
                                     <Label class="w-[8rem] text-sm "> $ {{ row.importe.toFixed(2)}}</Label>
                                 </div>
                                 <div class="flex flex-row ">
-                                    <Button variant="ghost" @click="printComprobante(row.id)">
+                                    <Button variant="ghost" @click="printComprobante(row.id, row.tipoComprobante, row.fecha)">
                                         <PrinterIcon />
                                     </Button>
-                                    <Button variant="ghost" @click="printComprobante(row.id)">
+                                    <Button variant="ghost" @click="emailComprobante(row.id)">
                                         <Mail />
                                     </Button>
-                                    <Button v-if="[1, 6].includes(row.tipoComprobante) && row.venta" variant="ghost" @click="router.replace(`/ventas/view/${row.venta.id}`)">
+                                    <Button v-if="[1, 6].includes(row.tipoComprobante) && row.venta" variant="ghost" @click="router.push(`/ventas/view/${row.venta.id}`)">
                                         <InspectIcon />
                                     </Button>
-                                    <Button v-if="[3,8,2,7].includes(row.tipoComprobante)" variant="ghost" @click="router.replace(`/nota-credito-debito/view/${row.id}`)">
+                                    <Button v-if="[3,8,2,7].includes(row.tipoComprobante)" variant="ghost" @click="router.push(`/nota-credito-debito/view/${row.id}`)">
                                         <InspectIcon />
                                     </Button>
                                 </div>
@@ -501,9 +510,7 @@ const onSubmit = async()=>{
                                     <Label class="w-[8rem] text-sm"><span class="font-bold" v-if="row.motivo==TipoMovimiento.VENTA">-</span> $ {{ row.importe.toFixed(2)}}</Label>
                                 </div>
                                 <div>
-                                    <Button variant="ghost" @click="printComprobante(row.id)">
-                                        <InspectIcon />
-                                    </Button>
+                                   ???
                                 </div>
                             </div>
 

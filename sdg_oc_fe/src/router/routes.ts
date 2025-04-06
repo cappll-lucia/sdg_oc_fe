@@ -270,5 +270,13 @@ export const routerRoutes = [
             meta: {
                 auth: true
             }
-        }
+        },
+        {
+            path: '/caja',
+            name:'caja',
+            component: ()=> import('../views/Caja/Caja.vue'),
+            meta: {
+                auth: true
+            }
+        },
     ]

@@ -103,7 +103,7 @@ const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=
 
 const emailComprobante = async(_id: string)=>{
     try {
-        const resp = await comprobantesApi.email(_id);
+        await comprobantesApi.email(_id);
         toast({
             title: 'Comprobante enviado por email'
         })
