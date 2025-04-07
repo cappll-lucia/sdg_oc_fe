@@ -47,7 +47,7 @@ const onSignin = handleSubmit(async (values)=>{
     loading.value=true;
     try{
         await userStore.singin(values.username, values.password);
-        router.replace('/');
+        router.push('/');
     }catch(err: any){
         console.log(err)
         errorMessage.value = err?.response?.data.message as string;

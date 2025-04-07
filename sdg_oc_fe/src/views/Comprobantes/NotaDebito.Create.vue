@@ -108,7 +108,7 @@ const onSubmit = async()=>{
         }
         const createdNC = await comprobantesApi.create(newComprobante)
         loading.value=false;
-        router.replace(`/nota-credito-debito/view/${createdNC.id}`)
+        router.push(`/nota-credito-debito/view/${createdNC.id}`)
         toast({
             title: 'Nota de débito emitida con éxito',
         })
@@ -268,7 +268,7 @@ const getTipoNotaDebito = (tipoFactura: number)=>{
                         </div>
                     </div>
                     <div class="w-full flex justify-end mt-4">
-                        <Button variant="outline" class="w-[12rem] mr-5" @click="router.replace('/ventas')">Cancelar</Button>
+                        <Button variant="outline" class="w-[12rem] mr-5" @click="router.push('/ventas')">Cancelar</Button>
                         <Button type="submit" class="w-[12rem]">Emitir Nota de Débito</Button>
                     </div>
                 </div>

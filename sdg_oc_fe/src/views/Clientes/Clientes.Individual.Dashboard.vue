@@ -273,12 +273,12 @@ const onSubmit = async()=>{
                         <div class="flex flex-row justify-between">
                             <h2 class="page-subtitle">Recetas</h2>
                             <div>
-                                <Button @click="router.replace(`/recetas/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent mr-4 hover:bg-white"><Eye/> </Button>
-                                <Button @click="router.replace(`/recetas/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
+                                <Button @click="router.push(`/recetas/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent mr-4 hover:bg-white"><Eye/> </Button>
+                                <Button @click="router.push(`/recetas/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
                             </div>
                         </div>
                         <ScrollArea v-if="recetasCliente.length" class=" mt-2 w-full h-[20rem] rounded-lg  bg-white border pr-4 scroll-ml-2">
-                            <div v-for="receta in recetasCliente" @click="router.replace(`/recetas/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-center items-center h-[4rem] rounded-lg mx-2 my-4 mr-4">
+                            <div v-for="receta in recetasCliente" @click="router.push(`/recetas/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-center items-center h-[4rem] rounded-lg mx-2 my-4 mr-4">
                                 <div class=" cursor-pointer w-[39%]  rounded-tl-lg h-full rounded-bl-lg  border-r border font-semibold text-sm bg-secondary flex  justify-end items-center">
                                     <Label class=" cursor-pointer p-4" > {{formatDate(receta.fecha.toString())}} </Label>     
                                     <span class="w-[0px] mr-1"><CircleDot class="w-2 text-gray-700" /> </span>
@@ -296,12 +296,12 @@ const onSubmit = async()=>{
                         <div class="flex flex-row justify-between">
                             <h2 class="page-subtitle">Audiometrías</h2>
                             <div>
-                                <Button @click="router.replace(`/audiometrias/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent mr-4 hover:bg-white"><Eye/> </Button>
-                                <Button @click="router.replace(`/audiometrias/create/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
+                                <Button @click="router.push(`/audiometrias/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent mr-4 hover:bg-white"><Eye/> </Button>
+                                <Button @click="router.push(`/audiometrias/create/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
                             </div>
                         </div>
                         <ScrollArea v-if="audiometriasCliente.length" class=" mt-2 w-full h-[12rem] pr-4  rounded-lg bg-white border">
-                            <div v-for="(audiom, index) in audiometriasCliente" @click="router.replace(`/audiometria/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-start items-center h-[3rem] p-4 rounded-lg bg-secondary border mx-2 my-4 mr-4">
+                            <div v-for="(audiom, index) in audiometriasCliente" @click="router.push(`/audiometria/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-start items-center h-[3rem] p-4 rounded-lg bg-secondary border mx-2 my-4 mr-4">
                                 <Label class=" cursor-pointer mr-4  text-sm" > {{formatDate(audiom.fechaInforme.toString())}} </Label>     
                                 <div class=" cursor-pointer flex flex-col">
                                     <Label class=" cursor-pointer text-sm font-thin" >Audiometía {{ index }}</Label>                    

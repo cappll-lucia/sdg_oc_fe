@@ -39,7 +39,7 @@ export const columns: ColumnDef<Cliente>[] = [
         variant: 'outline',
         size: 'icon',
         onClick: () => {
-         router.replace( `/clientes/dashboard/${row.original.id}`)
+         router.push( `/clientes/dashboard/${row.original.id}`)
         }
       }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }

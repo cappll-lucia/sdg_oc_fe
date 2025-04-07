@@ -46,7 +46,7 @@ const table = useVueTable({
         <Input class="max-w-sm" placeholder="Buscar Cliente"
             :model-value="table.getColumn('nombre')?.getFilterValue() as string"
             @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
-        <Button class="text-xs" @click="router.replace('/audiometrias/create')" >Registrar Nueva Audiometría</Button>
+        <Button class="text-xs" @click="router.push('/audiometrias/create')" >Registrar Nueva Audiometría</Button>
     </div>
     <div class="border rounded-md">
         <Table>

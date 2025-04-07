@@ -30,7 +30,7 @@ export const columns: ColumnDef<ClienteAudiometriasFecha>[] = [
         variant: 'outline',
         size: 'icon',
         onClick: () => {
-         router.replace( `/audiometrias/${row.original.clienteId}`)
+         router.push( `/audiometrias/${row.original.clienteId}`)
         }
       }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }

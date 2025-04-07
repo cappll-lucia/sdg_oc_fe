@@ -112,7 +112,7 @@ const parametrosItems: { title: string, href: string}[] = [
             </NavigationMenuItem>
         </NavigationMenuList>
         <div class="px-2 flex justify-between w-[13rem] items-center ">
-            <Button class="text-xs" @click="router.replace('/ventas/new')" >Nueva Venta</Button>
+            <Button class="text-xs" @click="router.push('/ventas/new')" >Nueva Venta</Button>
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Avatar class="border border-gray-950">

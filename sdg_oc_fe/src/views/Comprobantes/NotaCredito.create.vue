@@ -284,7 +284,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                         <p v-if="selectedFactura && importeComprobante > selectedFactura?.importeTotal" class="text-destructive text-sm py-2 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe de la Nota de Crédito no puede superar el importe de la factura original</p>               
                     </div>
                     <div class="w-full flex justify-end mt-4">
-                        <Button variant="outline" class="w-[12rem] mr-5" @click="router.replace('/ventas')">Cancelar</Button>
+                        <Button variant="outline" class="w-[12rem] mr-5" @click="router.push('/ventas')">Cancelar</Button>
                         <Button type="submit" class="w-[12rem]">Emitir Nota de Crédito</Button>
                     </div>
                 </div>

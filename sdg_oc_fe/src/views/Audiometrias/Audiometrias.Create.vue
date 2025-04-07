@@ -79,7 +79,7 @@ const onSubmit = handleSubmit(async (values) => {
         await audiometriasApi.create(values, audiometriaFile.value )
         loading.value=false;
         showSuccess.value = true;
-        router.replace('/audiometrias')
+        router.push('/audiometrias')
         toast({
             title: 'Audiometría registrada con éxito',
         })
@@ -236,7 +236,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
 
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.replace('/audiometrias')"  >Cancelar</Button>
+                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/audiometrias')"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
                 

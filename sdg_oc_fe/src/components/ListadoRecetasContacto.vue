@@ -63,7 +63,7 @@ const printRecetas = () => {
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2">
                 <!-- TODO add link to create -->
-                <Button variant="outline" @click="router.replace(`/recetas/contacto/new?cliente=${props.idCliente}`)" class="bg-transparent hover:bg-[#d7e5ec]">
+                <Button variant="outline" @click="router.push(`/recetas/contacto/new?cliente=${props.idCliente}`)" class="bg-transparent hover:bg-[#d7e5ec]">
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
@@ -146,7 +146,7 @@ const printRecetas = () => {
                     </div>
                         <div class="flex flex-col ">
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                            @click="() => { router.replace(`/recetas/contacto/edit/${currentRec?.id}`)}">
+                            @click="() => { router.push(`/recetas/contacto/edit/${currentRec?.id}`)}">
                             Editar
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>

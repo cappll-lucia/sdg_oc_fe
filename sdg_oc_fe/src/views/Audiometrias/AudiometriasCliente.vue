@@ -68,7 +68,7 @@ const changeSelectedAudiom = async(audiometria: Audiometria) =>{
                 v-if="currentCliente && audiometriasCliente.length>0">
                 <div class="panel-index w-[23%] h-[100%] p-4">
                     <div class="flex justify-between items-center mr-2 h-10">
-                        <Button @click="()=>router.replace('/audiometrias/create')" variant="outline" class="bg-transparent hover:bg-[#d7e5ec] w-full mr-2">
+                        <Button @click="()=>router.push('/audiometrias/create')" variant="outline" class="bg-transparent hover:bg-[#d7e5ec] w-full mr-2">
                                 Nueva Audiometria
                             <PlusIcon class="w-4 h-4" />
                         </Button>
@@ -100,7 +100,7 @@ const changeSelectedAudiom = async(audiometria: Audiometria) =>{
                                     <span>{{ formatDate(selectedAudiom.fechaInforme.toString()) }}</span>
                                 </div>
                                 <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                                    @click="() => router.replace(`/audiometrias/edit/${selectedAudiom?.id}`)">
+                                    @click="() => router.push(`/audiometrias/edit/${selectedAudiom?.id}`)">
                                     Editar
                                     <Pencil1Icon class="w-4 h-4" />
                                 </Button>

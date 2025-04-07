@@ -120,7 +120,7 @@ const onSubmit = async()=>{
             toast({
                 title: 'Lote de productos registrado con éxito',
             })
-            router.replace('/productos')
+            router.push('/productos')
         }
     } catch (err: any) {
         errorMessage.value=err.message as string
@@ -259,7 +259,7 @@ const loading = ref<boolean>(false);
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
                     <Button variant="outline" class="w-[15%] mr-5"
-                        @click="router.replace('/productos')">Cancelar</Button>
+                        @click="router.push('/productos')">Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
 

@@ -200,7 +200,7 @@ const onSubmit = async()=>{
         toast({
             title: 'Receta actualizada con éxito',
         })
-        router.replace('/recetas')
+        router.push('/recetas')
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -713,7 +713,7 @@ const validateDetalles = ()=>{
                         </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.replace('/audiometrias')"  >Cancelar</Button>
+                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/audiometrias')"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>

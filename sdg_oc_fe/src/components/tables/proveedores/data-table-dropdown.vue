@@ -49,7 +49,7 @@ const handleDeleteProveedor= async()=>{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="() => {router.replace(`/proveedores/edit/${proveedor.id}`)}">Editar</DropdownMenuItem>
+            <DropdownMenuItem @click="() => {router.push(`/proveedores/edit/${proveedor.id}`)}">Editar</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem @click="showAlertDelete=true" >Eliminar</DropdownMenuItem>
         </DropdownMenuContent>

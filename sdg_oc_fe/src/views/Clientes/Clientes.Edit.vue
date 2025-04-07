@@ -122,7 +122,7 @@ const onSubmit = handleSubmit(async (values) => {
         await clientesApi.edit(currentCliente.value?.id, values, osCliente);
         loading.value = false;
         showSuccess.value = true;
-        router.replace('/clientes');
+        router.push('/clientes');
         toast({ title: 'Cliente actualizado con éxito' });
     }
   } catch (err: any) {

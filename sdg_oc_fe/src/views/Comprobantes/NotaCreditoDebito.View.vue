@@ -123,7 +123,7 @@ const printComprobante = async(_id: string)=>{
                         </div>
                     </div>
                     <div class="w-full flex justify-end mt-4">
-                        <Button variant="outline" class="w-[10rem] mr-5" @click="router.replace('/ventas')">Volver</Button>
+                        <Button variant="outline" class="w-[10rem] mr-5" @click="router.push('/ventas')">Volver</Button>
                         <Button type="submit" class="w-[10rem]" @click="printComprobante(currentComprobante.id)" >Imprimir</Button>
                     </div>
                 </div>

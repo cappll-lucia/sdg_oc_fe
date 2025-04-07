@@ -48,7 +48,7 @@ const onSubmit = handleSubmit(async (values) => {
         await marcasApi.create(values)
         loading.value=false;
         showSuccess.value = true;
-        router.replace('/marcas')
+        router.push('/marcas')
         toast({
             title: 'Marca registrada con éxito',
         })
@@ -119,7 +119,7 @@ const validateAndSubmit = async () => {
 
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
                     <Button variant="outline" class="w-[25%] mr-5"
-                        :onclick="() => { router.replace('/marcas'); }">Cancelar</Button>
+                        :onclick="() => { router.push('/marcas'); }">Cancelar</Button>
 
                     <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>

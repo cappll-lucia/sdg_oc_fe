@@ -60,7 +60,7 @@ const printRecetas = () => {
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2 h-10">
-                <Button @click="router.replace(`/recetas/recetados/new?cliente=${props.idCliente}`)" variant="outline" class="bg-transparent hover:bg-[#d7e5ec]" >
+                <Button @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)" variant="outline" class="bg-transparent hover:bg-[#d7e5ec]" >
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
@@ -136,7 +136,7 @@ const printRecetas = () => {
                     </div>
                     <div class="flex flex-col ">
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                            @click="() => {router.replace(`/recetas/recetados/edit/${currentRec?.id}`)}">
+                            @click="() => {router.push(`/recetas/recetados/edit/${currentRec?.id}`)}">
                             Editar
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>

@@ -116,9 +116,9 @@ const clearFilters = async()=>{
             <DropdownMenu>
                 <DropdownMenuTrigger><Button class="w-[14rem]" >Registrar nuevos productos</Button></DropdownMenuTrigger>
                 <DropdownMenuContent class="w-[14rem]" >
-                    <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/lote')"  >Registrar lote de productos</DropdownMenuLabel>
+                    <DropdownMenuLabel class="cursor-pointer" @click="router.push('/productos/create/lote')"  >Registrar lote de productos</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuLabel class="cursor-pointer" @click="router.replace('/productos/create/single')" >Registrar producto único</DropdownMenuLabel>
+                    <DropdownMenuLabel class="cursor-pointer" @click="router.push('/productos/create/single')" >Registrar producto único</DropdownMenuLabel>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

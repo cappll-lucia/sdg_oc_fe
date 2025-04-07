@@ -13,7 +13,7 @@ import router from '@/router';
 import { toast } from '@/components/ui/toast';
 
 const handleCreateCliente = async()=>{
-    router.replace(`/clientes`)
+    router.push(`/clientes`)
     toast({
         title: 'Cliente regitrado con éxito',
     })

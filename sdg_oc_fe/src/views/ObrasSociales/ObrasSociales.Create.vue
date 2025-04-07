@@ -48,7 +48,7 @@ const onSubmit = handleSubmit(async (values) => {
         await obrasSocialesApi.create(values)
         loading.value=false;
         showSuccess.value = true;
-        router.replace('/obras-sociales')
+        router.push('/obras-sociales')
         toast({
             title: 'Obra Social registrada con éxito',
         })
@@ -120,7 +120,7 @@ const validateAndSubmit = async () => {
 
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
                     <Button variant="outline" class="w-[25%] mr-5"
-                        :onclick="() => { router.replace('/obras-sociales'); }">Cancelar</Button>
+                        :onclick="() => { router.push('/obras-sociales'); }">Cancelar</Button>
 
                     <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>

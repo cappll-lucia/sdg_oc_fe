@@ -22,7 +22,7 @@ defineProps<{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="()=>router.replace(`/ventas/view/${venta.id}`)">Ver Detalle</DropdownMenuItem>
+            <DropdownMenuItem @click="()=>router.push(`/ventas/view/${venta.id}`)">Ver Detalle</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Factura</DropdownMenuItem>
         </DropdownMenuContent>

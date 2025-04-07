@@ -302,11 +302,11 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                                 comprobante</Button></DropdownMenuTrigger>
                         <DropdownMenuContent class="w-[14rem]">
                             <DropdownMenuLabel class="cursor-pointer"
-                                @click="router.replace(`/nota-credito/new?venta=${currentVenta.id}`)">Nueva nota
+                                @click="router.push(`/nota-credito/new?venta=${currentVenta.id}`)">Nueva nota
                                 de crédito</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel class="cursor-pointer"
-                                @click="router.replace(`/nota-debito/new?venta=${currentVenta.id}`)">Nueva nota
+                                @click="router.push(`/nota-debito/new?venta=${currentVenta.id}`)">Nueva nota
                                 de débito</DropdownMenuLabel>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -340,10 +340,10 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         <Button variant="ghost" @click="emailComprobante(comprobante.id)">
                             <MailIcon />
                         </Button>
-                        <Button variant="ghost" v-if="[1, 6].includes(comprobante.tipoComprobante)" @click="router.replace(`/ventas/view/${comprobante.venta.id}`)">
+                        <Button variant="ghost" v-if="[1, 6].includes(comprobante.tipoComprobante)" @click="router.push(`/ventas/view/${comprobante.venta.id}`)">
                             <InspectIcon />
                         </Button>
-                        <Button variant="ghost" v-else @click="router.replace(`/nota-credito-debito/view/${comprobante.id}`)">
+                        <Button variant="ghost" v-else @click="router.push(`/nota-credito-debito/view/${comprobante.id}`)">
                             <InspectIcon />
                         </Button>
                     </div>

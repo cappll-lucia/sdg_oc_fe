@@ -99,7 +99,7 @@ const onSubmit = handleSubmit(async (values) => {
             }
             loading.value=false;
             showSuccess.value = true;
-            router.replace('/audiometrias')
+            router.push('/audiometrias')
             toast({
                 title: 'Audiometría actualizada con éxito',
             })
@@ -246,7 +246,7 @@ const handleFileUpload = () => {
 
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.replace('/audiometrias')"  >Cancelar</Button>
+                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/audiometrias')"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
                 
