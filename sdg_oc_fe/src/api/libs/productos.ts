@@ -49,8 +49,26 @@ const createLote = async(_marcaId: string, _provId: string, _file: File)=>{
     }
 }
 
+const updateLote = async(_marcaId: string, _provId: string, _porcentaje: number)=>{
+    try{
+        const resp = await http.patch('/producto/precio', {
+            proveedor:{
+                id: _provId
+            },
+            marca:{
+                id: _marcaId
+            },
+            porcentaje: _porcentaje
+        })
+        return resp.data.data as Producto[];
+    }catch(error){
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+}
+
 
 export const productosApi ={
     getAll: (_filters: ProductoFilters)=> getAll(_filters),
-    createLote: (_marcaId: string, _provId: string, _file: File)=> createLote (_marcaId, _provId, _file)
+    createLote: (_marcaId: string, _provId: string, _file: File)=> createLote (_marcaId, _provId, _file),
+    updateLote: (_marcaId: string, _provId: string, _porcentaje: number)=> updateLote (_marcaId, _provId, _porcentaje)
 }

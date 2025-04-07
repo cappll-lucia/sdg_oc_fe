@@ -147,7 +147,7 @@ const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=
 
 const emailComprobante = async(_id: string)=>{
     try {
-        const resp = await comprobantesApi.email(_id);
+        await comprobantesApi.email(_id);
         toast({
             title: 'Comprobante enviado por email'
         })
@@ -371,7 +371,7 @@ const onSubmit = async()=>{
                                     <Label class="text-right col-span-1">Importe</Label>
                                     <div class=" ml-4 col-span-3 flex flex-row items-center justify-between">
                                         <Label class="w-[7%] text-left">$</Label>
-                                        <Input decimal type="number" class="w-[93%]" v-model="newMovimiento.importe"   />
+                                        <Input v-decimal type="number" class="w-[93%]" v-model="newMovimiento.importe"   />
                                         <TooltipProvider  v-if="!isValidNewMovimiento.importe" >
                                             <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>

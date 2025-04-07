@@ -127,6 +127,14 @@ export const routerRoutes = [
 			    auth: true,
 		    },
         },
+        {
+            path: '/productos/update-price/lote',
+            name: 'productos_lote',
+            component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
         // {
         //     path: '/recetas',
         //     name: 'recetas',

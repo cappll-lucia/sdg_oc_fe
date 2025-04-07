@@ -308,7 +308,7 @@ const resetNewMovimiento = ()=>{
                                     <Label class="text-right col-span-1">Importe</Label>
                                     <div class=" ml-4 mr-12  col-span-2 flex flex-row items-center justify-between">
                                         <Label class="w-[7%] text-left">$</Label>
-                                        <Input decimal type="number" class="w-[93%]" v-model="newMovimeintoCaja.importe"   />
+                                        <Input v-decimal type="number" class="w-[93%]" v-model="newMovimeintoCaja.importe"   />
                                         <TooltipProvider  v-if="!isValidNewMovimeintoCaja.importe" >
                                             <Tooltip>
                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
@@ -368,7 +368,7 @@ const resetNewMovimiento = ()=>{
                                             <Label class="text-right col-span-1">Importe Efectivo</Label>
                                             <div class=" ml-4 mr-12  col-span-2 flex flex-row items-center justify-between">
                                                 <Label class="w-[7%] text-left">$</Label>
-                                                <Input decimal type="number" class="w-[93%]" v-model="importeOpenCaja"   />
+                                                <Input v-decimal type="number" class="w-[93%]" v-model="importeOpenCaja"   />
                                                 <TooltipProvider  v-if="!isValidImporteOpenCaja" >
                                                     <Tooltip>
                                                         <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
