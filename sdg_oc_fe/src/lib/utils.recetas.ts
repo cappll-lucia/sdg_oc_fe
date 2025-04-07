@@ -4,6 +4,8 @@ import type { Updater } from '@tanstack/vue-table'
 import type { Ref } from 'vue'
 import { RecetasAereos } from '@/api/entities/recetasAereos';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,134 +23,198 @@ export const formatDate = (dateString: string | Date) => {
 };
 
 export function generateRecetasRecetadosPDF (recetas: RecetasAereos[], nombreCliente:string) {
+  const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(`Recetas Anteojos Recetados`, 105, 20, { align: "center" });
+    doc.setFontSize(14);
+    doc.text(`${nombreCliente}`, 105, 30, { align: "center" });
+  let y = 30;
 
-    // const doc = new jsPDF();
-    // let yOffset = 10; // Posición inicial en el eje Y
+  recetas.forEach((receta, index) => {
+    doc.setFontSize(14);
+    y+=10;
+    doc.text(`Receta #${receta.id}`, 20, y);
+    y += 6;
 
-    // recetas.forEach((receta) => {
-    //     doc.setFontSize(16);
-    //     doc.text(`Receta ${receta.id}`, 10, yOffset);
-    //     doc.text(`Cliente: ${nombreCliente}`, 10, yOffset);
+    const recetaInfo = [
+      ["Fecha", new Date(receta.fecha).toLocaleDateString()],
+      ["Oftalmólogo", receta.oftalmologo],
+      ["Tipo", receta.tipoReceta],
+      ["Cristal", receta.cristal],
+      ["Color", receta.color],
+      ["Tratamiento", receta.tratamiento],
+      ["Armazón", receta.armazon ?? "Sin especificar"],
+      ["Observaciones", receta.observaciones],
+    ];
 
-    //     yOffset += 10;
+    autoTable(doc, {
+      startY: y,
+      theme: "striped",
+      head: [["Campo", "Valor"]],
+      body: recetaInfo,
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+    });
 
-    //     doc.setFontSize(12);
-    //     doc.text(`Tipo Receta: ${receta.tipoReceta}`, 10, yOffset);
-    //     doc.text(`Fecha Receta: ${receta.fecha.toISOString().split("T")[0]}`, 140, yOffset, { align: "right" });
-    //     yOffset += 10;
+    y = (doc as any).lastAutoTable.finalY + 5;
 
-    //     autoTable(doc, {
-    //         startY: yOffset,
-    //         head: [["Ojo", "Esf.", "Cil.", "A"]],
-    //         body: [
-    //             [
-    //                 "O.D.",
-    //                 receta.odEsf !== null && receta.odEsf !== undefined ? receta.odEsf.toFixed(2) : "--",
-    //                 receta.odCil !== null && receta.odCil !== undefined ? receta.odCil.toFixed(2): "--",
-    //                 receta.odA !== null && receta.odA !== undefined ? receta.odA + "°" : "--"
-    //             ],
-    //             [
-    //                 "O.I.",
-    //                 receta.oiEsf !== null && receta.oiEsf !== undefined ? receta.oiEsf.toFixed(2) : "--",
-    //                 receta.oiCil !== null && receta.oiCil !== undefined ? receta.oiCil.toFixed(2) : "--",
-    //                 receta.oiA !== null && receta.oiA !== undefined ? receta.oiA + "°" : "--"
-    //             ],
-    //         ],
-    //         theme: "grid",
-    //     });
-    //     yOffset += 25;
+    if (receta.detallesRecetaLentesAereos.length > 0) {
+      const detalleRows = receta.detallesRecetaLentesAereos.flatMap((d) => [
+        [
+          d.tipo_detalle,
+          "OD",
+          d.od_esferico,
+          d.od_cilindrico,
+          d.od_grados,
+          d.dnp,
+        ],
+        [
+          d.tipo_detalle,
+          "OI",
+          d.oi_esferico,
+          d.oi_cilindrico,
+          d.oi_grados,
+          d.dnp,
+        ],
+      ]);
 
-    //     autoTable(doc, {
-    //         startY: yOffset,
-    //         head: [["DNP", "Phi"]],
-    //         body: [
-    //             [ receta.dnp1 || "--", receta.dnp2 || "--"],
-    //         ],
-    //         theme: "grid",
-    //     });
-    //     yOffset +=25;
+      autoTable(doc, {
+        startY: y,
+        head: [["Tipo", "Ojo", "Esférico", "Cilíndrico", "Grados", "DNP"]],
+        body: detalleRows,
+        styles: { fontSize: 10 },
+        margin: { left: 20, right: 20 },
+        theme: "striped",
+      });
 
-    //    doc.text(`Cristal: ${receta.cristal || "--"}`, 10, yOffset);
-    //     yOffset += 10;
+      y = (doc as any).lastAutoTable.finalY + 10;
+    } else {
+      doc.setFontSize(10);
+      doc.text("Sin detalles de lentes aéreos.", 20, y);
+      y += 10;
+    }
 
-    //     doc.text(`Color: ${receta.color || "--"}`, 10, yOffset);
-    //     yOffset += 10;
-
-    //     doc.text(`Tratamiento: ${receta.tratamiento || "--"}`, 10, yOffset);
-    //     yOffset += 10;
-
-    //     doc.text(`Observaciones: ${receta.observaciones || "--"}`, 10, yOffset);
-    //     yOffset += 20;
-
-    //     if (yOffset > 200) {
-    //         doc.addPage();
-    //         yOffset = 20;
-    //     }
-    // });
-
-
-    // doc.save(`Recetas_${nombreCliente}.pdf`);
+    if (y > 270 && index < recetas.length - 1) {
+      doc.addPage();
+      y = 20;
+    }
+  });
+  doc.save(`Recetas_${nombreCliente}.pdf`);
 };
 
 
 export function generateRecetasContactoPDF (recetas: RecetaContacto[], nombreCliente:string) {
+  const doc = new jsPDF();
+  doc.setFontSize(18);
+    doc.text(`Recetas Lentes de Contacto`, 105, 20, { align: "center" });
+    doc.setFontSize(14);
+    doc.text(`${nombreCliente}`, 105, 30, { align: "center" });
 
-    // const doc = new jsPDF();
-    // let yOffset = 10; // Posición inicial en el eje Y
+  let y = 30;
 
-    // recetas.forEach((receta) => {
-    //     doc.setFontSize(16);
-    //     doc.text(`Receta ${receta.id}`, 10, yOffset);
-    //     yOffset += 10;
-    //     doc.text(`Cliente: ${nombreCliente}`, 10, yOffset);
+  recetas.forEach((receta, index) => {
+    doc.setFontSize(14);
+    y+=10;
+    doc.text(`Receta #${receta.id}`, 20, y);
+    y += 6;
 
-    //     yOffset += 10;
+    const infoGeneral = [
+      ["Fecha", new Date(receta.fecha).toLocaleDateString()],
+      ["Oftalmólogo", receta.oftalmologo],
+      ["Observaciones", receta.observaciones],
+    ];
 
-    //     doc.setFontSize(12);
-    //     doc.text(`Receta Lentes de Contacto`, 10, yOffset);
-    //     doc.text(`Fecha Receta: ${receta.fecha.toISOString().split("T")[0]}`, 140, yOffset, { align: "right" });
-    //     yOffset += 10;
+    autoTable(doc, {
+      startY: y,
+      head: [["Campo", "Valor"]],
+      body: infoGeneral,
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+    });
 
-    //     autoTable(doc, {
-    //         startY: yOffset,
-    //         head: [["Ojo", "C.B.", "Esf.", "Cil.", "Eje", "Diam."]],
-    //         body: [
-    //             [
-    //                 "O.D.",
-    //                 receta.odCb !== null && receta.odCb !== undefined ? receta.odCb.toFixed(2) : "--",
-    //                 receta.odEsferico !== null && receta.odEsferico !== undefined ? receta.odEsferico.toFixed(2) : "--",
-    //                 receta.odCilindrico !== null && receta.odCilindrico !== undefined ? receta.odCilindrico.toFixed(2): "--",
-    //                 receta.odEje !== null && receta.odEje !== undefined ? receta.odEje + "°" : "--",
-    //                 receta.odDiametro !== null && receta.odDiametro !== undefined ? receta.odDiametro : "--"
+    y = (doc as any).lastAutoTable.finalY + 5;
 
-    //             ],
-    //             [
-    //                 "O.I.",
-    //                 receta.oiCb !== null && receta.oiCb !== undefined ? receta.oiCb.toFixed(2) : "--",
-    //                 receta.oiEsferico !== null && receta.oiEsferico !== undefined ? receta.oiEsferico.toFixed(2) : "--",
-    //                 receta.oiCilindrico !== null && receta.oiCilindrico !== undefined ? receta.oiCilindrico.toFixed(2): "--",
-    //                 receta.oiEje !== null && receta.oiEje !== undefined ? receta.oiEje + "°" : "--",
-    //                 receta.oiDiametro !== null && receta.oiDiametro !== undefined ? receta.oiDiametro : "--"
-    //             ],
-    //         ],
-    //         theme: "grid",
-    //     });
-    //     yOffset += 30;
+    // Queterometría
+    const queteBody = [
+      ["M1 OD", receta.quet_m1_od, "M2 OD", receta.quet_m2_od],
+      ["M1 OI", receta.quet_m1_oi, "M2 OI", receta.quet_m2_oi],
+    ];
 
-    //    doc.text(`Marca: ${receta.marca || "--"}`, 10, yOffset);
-    //     yOffset += 10;
+    autoTable(doc, {
+      startY: y,
+      head: [["Queterometría", "", "", ""]],
+      body: queteBody,
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+    });
 
-    //     doc.text(`Observaciones: ${receta.observaciones || "--"}`, 10, yOffset);
-    //     yOffset += 20;
+    y = (doc as any).lastAutoTable.finalY + 3;
 
-    //     if (yOffset > 200) {
-    //         doc.addPage();
-    //         yOffset = 20;
-    //     }
-    // });
+    doc.setFontSize(10);
+    y += 7;
+    doc.text(`Observaciones Queterometría: ${receta.observaciones_queterometria}`, 20, y);
+    y += 7;
 
+    const booleanos = [
+      ["Maquillaje", receta.maquillaje ? "Sí" : "No"],
+      ["Tonicidad", receta.tonicidad ? "Sí" : "No"],
+      ["Hendidura Palpebral", receta.hendidura_palpebral ? "Sí" : "No"],
+      ["Altura Palpebral", receta.altura_palpebral ? "Sí" : "No"],
+      ["Buen Parpadeo (Ritmo)", receta.buen_parpadeo_ritmo ? "Sí" : "No"],
+      ["Buen Parpadeo (Amplitud)", receta.buen_parpadeo_amplitud ? "Sí" : "No"],
+      ["Estesiometría", receta.estesiometria],
+    ];
 
-    // doc.save(`Recetas_${nombreCliente}.pdf`);
+    autoTable(doc, {
+      startY: y,
+      head: [["Evaluación", "Resultado"]],
+      body: booleanos,
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 5;
+
+    // Graduación OD / OI
+    const graduacion = [
+      [
+        "OD",
+        receta.od_cb,
+        receta.od_esferico,
+        receta.od_cilindrico,
+        receta.od_eje,
+        receta.od_diametro,
+        receta.od_marca,
+      ],
+      [
+        "OI",
+        receta.oi_cb,
+        receta.oi_esferico,
+        receta.oi_cilindrico,
+        receta.oi_eje,
+        receta.oi_diametro,
+        receta.oi_marca,
+      ],
+    ];
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Ojo", "CB", "Esférico", "Cilíndrico", "Eje", "Diámetro", "Marca"]],
+      body: graduacion,
+      styles: { fontSize: 10 },
+      margin: { left: 20, right: 20 },
+      theme: "striped",
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    if (y > 270 && index < recetas.length - 1) {
+      doc.addPage();
+      y = 20;
+    }
+  });
+
+     doc.save(`Recetas_${nombreCliente}.pdf`);
 };
 
 

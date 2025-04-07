@@ -197,10 +197,10 @@ const onSubmit = async()=>{
         editedRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
         await recetasApi.editRecetaAereos(editedRecetaObj)
         loading.value=false;
+        router.push(`/recetas/${currentReceta.value.cliente.id}`)
         toast({
             title: 'Receta actualizada con éxito',
         })
-        router.push('/recetas')
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;

@@ -56,6 +56,22 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
+                    <BreadcrumbLink href="/clientes">
+                        Cliente
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink :href="`/clientes/dashboard/${currentCliente?.id}`">
+                        {{nombreCliente}}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
                     <BreadcrumbPage>Recetas</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>

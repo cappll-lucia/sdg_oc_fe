@@ -30,6 +30,7 @@ const currentRec = ref<RecetasAereos|undefined>();
 const detalleCerca = ref<DetalleRecetaAereos|undefined>();
 const detalleLejos = ref<DetalleRecetaAereos|undefined>();
 const selectedToPrint = ref<RecetasAereos[]>([]);
+const printOpen = ref<boolean>(false);
 
 onMounted(()=>{
     currentRec.value = props.recetas[0];
@@ -50,7 +51,14 @@ const printRecetas = () => {
         return;
     }
     generateRecetasRecetadosPDF(selectedToPrint.value, props.nombreCliente)
+    printOpen.value=false
 };
+
+const handleChangeReceta = (receta: RecetasAereos)=>{
+    currentRec.value=receta;
+    detalleCerca.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Cerca')
+    detalleLejos.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Lejos')
+}
 
 
 </script>
@@ -64,7 +72,7 @@ const printRecetas = () => {
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
-                <Dialog>
+                <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
                         <Button  variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
                             Imprimir
@@ -112,7 +120,7 @@ const printRecetas = () => {
                         <p class="font-bold ">{{ formatDate(receta.fecha.toString())}}</p>
                         <p class="font-light  ">{{receta.tipoReceta}}</p>
                     </div>
-                    <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]">
+                    <Button variant="outline" size="icon" @click="handleChangeReceta(receta)" class="bg-transparent hover:bg-[#d7e5ec]">
                         <ChevronRightIcon class="w-4 h-4" />
                     </Button>
                 </div>

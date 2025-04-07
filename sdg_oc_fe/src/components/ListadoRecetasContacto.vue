@@ -21,6 +21,7 @@ import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import router from '@/router';
 
+const printOpen = ref<boolean>(false);
 const props = defineProps<{
     historiaClinica: HistoriaClinica | undefined,
     recetas: RecetaContacto[],
@@ -50,7 +51,9 @@ const printRecetas = () => {
         alert("Por favor, selecciona al menos una receta para imprimir.");
         return;
     }
-    generateRecetasContactoPDF(selectedToPrint.value, props.nombreCliente)
+    generateRecetasContactoPDF(selectedToPrint.value, props.nombreCliente);
+    printOpen.value=false;
+
 };
 
 
@@ -67,7 +70,7 @@ const printRecetas = () => {
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
-                <Dialog>
+                <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
                         <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
                             Imprimir

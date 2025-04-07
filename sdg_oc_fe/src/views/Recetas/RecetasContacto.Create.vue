@@ -306,9 +306,9 @@ const onSubmit = async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/recetas">
+                    <BreadcrumbPage>
                         Recetas
-                    </BreadcrumbLink>
+                    </BreadcrumbPage>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
                     <SlashIcon />
