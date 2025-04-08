@@ -39,7 +39,7 @@ const reportes: { title: string, href: string}[] = [
     },
     {
         title: 'Reportes Ventas',
-        href: '/reportes/venta'
+        href: '/reportes/ventas'
     }
 ];
 
@@ -91,7 +91,7 @@ const reportes: { title: string, href: string}[] = [
                     Caja
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem v-if="userData?.role=='admin'" class="mr-[1rem]">
                 <NavigationMenuTrigger> <ChartColumnIcon  class="w-5 h-5 mr-2" />Reportes</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
@@ -106,7 +106,7 @@ const reportes: { title: string, href: string}[] = [
                     </ul>
                 </NavigationMenuContent>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem  v-if="userData?.role=='admin'" class="mr-[1rem]">
                 <NavigationMenuLink href="/parametros" :class="navigationMenuTriggerStyle()">
                     <SettingsIcon  class="w-5 h-5 mr-2" />
                     Parámetros
@@ -122,8 +122,10 @@ const reportes: { title: string, href: string}[] = [
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent class="mr-4 w-[8rem]">
+                <DropdownMenuContent class="px-4 w-[15rem]">
                     <DropdownMenuLabel>{{ userData?.username }}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem @click="router.push('/preguntas')" >Preguntas Frecuentes</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem @click="userStore.signOut()" >Cerrar sesión</DropdownMenuItem>
                 </DropdownMenuContent>

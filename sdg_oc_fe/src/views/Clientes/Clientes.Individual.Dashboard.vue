@@ -508,10 +508,7 @@ const onSubmit = async()=>{
                                     <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{row.motivo}}</Label></Label>
                                     <Label class="w-[18rem] text-xs flex justify-start ">Cuenta Corriente</Label>
                                     <Label class="w-[8rem] text-sm"><span class="font-bold" v-if="row.motivo==TipoMovimiento.VENTA">-</span> $ {{ row.importe.toFixed(2)}}</Label>
-                                </div>
-                                <div>
-                                   ???
-                                </div>
+                                </div>      
                             </div>
 
                         </div>

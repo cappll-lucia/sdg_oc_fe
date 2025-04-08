@@ -36,7 +36,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import router from '@/router';
+import { useUserStore } from '@/stores/UsersStore';
+import { JwtUser } from '@/api/entities/jwtUser';
 
+const userStore = useUserStore()
+
+const userData = ref<JwtUser | null>();
 const productos = ref<Producto[]>([]);
 const marcas = ref<Marca[]>([]);
 const proveedores = ref<Proveedor[]>([]);
@@ -57,6 +62,7 @@ const loadData = async()=>{
 }
 
 onMounted(async () => {
+    userData.value = userStore?.getMe
     await loadData()
 });
 
@@ -124,7 +130,7 @@ const clearFilters = async()=>{
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <DropdownMenu>
-                    <DropdownMenuTrigger><Button class="ml-4 w-[14rem]" >Actualizar Precios</Button></DropdownMenuTrigger>
+                    <DropdownMenuTrigger><Button class="ml-4 w-[14rem]" v-if="userData?.role=='admin'" >Actualizar Precios</Button></DropdownMenuTrigger>
                     <DropdownMenuContent class="ml-4 w-[14rem]" >
                         <DropdownMenuLabel class="cursor-pointer" @click="router.push('/productos/update-price/lote')"  >Actualizar precio de lote de productos</DropdownMenuLabel>
                     </DropdownMenuContent>

@@ -45,6 +45,7 @@ export const routerRoutes = [
             component: () => import('../views/Marcas/Marcas.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -53,6 +54,8 @@ export const routerRoutes = [
             component: () => import('../views/Marcas/Marcas.Create.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
+
 		    },
         },
         {
@@ -61,6 +64,7 @@ export const routerRoutes = [
             component: () => import('../views/Marcas/Marcas.Edit.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -69,6 +73,7 @@ export const routerRoutes = [
             component: () => import('../views/Proveedores/Proveedores.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -77,6 +82,7 @@ export const routerRoutes = [
             component: () => import('../views/Proveedores/Proveedores.Create.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -85,6 +91,7 @@ export const routerRoutes = [
             component: () => import('../views/Proveedores/Proveedores.Edit.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -93,6 +100,7 @@ export const routerRoutes = [
             component: () => import('../views/ObrasSociales/ObrasSociales.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -101,6 +109,7 @@ export const routerRoutes = [
             component: () => import('../views/ObrasSociales/ObrasSociales.Create.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -109,6 +118,7 @@ export const routerRoutes = [
             component: ()=> import('../views/ObrasSociales/ObrasSociales.Edit.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -133,6 +143,7 @@ export const routerRoutes = [
             component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         // {
@@ -300,7 +311,8 @@ export const routerRoutes = [
             name:'parametros',
             component: ()=> import('../views/Parametros/Parametros.vue'),
             meta: {
-                auth: true
+                auth: true,
+                requireAdmin: true,
             }
         },
         {
@@ -308,7 +320,41 @@ export const routerRoutes = [
             name:'reportes-obras-sociales',
             component: ()=> import('../views/Reportes/Reportes.ObrasSociales.vue'),
             meta: {
-                auth: true
+                auth: true,
+                requireAdmin: true,
+            }
+        },
+        {
+            path: '/reportes/ventas',
+            name:'reportes-ventas',
+            component: ()=> import('../views/Reportes/Reportes.Ventas.vue'),
+            meta: {
+                auth: true,
+                requireAdmin: true,
+            }
+        },
+        {
+            path: '/not-found',
+            name:'not-found',
+            component: ()=> import('../views/Redirects/NotFound.vue'),
+            meta: {
+                auth: true,
+            }
+        },
+        {
+            path: '/not-admin',
+            name:'not-admin',
+            component: ()=> import('../views/Redirects/NotAdmin.vue'),
+            meta: {
+                auth: true,
+            }
+        },
+        {
+            path: '/preguntas',
+            name:'preguntas',
+            component: ()=> import('../views/Preguntas/PreguntasFrecuentes.vue'),
+            meta: {
+                auth: true,
             }
         },
     ]

@@ -143,7 +143,7 @@ const abrirCajaDiaria = async()=>{
 const cerrarCajaDiaria = async()=>{
     try{
         if(todayDate.value){
-            await cajaApi.cierre()
+            cierreToday.value = await cajaApi.cierre()
             await informeCierre(todayDate.value);
         }
         openDialogCloseCaja.value=false;
@@ -460,7 +460,7 @@ const resetNewMovimiento = ()=>{
                         <div v-for="mov in dateMovements" class="flex flex-row justify-between w-ful h-[4rem]  mb-2 border-b items-center px-4 ">
                             <Label class="w-[8rem] text-sm ">{{ formatDate(mov.fechaMovimiento) }}</Label>
                             <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
-                            <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle}}</Label>
+                            <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle ?? "Cta. Cte. Cliente"}}</Label>
                             <Label class="w-[18rem] text-xs flex justify-start "></Label>
                             <Label class="w-[8rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
                         </div>
