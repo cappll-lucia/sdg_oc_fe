@@ -121,7 +121,7 @@ export const routerRoutes = [
         },
         {
             path: '/productos/create/lote',
-            name: 'productos_lote',
+            name: 'productos_lote_create',
             component: () => import('../views/Productos/Productos.Create.Lote.vue'),
             meta: {
 			    auth: true,
@@ -129,7 +129,7 @@ export const routerRoutes = [
         },
         {
             path: '/productos/update-price/lote',
-            name: 'productos_lote',
+            name: 'productos_lote_update',
             component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),
             meta: {
 			    auth: true,
@@ -291,6 +291,22 @@ export const routerRoutes = [
             path: '/caja',
             name:'caja',
             component: ()=> import('../views/Caja/Caja.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/parametros',
+            name:'parametros',
+            component: ()=> import('../views/Parametros/Parametros.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/reportes/obras-sociales',
+            name:'reportes-obras-sociales',
+            component: ()=> import('../views/Reportes/Reportes.ObrasSociales.vue'),
             meta: {
                 auth: true
             }

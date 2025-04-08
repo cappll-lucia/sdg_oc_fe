@@ -226,9 +226,9 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
 
 
                     <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
-                        <div class="w-[30rem] rounded-lg border p-4  flex flex-col justify-start  items-start">
+                        <div class="w-[33rem] rounded-lg border p-4  flex flex-col justify-start  items-start">
 
-                            <div class="rounded-lg w-[28rem] min-h-[4rem]">
+                            <div class="rounded-lg w-[30rem] min-h-[4rem]">
                                 <h3 class="text-md font-bold ">Obras Sociales</h3>
                                 <span v-if="currentVenta.ventaObraSocial.length==0" class="text-sm">No aplica</span>
                                 <div v-else v-for="vos in currentVenta.ventaObraSocial"

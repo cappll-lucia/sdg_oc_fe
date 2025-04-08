@@ -82,6 +82,7 @@ const loadData = async()=>{
     const saldoCaja = await cajaApi.getMovimientos(formatDateValue.value)
     saldoActual.value = saldoCaja.cajaEfectivo;
     dateMovements.value = saldoCaja.cajaFinal;
+    console.log(saldoCaja)
 }
 
 onMounted(async () => {
@@ -388,7 +389,7 @@ const resetNewMovimiento = ()=>{
                                     </form>
                                 </DialogContent>
                             </Dialog>
-                            <Dialog v-if="!cierreToday" v-model:open="openDialogCloseCaja" >
+                            <Dialog v-if="!cierreToday && aperturaToday" v-model:open="openDialogCloseCaja" >
                                     <DialogTrigger as-child>
                                     <Button>
                                     Cerrar Caja
@@ -408,7 +409,7 @@ const resetNewMovimiento = ()=>{
                                     </form>
                                     </DialogContent>
                             </Dialog>
-                            <div v-else>
+                            <div v-if="cierreToday">
                                 <span class=" font-bold mr-4 text-red-800">Caja del día cerrada</span>
                                 <Button @click="informeCierre(todayDate)" > Imprimir Cierre</Button>
                             </div>

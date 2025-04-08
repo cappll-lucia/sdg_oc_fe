@@ -22,7 +22,7 @@ import router from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { onMounted, ref } from 'vue';
 import { JwtUser } from '@/api/entities/jwtUser';
-import { ArrowDownUpIcon, BanknoteIcon, GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
+import { ArrowDownUpIcon, BanknoteIcon, ChartColumnIcon, GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
 
 
 const userStore = useUserStore();
@@ -32,18 +32,14 @@ onMounted(async()=>{
     userData.value = userStore.getMe
 })
 
-const parametrosItems: { title: string, href: string}[] = [
+const reportes: { title: string, href: string}[] = [
     {
-        title: 'Obras Sociales',
-        href: '/obras-sociales'
+        title: 'Reportes Obras Sociales',
+        href: '/reportes/obras-sociales'
     },
     {
-        title: 'Marcas',
-        href: '/marcas'
-    },
-    {
-        title: 'Proveedores',
-        href: '/proveedores'
+        title: 'Reportes Ventas',
+        href: '/reportes/venta'
     }
 ];
 
@@ -96,10 +92,10 @@ const parametrosItems: { title: string, href: string}[] = [
                 </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem class="mr-[1rem]">
-                <NavigationMenuTrigger> <SettingsIcon  class="w-5 h-5 mr-2" /> Parámetros</NavigationMenuTrigger>
+                <NavigationMenuTrigger> <ChartColumnIcon  class="w-5 h-5 mr-2" />Reportes</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
-                        <li v-for="item in parametrosItems" :key="item.title">
+                        <li v-for="item in reportes" :key="item.title">
                             <NavigationMenuLink as-child>
                                 <a :href="item.href"
                                     class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
@@ -109,6 +105,12 @@ const parametrosItems: { title: string, href: string}[] = [
                         </li>
                     </ul>
                 </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/parametros" :class="navigationMenuTriggerStyle()">
+                    <SettingsIcon  class="w-5 h-5 mr-2" />
+                    Parámetros
+                </NavigationMenuLink>
             </NavigationMenuItem>
         </NavigationMenuList>
         <div class="px-2 flex justify-between w-[13rem] items-center ">

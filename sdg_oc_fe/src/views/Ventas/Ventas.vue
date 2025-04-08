@@ -24,14 +24,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import router from '@/router';
 import { RangeCalendar } from '@/components/ui/range-calendar'
 import {
   CalendarDate,
   DateFormatter,
   getLocalTimeZone,
-  parseDate,
-  type DateValue
 } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 import type { DateRange } from 'reka-ui'
@@ -69,14 +66,13 @@ const handleFilterVentas = async()=>{
     previousPage.value =resp.previousPage;
 }
 
-    const formatDateValue = (dateValue: CalendarDate | undefined): string => {
-        if (!dateValue) return '';
-        // Usamos los métodos correctos de DateValue
-        const year = dateValue.year;
-        const month = String(dateValue.month).padStart(2, '0');
-        const day = String(dateValue.day).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+const formatDateValue = (dateValue: CalendarDate | undefined): string => {
+    if (!dateValue) return '';
+    const year = dateValue.year;
+    const month = String(dateValue.month).padStart(2, '0');
+    const day = String(dateValue.day).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 
 const clearFilters = async()=>{
