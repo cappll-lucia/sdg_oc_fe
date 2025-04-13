@@ -64,7 +64,7 @@ const onSignin = handleSubmit(async (values)=>{
 <template>
     <div class="flex justify-center items-top h-[100vh] w-[100vw]">
         <form @submit="onSignin">
-        <Card class="w-[350px] h-[400px] relative top-[200px]">
+        <Card class="w-[350px] h-[450px] relative top-[200px]">
             <CardHeader class="text-center gap-0">
                 <CardTitle><img src="../assets/logo_no_bg.png" /></CardTitle>
                 <CardDescription class="text-lg">Sistema de Gestión</CardDescription>
