@@ -20,7 +20,7 @@ import router from '@/router';
                 </div>
                 <span>Caja</span>
             </div>
-            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/oc_logo_nobkg.png" /> </div>
+            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/logo_no_bg.png" /> </div>
 
             <div @click="router.push(`/ventas/new`)" class="box menu-venta">
                 <ShoppingBag class="mb-2" :size="25" />
