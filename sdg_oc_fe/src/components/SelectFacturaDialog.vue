@@ -12,11 +12,8 @@ import { Button } from '@/components/ui/button';
 import Label from './ui/label/Label.vue';
 import { RangeCalendar } from '@/components/ui/range-calendar'
 import {
-  CalendarDate,
   DateFormatter,
   getLocalTimeZone,
-  parseDate,
-  type DateValue
 } from '@internationalized/date'
 import { CalendarIcon } from 'lucide-vue-next'
 import type { DateRange } from 'reka-ui'
@@ -41,9 +38,9 @@ const dateRange = ref<DateRange>({
 })
 
 
-const toDateValue = (date: CalendarDate): DateValue => {
-  return parseDate(`${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`)
-}
+// const toDateValue = (date: CalendarDate): DateValue => {
+//   return parseDate(`${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`)
+// }
 
 const emit = defineEmits(['update:modelValue', 'selectFactura']);
 
