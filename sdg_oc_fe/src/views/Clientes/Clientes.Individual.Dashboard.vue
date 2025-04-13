@@ -34,7 +34,7 @@ import {
     User,
     Wallet,
 } from 'lucide-vue-next'
-import { SlashIcon } from '@radix-icons/vue';
+import { Pencil1Icon, SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -228,9 +228,16 @@ const onSubmit = async()=>{
         <div class="pt-2">
             <div v-if="currentCliente" class="w-full flex flex-row justify-between h-[15rem]">
                 <div class="w-[72%] bg-secondary rounded-lg p-10 flex flex-col justify-between">
-                    <div class="flex flex-row  w-full items-center justify-start ">
-                        <User class="rounded-[50%] bg-white p-2 mr-4 w-16 h-16" />
-                        <h1 class="page-title text-left">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</h1>
+                    <div class="flex flex-row  w-full items-center justify-between ">
+                        <div class="flex flex-row items-center justify-start">
+                            <User class="rounded-[50%] bg-white p-2 mr-4 w-16 h-16" />
+                            <h1 class="page-title text-left">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</h1>
+                        </div>
+                        <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
+                            @click="() => router.push(`/clientes/edit/${currentCliente?.id}`)">
+                            Editar
+                            <Pencil1Icon class="w-4 h-4" />
+                        </Button>
                     </div>
                     <div class="w-full flex flex-row justify-start items-start h-[5rem]">
                         <div class="text-gray-700 w-[50%] h-[5rem] flex flex-col justify-between items-start">

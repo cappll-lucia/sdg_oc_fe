@@ -121,14 +121,14 @@ export const createClienteCustomValidator = (_newCliente: {
     year: string,
   })=>{
     const isValid = {
-      nroDocumento: isValidNumber(_newCliente.tipoDocumento),
+      nroDocumento: _newCliente.nroDocumento ? isValidNumber(_newCliente.nroDocumento) : false,
       tipoDocumento: _newCliente.tipoDocumento ? Object.values(TipoDocumento).includes(_newCliente.tipoDocumento) : false ,
       categoriaFiscal:  _newCliente.categoriaFiscal ? Object.values(CondicionIva).includes(_newCliente.categoriaFiscal) : false ,
       nombre: _newCliente.nombre ? _newCliente.nombre?.trim().length > 0 : false,
       apellido:  _newCliente.apellido ? _newCliente.apellido?.trim().length > 0 : false,
       email: emailValidator.safeParse(_newCliente.email).success,
       sexo: _newCliente.sexo ? ['Femenino', 'Masculino'].includes(_newCliente.sexo) :false,
-      telefono: isValidNumber(_newCliente.tipoDocumento),
+      telefono: _newCliente.telefono? isValidNumber(_newCliente.tipoDocumento) : false,
       domicilio: _newCliente.domicilio ? _newCliente.domicilio?.trim().length > 0 : false, 
       fechaNac: fechaValidator.safeParse(_fecha).success,
       localidad: _newCliente.localidad ? Boolean(_newCliente.localidad.id) : false,
@@ -151,6 +151,28 @@ export const createClienteObraSocialCustomValidator = (_clienteOS:{
   return {success, isValid: isValidArray}
 }
 
+export const editClienteCustomValidator = (_cliente: Cliente, _fecha : {
+    day: string,
+    month: string,
+    year: string,
+  })=>{
+    const isValid = {
+      nroDocumento: _cliente.nroDocumento ? isValidNumber(_cliente.nroDocumento) : false,
+      tipoDocumento: _cliente.tipoDocumento ? Object.values(TipoDocumento).includes(_cliente.tipoDocumento) : false ,
+      categoriaFiscal:  _cliente.categoriaFiscal ? Object.values(CondicionIva).includes(_cliente.categoriaFiscal) : false ,
+      nombre: _cliente.nombre ? _cliente.nombre?.trim().length > 0 : false,
+      apellido:  _cliente.apellido ? _cliente.apellido?.trim().length > 0 : false,
+      email: emailValidator.safeParse(_cliente.email).success,
+      sexo: _cliente.sexo ? ['Femenino', 'Masculino'].includes(_cliente.sexo) :false,
+      telefono: _cliente.telefono? isValidNumber(_cliente.tipoDocumento) : false,
+      domicilio: _cliente.domicilio ? _cliente.domicilio?.trim().length > 0 : false, 
+      fechaNac: fechaValidator.safeParse(_fecha).success,
+      localidad: _cliente.localidad ? Boolean(_cliente.localidad.id) : false,
+    }
+    const success = Object.values(isValid).every(Boolean);
+    return {success, isValid};
+  }
+
 
 export type NewClienteType = {
   nroDocumento: number| undefined,
@@ -164,5 +186,20 @@ export type NewClienteType = {
   domicilio: string | undefined, 
   fechaNac: Date | undefined, 
   observaciones: string | undefined, 
+  localidad: { id: number| undefined}
+}
+
+export type EditedClienteType = {
+  nroDocumento: number,
+  tipoDocumento: TipoDocumento,
+  categoriaFiscal: CondicionIva,
+  nombre: string , 
+  apellido: string , 
+  email: string , 
+  sexo:  string, 
+  telefono: string , 
+  domicilio: string , 
+  fechaNac: Date , 
+  observaciones: string , 
   localidad: { id: number| undefined}
 }

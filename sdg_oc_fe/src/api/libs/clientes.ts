@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
-import { Cliente, EditClienteValidator, NewClienteType } from '../entities/clientes';
+import { Cliente, EditedClienteType, NewClienteType } from '../entities/clientes';
 import { RecetasAereos } from '../entities/recetasAereos';
 import { RecetaContacto } from '../entities/recetasContacto';
 import { HistoriaClinica } from '../entities/historiaClinica';
@@ -37,7 +37,9 @@ const getAll = async (filters: ClienteFilers={}) => {
 const getOne = async (_id: number) => {
     try {
         const resp = await http.get(`/cliente/${_id}`);
-        return resp.data.data as Cliente;
+        const foundCliente = resp.data.data as Cliente
+        foundCliente.fechaNac = new Date(foundCliente.fechaNac);
+        return foundCliente
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -94,12 +96,13 @@ const create = async (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id:
     }
 };
 
-const edit = async (_id: number, _cliente: EditClienteValidator, _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[]) => {
+const edit = async (_id: number, _cliente: EditedClienteType, _obrasSociales: {obraSocial:{id: number|undefined}, numeroSocio: string}[]) => {
     try {
         const updatedCliente = {
             ..._cliente,
             clienteObrasSociales: _obrasSociales
         }
+        console.log('----', updatedCliente)
         const resp = await http.patch(`/cliente/${_id}`, updatedCliente);
         return resp.data.data as Cliente;
     } catch (error) {
@@ -122,6 +125,6 @@ export const clientesApi = {
     getRecetasSummaryByCliente: (_idCliente: number)=> getRecetasSummaryByCliente(_idCliente),
     getAudiometriasByCliente: (_idCliente: number)=> getAudiometriasByCliente(_idCliente),
     create: (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> create(_cliente, _obrasSociales),
-    edit: (_id: number, _cliente: EditClienteValidator,  _obrasSociales: {obraSocial:{id: number}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),
+    edit: (_id: number, _cliente: EditedClienteType,  _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),
     remove: (_id: number)=> remove(_id),
 }
