@@ -53,7 +53,7 @@ const table = useVueTable({
                 <template v-else>
                     <TableRow>
                         <TableCell :colspan="columns.length" class="h-24 text-center">
-                            Cliente no encontrado
+                            Ningún cliente coincide con los criterios de búsqueda
                         </TableCell>
                     </TableRow>
                 </template>

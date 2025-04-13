@@ -63,7 +63,10 @@ import { RedDePago, TipoMedioDePagoEnum } from '@/api/entities/mediosDePago';
 import { Venta } from '@/api/entities/venta';
 import { toast } from '@/components/ui/toast';
 import AlertError from '@/components/AlertError.vue';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import LoaderForm from '@/components/LoaderForm.vue';
 
+const loader = useLoaderStore();
 const route = useRoute();
 const currentCliente = ref<Cliente>();
 const ctaCorriente = ref<CuentaCorriente>();
@@ -72,6 +75,7 @@ const audiometriasCliente = ref<Audiometria[]>([]);
 const comprobantesCliente = ref<Comprobante[]>([]);
 const movimientosAndComprobantes = ref<{id: string, fecha: Date, importe: number, motivo:string, clase: string, venta: Venta|undefined, tipoComprobante: TipoComprobante|undefined}[]>([])
 const openDialog = ref<boolean>(false);
+const loadingForm = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -93,11 +97,14 @@ const isValidNewMovimiento= ref<{tipoMovimiento: boolean, redDePago: boolean, im
 })
 
 onMounted( async()=>{
-   await loadData();
+    loader.show();
+    await loadData();
+    loader.hide();
 })
 
 const loadData = async()=>{
     // TODO pagination
+    loader
     currentCliente.value = await clientesApi.getOne(Number(route.params.id));
     recetasCliente.value = await clientesApi.getRecetasSummaryByCliente(currentCliente.value.id);
     audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(currentCliente.value.id);
@@ -167,6 +174,7 @@ const validateAndSubmit = async()=>{
 
 const onSubmit = async()=>{
     try{
+        loadingForm.value=true;
         if(currentCliente.value){
             ctaCorriente.value = await cuentaCorrienteApi.updateSaldo(currentCliente.value?.id, newMovimiento.value)
             toast({
@@ -174,6 +182,8 @@ const onSubmit = async()=>{
             })
             await loadData();
             openDialog.value=false;
+            loadingForm.value=false;
+
             newMovimiento.value={
                 tipoMovimiento: undefined, 
                 importe: 0,
@@ -184,6 +194,8 @@ const onSubmit = async()=>{
         }   
     }catch (err: any) {
         errorMessage.value = err.message as string;
+        openDialog.value=false;
+        loadingForm.value=false;
         showError.value = true;
     }
 }
@@ -330,7 +342,7 @@ const onSubmit = async()=>{
                                 Este movimiento afectará el saldo de la cuenta corriente
                                 </DialogDescription>
                             </DialogHeader>
-                            <form @submit.prevent="validateAndSubmit" >
+                            <form @submit.prevent="validateAndSubmit" v-if="!loadingForm" >
                             <div class="grid gap-4 py-4">
                                  <div class="grid grid-cols-4 items-center mb-4 gap-4">
                                     <Label class="text-right col-span-1">Tipo Movimiento</Label>
@@ -474,6 +486,9 @@ const onSubmit = async()=>{
                                 </Button>
                             </DialogFooter>
                             </form>
+                            <div v-else>
+                                <LoaderForm />
+                            </div>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -512,7 +527,6 @@ const onSubmit = async()=>{
                             </div>
 
                         </div>
-
                     </ScrollArea>
                     <div v-else class=" mt-2 w-full text-center flex justify-center items-center h-full border rounded-lg bg-white py-4">
                             <Label class="text-sm h-[15rem]">No hay ventas ni movimientos de cuenta corriente registrados para el cliente </Label>   

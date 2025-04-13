@@ -33,8 +33,10 @@ import { toast } from '@/components/ui/toast';
 import { Venta } from '@/api/entities/venta';
 import { useRoute } from 'vue-router';
 import { ventasApi } from '@/api/libs/ventas';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
 const route = useRoute();
+const loader = useLoaderStore()
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -42,7 +44,6 @@ const selectedCliente = ref<Cliente>();
 const selectedFactura = ref<Comprobante>();
 const searchClienteOpen =ref<boolean>(false);
 const searchFacturaOpen =ref<boolean>(false);
-const loading = ref<boolean>(false);
 
 const fechaComprobante = ref<Date>(new Date());
 const motivoComprobante = ref<string>();
@@ -52,6 +53,7 @@ const prevVenta= ref<Venta>();
 
 
 onMounted(async()=>{
+    loader.show();
     const query = route.query;
     if(query.venta){
         const res = await ventasApi.getOne(query.venta.toString());
@@ -59,6 +61,7 @@ onMounted(async()=>{
             handleSelectCliente(prevVenta.value.cliente)
         handleSelectFactura(prevVenta.value.factura)
     }
+    loader.hide();
 })
 
 
@@ -89,7 +92,6 @@ const isValidComprobante = ref<{
 });
 
 const validateAndSubmit = async ()=>{
-    loading.value=true;
     isValidComprobante.value.cliente= Boolean(selectedCliente.value?.id);
     isValidComprobante.value.importeTotal=  selectedFactura.value ? importeComprobante.value <= selectedFactura.value.importeTotal : false;
     isValidComprobante.value.motivo= Boolean(motivoComprobante.value);
@@ -98,11 +100,11 @@ const validateAndSubmit = async ()=>{
     if(isValidComprobante.value.cliente && isValidComprobante.value.facturaRelacionada && isValidComprobante.value.importeTotal && isValidComprobante.value.motivo && isValidComprobante.value.tipoComprobante){
         await onSubmit()
     }
-    loading.value=false;
 }
 
 const onSubmit = async()=>{
        try{
+        loader.show()
         const newComprobante ={
             importeTotal: importeComprobante.value,
             transaccionRelacionadaId: {
@@ -113,7 +115,7 @@ const onSubmit = async()=>{
             condicionIvaCliente: selectedFactura.value?.condicionIvaCliente
         }
         const createdNC = await comprobantesApi.create(newComprobante)
-        loading.value=false;
+        loader.hide();
         router.push(`/nota-credito-debito/view/${createdNC.id}`)
         toast({
             title: 'Nota de crédito emitida con éxito',
@@ -121,6 +123,7 @@ const onSubmit = async()=>{
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
+        loader.hide();
   }
 }
 
@@ -166,7 +169,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
         </Breadcrumb>
         <h1 class="page-title">Nueva Nota de Crédito</h1>
         <div class="pt-2">
-            <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4 ">
+            <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4" >
                 <div class="rounded-[0.5rem] w-[55rem] h-auto flex flex-col justify-start items-start">
                     <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8">
                         <div class="h-[10rem] w-full flex flex-row items-center justify-start ">

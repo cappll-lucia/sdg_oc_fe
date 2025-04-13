@@ -34,8 +34,10 @@ import {
 import { CalendarIcon } from 'lucide-vue-next'
 import type { DateRange } from 'reka-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useLoaderStore } from '@/stores/LoaderStore';
 
 
+const loader=useLoaderStore()
 const selectedTipoFactura = ref<string>('');
 const txtSearch = ref<string>('');
 const currentLimit = ref<string>('10');
@@ -54,6 +56,7 @@ const comprobantes = ref<Comprobante[]>([]);
 
 
 const handleFilterComprobantes = async()=>{
+    loader.show();
     const resp = await comprobantesApi.getAll({
         nombreCliente: txtSearch.value,
         fechaDesde: dateRange.value.start ? formatDateValue(dateRange.value.start as CalendarDate | undefined) : '',
@@ -65,6 +68,7 @@ const handleFilterComprobantes = async()=>{
     comprobantes.value = resp.items;
     nextPage.value = resp.nextPage;
     previousPage.value =resp.previousPage;
+    loader.hide();
 }
 
     const formatDateValue = (dateValue: CalendarDate | undefined): string => {

@@ -46,10 +46,16 @@ import { cajaApi } from '@/api/libs/caja';
 import { formatDate } from '@/lib/utils.recetas';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
+import LoaderForm from '@/components/LoaderForm.vue';
 
 const df = new DateFormatter('es-AR', {
   dateStyle: 'long',
 })
+
+const loader = useLoaderStore();
+const loadingForm = ref<boolean>(false)
 
 const saldoActual = ref<number>();
 const aperturaToday = ref<Caja>();
@@ -59,6 +65,9 @@ const todayDate = ref<DateValue>();
 const openDialog = ref<boolean>(false);
 const openDialogOpenCaja = ref<boolean>(false);
 const openDialogCloseCaja = ref<boolean>(false);
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 const dateMovements = ref<Caja[]>([]);
 const todayMovements = ref<Caja[]>([]);
@@ -82,10 +91,13 @@ const loadData = async()=>{
     const saldoCaja = await cajaApi.getMovimientos(formatDateValue.value)
     saldoActual.value = saldoCaja.cajaEfectivo;
     dateMovements.value = saldoCaja.cajaFinal;
-    console.log(saldoCaja)
+    cierreToday.value = dateMovements.value.find(m=>m.detalle=="CIERRE");
+    aperturaToday.value = dateMovements.value.find(m=>m.detalle=="APERTURA");
+    todayMovements.value = dateMovements.value;
 }
 
 onMounted(async () => {
+    loader.show();
     const today = new Date();
     todayDate.value=new CalendarDate(today.getFullYear(), today.getMonth()+1, today.getDate());
     selectedDate.value = todayDate.value;
@@ -93,29 +105,34 @@ onMounted(async () => {
     cierreToday.value = dateMovements.value.find(m=>m.detalle=="CIERRE");
     aperturaToday.value = dateMovements.value.find(m=>m.detalle=="APERTURA");
     todayMovements.value = dateMovements.value;
+    loader.hide();
 });
 
 const validateAndSubmit = async()=>{
-    console.log('fghjk')
     isValidNewMovimeintoCaja.value.tipo = ["INGRESO", "EGRESO"].includes(newMovimeintoCaja.value.tipo)
     isValidNewMovimeintoCaja.value.importe = newMovimeintoCaja.value.importe > 0;
     isValidNewMovimeintoCaja.value.detalle = Boolean(newMovimeintoCaja.value.detalle)
     if(Object.values(isValidNewMovimeintoCaja.value).every(Boolean)){
-        await onSubmit()
+        await onSubmit();
     }
 }
 
 
 const onSubmit = async()=>{
     try{
-       await cajaApi.afectar({
+        loadingForm.value=true;
+        await cajaApi.afectar({
             detalle: newMovimeintoCaja.value.detalle,
             importe: newMovimeintoCaja.value.tipo=="INGRESO" ? newMovimeintoCaja.value.importe : -newMovimeintoCaja.value.importe
         })
         await loadData();
         openDialog.value=false;
-    }catch(e){
-        console.log(e)
+        loadingForm.value=true;
+    }catch(e: any){
+        errorMessage.value = e.message as string;
+        openDialog.value=false;
+        loadingForm.value=true;
+        showError.value = true;
     }
 }
 
@@ -131,24 +148,34 @@ const onSubmit = async()=>{
 const abrirCajaDiaria = async()=>{
     try{
         if(importeOpenCaja.value > 0){
+            loadingForm.value=true;
             await cajaApi.apertura(importeOpenCaja.value)
             await loadData();
             openDialogOpenCaja.value=false;
+            loadingForm.value=false
         }
-    }catch(e){
-        console.log(e)
+    }catch(e: any){
+        errorMessage.value = e.message as string;
+        openDialogOpenCaja.value=false;
+        loadingForm.value=false
+        showError.value = true;
     }
 }
 
 const cerrarCajaDiaria = async()=>{
     try{
         if(todayDate.value){
+            loadingForm.value=true;
             cierreToday.value = await cajaApi.cierre()
             await informeCierre(todayDate.value);
         }
         openDialogCloseCaja.value=false;
-    }catch(e){
-        console.log(e)
+        loadingForm.value=false;
+    }catch(e: any){
+        errorMessage.value = e.message as string;
+        openDialogCloseCaja.value=false;
+        loadingForm.value=false;
+        showError.value = true;
     }
 }
 
@@ -273,7 +300,7 @@ const resetNewMovimiento = ()=>{
                                     Este movimiento corresponde a retiros o ingresos de EFECTIVO a la caja
                                 </DialogDescription>
                             </DialogHeader>
-                            <form @submit.prevent="validateAndSubmit" >
+                            <form @submit.prevent="validateAndSubmit" v-if="!loadingForm" >
                             <div class="grid gap-4 py-4">
                                  <div class="grid grid-cols-3 items-center mb-4 gap-4">
                                     <Label class="text-right col-span-1">Tipo Movimiento</Label>
@@ -342,6 +369,9 @@ const resetNewMovimiento = ()=>{
                                 </Button>
                             </DialogFooter>
                             </form>
+                            <div v-else >
+                                <LoaderForm />
+                            </div>
                             </DialogContent>
                 </Dialog>
             </div>
@@ -363,7 +393,7 @@ const resetNewMovimiento = ()=>{
                                             Ingrese el importe en EFECTIVO con el que abre la caja de hoy
                                         </DialogDescription>
                                     </DialogHeader>
-                                    <form @submit.prevent="abrirCajaDiaria()" >
+                                    <form @submit.prevent="abrirCajaDiaria()" v-if="!loadingForm" >
                                     <div class="grid gap-4 py-4">
                                         <div class="grid grid-cols-3 items-center mb-4 gap-4">
                                             <Label class="text-right col-span-1">Importe Efectivo</Label>
@@ -387,6 +417,9 @@ const resetNewMovimiento = ()=>{
                                         </Button>
                                     </DialogFooter>
                                     </form>
+                                    <div v-else>
+                                        <LoaderForm />
+                                    </div>
                                 </DialogContent>
                             </Dialog>
                             <Dialog v-if="!cierreToday && aperturaToday" v-model:open="openDialogCloseCaja" >
@@ -395,11 +428,11 @@ const resetNewMovimiento = ()=>{
                                     Cerrar Caja
                                     </Button>
                                     </DialogTrigger>
-                                    <DialogContent class="max-w-[30rem] min-h-[10rem] flex flex-col justify-center text-center ">
+                                    <DialogContent class="max-w-[30rem] h-[12rem] flex flex-col justify-center text-center ">
                                     <DialogHeader>
                                         <DialogTitle class="text-center">Cerrar caja del Día</DialogTitle>
                                     </DialogHeader>
-                                    <form @submit.prevent="cerrarCajaDiaria()" >
+                                    <form @submit.prevent="cerrarCajaDiaria()" v-if="!loadingForm" >
                                         <Label class="text-right "> Con esta acción registrará el cierre de caja de Hoy</Label>
                                         <DialogFooter class="flex w-full mt-6 flex-row justify-center sm:justify-center xs:justify-center items-center">
                                             <Button type="submit">
@@ -407,6 +440,9 @@ const resetNewMovimiento = ()=>{
                                             </Button>
                                         </DialogFooter>
                                     </form>
+                                    <div v-else class="h-[6rem] flex justify-center" >
+                                        <LoaderForm />
+                                    </div>
                                     </DialogContent>
                             </Dialog>
                             <div v-if="cierreToday">
@@ -470,6 +506,13 @@ const resetNewMovimiento = ()=>{
                     </ScrollArea>
                 </div>
             </div>
+            <AlertError
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
+        />
         </div>
     </div>
 </template>

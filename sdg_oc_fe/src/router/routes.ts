@@ -334,7 +334,7 @@ export const routerRoutes = [
             }
         },
         {
-            path: '/not-found',
+            path: '/:pathMatch(.*)*',
             name:'not-found',
             component: ()=> import('../views/Redirects/NotFound.vue'),
             meta: {

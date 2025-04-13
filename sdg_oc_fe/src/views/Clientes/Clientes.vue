@@ -26,9 +26,9 @@ import { Button } from '@/components/ui/button';
 import { Localidad } from '@/api/entities/localidad';
 import { localidadesApi } from '@/api/libs/localidades';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
-
-
+const loader = useLoaderStore()
 const clientes = ref<Cliente[]>([]);
 const localidades = ref<Localidad[]>([]);
 const selectedLocalidadId = ref<string>('');
@@ -45,7 +45,9 @@ const loadData = async()=>{
 }
 
 onMounted(async () => {
+    loader.show()
     await loadData()
+    loader.hide()
 });
 
 const clearFilters = async()=>{
@@ -58,6 +60,7 @@ const clearFilters = async()=>{
 }
 
 const handleFilterClientes = async()=>{
+    loader.show();
     const res= await clientesApi.getAll({
         filtro: txtSearch.value,
         sexo: selectedSexo.value,
@@ -68,6 +71,7 @@ const handleFilterClientes = async()=>{
     clientes.value = res.items.filter(c=> c.id!=0);
     nextPage.value = res.nextPage;
     previousPage.value =res.previousPage;
+    loader.hide()
 };
 
 const handlePageChange = async(offset: number) => {
