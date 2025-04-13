@@ -23,7 +23,7 @@ module.exports = {
   	},
   	extend: {
 		fontFamily: {
-			sans: ['Roboto', 'sans-serif'],
+			sans: ['Inter', 'sans-serif'],
 		},
   		colors: {
   			border: 'hsl(var(--border))',
