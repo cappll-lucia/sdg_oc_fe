@@ -47,7 +47,7 @@ const handleDeleteObraSocial= async()=>{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="() => {router.replace(`/obras-sociales/edit/${obraSocial.id}`)}">Editar</DropdownMenuItem>
+            <DropdownMenuItem @click="() => {router.push(`/obras-sociales/edit/${obraSocial.id}`)}">Editar</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem @click="showAlertDelete=true" >Eliminar</DropdownMenuItem>
         </DropdownMenuContent>

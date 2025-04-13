@@ -58,13 +58,13 @@ const {handleSubmit, setFieldValue} = useForm({
 
 onMounted(async()=>{
     // TODO pagination
-    foundClientes.value = await clientesApi.getAll();
+    const res= await clientesApi.getAll({});
+    foundClientes.value = res.items
 })
 
 const onSubmit = handleSubmit(async (values) => {
     loading.value=true;
     errorPDF.value = '';
-    console.log(audiometriaFile.value)
     if (!audiometriaFile.value) {
         errorPDF.value = 'Suba el archivo del informe';
         audiometriaFile.value = null; 
@@ -76,12 +76,10 @@ const onSubmit = handleSubmit(async (values) => {
         return;
     }
     try {
-        // TODO Send files
-        const fromData = new FormData()
-        await audiometriasApi.create(values, fromData )
+        await audiometriasApi.create(values, audiometriaFile.value )
         loading.value=false;
         showSuccess.value = true;
-        router.replace('/audiometrias')
+        router.push('/audiometrias')
         toast({
             title: 'Audiometría registrada con éxito',
         })
@@ -158,15 +156,14 @@ const handleSelectCliente = (cliente:Cliente)=>{
                 <div class="flex flex-row w-[100%] h-[40rem] justify-between items-start">
                 
                  <div class="flex flex-col w-[45%] h-full ">
-
                     <FormField v-slot="{ errorMessage }" name="cliente.id">
                         <FormItem class="h-[5rem] mt-6 w-full">
-                            <div class="flex items-center justify-between">
-                                <FormLabel class="form-label w-[7rem] text-right">Cliente</FormLabel>
-                                <div class="flex flex-row justify-end items-center">
+                            <div class="flex items-center w-full  bg-emerald-300 justify-start">
+                                <FormLabel class="form-label w-[7rem]  pr-4 text-right">Cliente</FormLabel>
+                                <div class="flex flex-row w-[90%] justify-start items-center">
                                     <FormControl>
                                         <Input type="text" 
-                                            class="w-[24rem] h-10"
+                                            class="w-[80%] h-10"
                                             readonly
                                             :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
                                             @click="searchClienteOpen = true"
@@ -187,9 +184,9 @@ const handleSelectCliente = (cliente:Cliente)=>{
                     <FormField v-slot="{ handleChange, errorMessage }" name="fechaInforme">
                         <FormItem class="h-[5rem] mt-2">
                             <div class="flex flex-row justify-between items-center">
-                            <FormLabel class="w-[7rem] text-right">Fecha de Informe</FormLabel>
+                            <FormLabel class="w-[7rem] text-right pr-4">Fecha de Informe</FormLabel>
                             <FormControl>
-                                <div class="flex gap-2 w-[27rem] ">
+                                <div class="flex gap-2 w-[80%] ">
                                 <Input type="text" v-model="fechaInforme.day" placeholder="DD" class="w-16 text-center" maxlength="2"
                                     @input="handleChange({ ...fechaInforme, day: $event.target.value.trim() })"/>
                                 <Input type="text" v-model="fechaInforme.month" placeholder="MM" class="w-16 text-center" maxlength="2"
@@ -205,7 +202,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
                     
                     <div class="h-[5rem] mt-2 w-full">
                             <div class="flex items-center justify-between">
-                                <Label class="w-[7rem] text-right ">PDF</Label>
+                                <Label class="w-[7rem] text-right mr-2 ">PDF</Label>
                                     <Input type="file" class="w-[27rem]" accept=".pdf" @change="handleFileUpload" />
 
                             </div>
@@ -215,7 +212,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
                     <FormField v-slot="{ componentField, errorMessage }" name="observaciones">
                     <FormItem class="h-[12rem] mt-2 w-full">
                         <div class="flex items-start justify-between">
-                            <FormLabel class="w-[7rem] text-right ">Observaciones</FormLabel>
+                            <FormLabel class="w-[7rem] text-right mr-2 ">Observaciones</FormLabel>
                             <FormControl>
                                 <Textarea
                                     class="resize-none w-[27rem] h-[12rem]"
@@ -239,7 +236,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
 
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.replace('/audiometrias')"  >Cancelar</Button>
+                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/audiometrias')"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
                 

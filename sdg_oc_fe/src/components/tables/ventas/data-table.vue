@@ -1,7 +1,5 @@
 <script setup lang="ts" generic="TData, TValue">
-
-import {ref} from 'vue';
-import type {ColumnDef, ColumnFiltersState} from '@tanstack/vue-table';
+import type {ColumnDef} from '@tanstack/vue-table';
 import {
     Table,
     TableBody,
@@ -24,16 +22,11 @@ const props = defineProps<{
 }>();
 
 
-const columnFilters = ref <ColumnFiltersState> ([]);
-
 const table = useVueTable({
     get data() { return props.data; },
     get columns() { return props.columns; },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-        get columnFilters() { return columnFilters.value; }
-    }
 });
 
 </script>

@@ -47,7 +47,7 @@ const handleDeleteMarca= async()=>{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="() => {router.replace(`/marcas/edit/${marca.id}`)}">Editar</DropdownMenuItem>
+            <DropdownMenuItem @click="() => {router.push(`/marcas/edit/${marca.id}`)}">Editar</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem @click="showAlertDelete=true" >Eliminar</DropdownMenuItem>
         </DropdownMenuContent>

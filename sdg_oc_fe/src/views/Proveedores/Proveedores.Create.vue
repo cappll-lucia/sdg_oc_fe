@@ -49,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
         await proveedoresApi.create(values)
         loading.value=false;
         showSuccess.value = true;
-        router.replace('/proveedores')
+        router.push('/proveedores')
         toast({
             title: 'Proveedor registrado con éxito',
         })
@@ -155,7 +155,7 @@ const validateAndSubmit = async () => {
                 </FormField>
 
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                    <Button variant="outline" class="w-[25%] mr-5" @click="router.replace('/proveedores')"  >Cancelar</Button>
+                    <Button variant="outline" class="w-[25%] mr-5" @click="router.push('/proveedores')"  >Cancelar</Button>
 
                     <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>

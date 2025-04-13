@@ -45,6 +45,7 @@ export const routerRoutes = [
             component: () => import('../views/Marcas/Marcas.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -53,6 +54,8 @@ export const routerRoutes = [
             component: () => import('../views/Marcas/Marcas.Create.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
+
 		    },
         },
         {
@@ -61,6 +64,7 @@ export const routerRoutes = [
             component: () => import('../views/Marcas/Marcas.Edit.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -69,6 +73,7 @@ export const routerRoutes = [
             component: () => import('../views/Proveedores/Proveedores.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -77,6 +82,7 @@ export const routerRoutes = [
             component: () => import('../views/Proveedores/Proveedores.Create.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -85,6 +91,7 @@ export const routerRoutes = [
             component: () => import('../views/Proveedores/Proveedores.Edit.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -93,6 +100,7 @@ export const routerRoutes = [
             component: () => import('../views/ObrasSociales/ObrasSociales.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -101,6 +109,7 @@ export const routerRoutes = [
             component: () => import('../views/ObrasSociales/ObrasSociales.Create.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -109,6 +118,7 @@ export const routerRoutes = [
             component: ()=> import('../views/ObrasSociales/ObrasSociales.Edit.vue'),
             meta: {
 			    auth: true,
+                requireAdmin: true,
 		    },
         },
         {
@@ -120,13 +130,30 @@ export const routerRoutes = [
 		    },
         },
         {
-            path: '/recetas',
-            name: 'recetas',
-            component: () => import('../views/Recetas/Recetas.vue'),
+            path: '/productos/create/lote',
+            name: 'productos_lote_create',
+            component: () => import('../views/Productos/Productos.Create.Lote.vue'),
             meta: {
 			    auth: true,
-		    },},      
-
+		    },
+        },
+        {
+            path: '/productos/update-price/lote',
+            name: 'productos_lote_update',
+            component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),
+            meta: {
+			    auth: true,
+                requireAdmin: true,
+		    },
+        },
+        // {
+        //     path: '/recetas',
+        //     name: 'recetas',
+        //     component: () => import('../views/Recetas/Recetas.vue'),
+        //     meta: {
+		// 	    auth: true,
+		//     },
+        // },      
         {
             path: '/audiometrias',
             name: 'recetas_audiometria',
@@ -168,6 +195,38 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/recetas/recetados/new',
+            name: 'new_receta_recetados',
+            component: () => import('../views/Recetas/RecetasRecetados.Create.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/recetas/recetados/edit/:id',
+            name: 'edit_receta_recetados',
+            component: () => import('../views/Recetas/RecetasRecetados.Edit.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/recetas/contacto/new',
+            name: 'new_receta_contacto',
+            component: () => import('../views/Recetas/RecetasContacto.Create.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/recetas/contacto/edit/:id',
+            name: 'edit_receta_contado',
+            component: () => import('../views/Recetas/RecetasContacto.Edit.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/ventas',
             name:'ventas',
             component: ()=> import('../views/Ventas/Ventas.vue'),
@@ -182,5 +241,120 @@ export const routerRoutes = [
             meta: {
                 auth: true
             }
-        }
+        },
+        {
+            path: '/ventas/view/:id',
+            name:'view-venta',
+            component: ()=> import('../views/Ventas/Ventas.View.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/nota-credito/new',
+            name:'nc-new',
+            component: ()=> import('../views/Comprobantes/NotaCredito.Create.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/nota-debito/new',
+            name:'nd-new',
+            component: ()=> import('../views/Comprobantes/NotaDebito.Create.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/nota-credito-debito/view/:id',
+            name:'nc-view',
+            component: ()=> import('../views/Comprobantes/NotaCreditoDebito.View.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/comprobantes',
+            name:'comprobantes',
+            component: ()=> import('../views/Comprobantes/Comprobantes.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/cuentas-corrientes',
+            name:'cuentas-corrientes',
+            component: ()=> import('../views/CuentasCorrientes/CtasCorrientes.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/clientes/dashboard/:id',
+            name:'dashboard_cliente',
+            component: ()=> import('../views/Clientes/Clientes.Individual.Dashboard.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/caja',
+            name:'caja',
+            component: ()=> import('../views/Caja/Caja.vue'),
+            meta: {
+                auth: true
+            }
+        },
+        {
+            path: '/parametros',
+            name:'parametros',
+            component: ()=> import('../views/Parametros/Parametros.vue'),
+            meta: {
+                auth: true,
+                requireAdmin: true,
+            }
+        },
+        {
+            path: '/reportes/obras-sociales',
+            name:'reportes-obras-sociales',
+            component: ()=> import('../views/Reportes/Reportes.ObrasSociales.vue'),
+            meta: {
+                auth: true,
+                requireAdmin: true,
+            }
+        },
+        {
+            path: '/reportes/ventas',
+            name:'reportes-ventas',
+            component: ()=> import('../views/Reportes/Reportes.Ventas.vue'),
+            meta: {
+                auth: true,
+                requireAdmin: true,
+            }
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name:'not-found',
+            component: ()=> import('../views/Redirects/NotFound.vue'),
+            meta: {
+                auth: true,
+            }
+        },
+        {
+            path: '/not-admin',
+            name:'not-admin',
+            component: ()=> import('../views/Redirects/NotAdmin.vue'),
+            meta: {
+                auth: true,
+            }
+        },
+        {
+            path: '/preguntas',
+            name:'preguntas',
+            component: ()=> import('../views/Preguntas/PreguntasFrecuentes.vue'),
+            meta: {
+                auth: true,
+            }
+        },
     ]

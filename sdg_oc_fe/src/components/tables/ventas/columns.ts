@@ -3,13 +3,9 @@ import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import DropdownAction from './data-table-dropdown.vue'
 import { formatDate } from "@/lib/utils.recetas";
+import { tipoComprobanteDisplay } from "@/lib/utils";
 
 export const columns: ColumnDef<Venta>[]=[
-    {
-        accessorKey: 'id',
-        header: () => h('div', 'ID'),
-        cell: info=> info.getValue()
-    },
     {
         accessorKey: 'fecha',
         header: () => h('div', 'Fecha'),
@@ -18,12 +14,14 @@ export const columns: ColumnDef<Venta>[]=[
     {
         accessorKey: 'cliente',
         header: () => h('div', 'Cliente'),
-        cell: ({row})=>`${row.original.cliente.apellido}, ${row.original.cliente.nombre}`
+        cell: ({row})=> row.original.cliente.id!=0 
+            ?  `${row.original.cliente.apellido}, ${row.original.cliente.nombre}`
+            : 'Consumidor Final'
     },
     {
         accessorKey: 'importe',
         header: () => h('div', 'Importe Total'),
-        cell: ({row})=> `$ ${row.original.importe.toFixed(2)}`
+        cell: ({row})=> `$ ${totalVenta(row.original).toFixed(2)}`
     },
     {
         accessorKey: 'mediosPago',
@@ -35,9 +33,16 @@ export const columns: ColumnDef<Venta>[]=[
         )
     },
     {
+        accessorKey: 'tipoFactura',
+        header: () => h('div', 'Tipo Factura'),
+        cell: ({row})=>  row.original.factura 
+                        ? `${tipoComprobanteDisplay(row.original.factura.tipoComprobante)?.nombre} ${tipoComprobanteDisplay(row.original.factura.tipoComprobante)?.letra}`
+                        : ' Pendiente '
+    },
+    {
         accessorKey: 'numeroFactura',
         header: () => h('div', 'Numero Factura'),
-        cell: info=> info.getValue() || ' Pendiente '
+        cell: ({row})=>  row.original.factura ? row.original.factura.numeroComprobante : ' Pendiente '
     },
     {
         id: 'actions',
@@ -50,3 +55,16 @@ export const columns: ColumnDef<Venta>[]=[
         },
     }
 ]
+
+
+const totalVenta = (venta: Venta)=>{
+    const totalBruto = venta.lineasDeVenta.reduce((total, linea) => {
+            return total + (linea.precioIndividual ? linea.precioIndividual * linea.cantidad : 0);
+        }, 0);
+    const montoOS = venta.ventaObraSocial.reduce((total, os)=>{
+            return total + os.importe
+        }, 0);
+    const totalFinalVenta = totalBruto - montoOS; 
+    const montoDto = totalFinalVenta * venta.descuentoPorcentaje / 100
+    return totalFinalVenta - montoDto
+}   

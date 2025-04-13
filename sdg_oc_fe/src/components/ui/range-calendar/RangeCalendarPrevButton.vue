@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { cn } from '@/lib/utils.recetas'
+import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-vue-next'
 import { RangeCalendarPrev, type RangeCalendarPrevProps, useForwardProps } from 'reka-ui'

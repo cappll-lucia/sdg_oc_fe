@@ -14,12 +14,16 @@ export const useUserStore = defineStore('UserStore', {
         async singin(username: string, password: string){
             try{
                 const res = await http.post('/auth/signin', {username, password});
-                console.log(res)
                 token.set(res.data.data.access_token);
                 this.user = jwtDecode(res.data.data.access_token);
             }catch(error: any){
                 throw error
             }
+        },
+
+        async signOut(){
+            token.delete();
+			window.location.reload();
         }
     },
 

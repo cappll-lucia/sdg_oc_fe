@@ -40,7 +40,7 @@ export const columns: ColumnDef<ClienteRecetasCount>[] = [
         variant: 'outline',
         size: 'icon',
         onClick: () => {
-         router.replace( `/recetas/${row.original.clienteId}`)
+         router.push( `/recetas/${row.original.clienteId}`)
         }
       }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }

@@ -58,6 +58,17 @@
   }
 }
 
+
+html,
+body,
+#app {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -69,6 +80,12 @@
 
 .page{
   padding: 1rem 2rem;
+  width: 100%
+
+}
+
+.forms-wide{
+  width: 100%
 }
 
 .forms{
@@ -107,12 +124,12 @@
  }
 }
 
-@media (min-width: 1400px) {
+/* @media (min-width: 1400px) {
  .page{
   padding-right: 10rem ;
   padding-left: 10rem ;
- }
-}
+ } */
+
 
 .forms .form-item, .forms-wide .form-item-wide {
   display: flex;

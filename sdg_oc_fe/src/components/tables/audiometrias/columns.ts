@@ -1,16 +1,12 @@
-import { ClienteConAudiometria } from "@/api/entities/entities";
 import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "@radix-icons/vue";
 import router from '@/router/index';
+import { ClienteAudiometriasFecha } from "@/api/entities/audiometrias";
+import { formatDate } from '@/lib/utils.recetas';
 
-export const columns: ColumnDef<ClienteConAudiometria>[] = [
-    {
-    accessorKey: 'id',
-    header: () => h('div', 'ID'),
-    cell: info=> info.getValue()
-  },
+export const columns: ColumnDef<ClienteAudiometriasFecha>[] = [
   {
     accessorKey: 'nombre',
     header: () => h('div', 'Nombre'),
@@ -22,13 +18,9 @@ export const columns: ColumnDef<ClienteConAudiometria>[] = [
     cell: info=> info.getValue(),
   },
   {
-    accessorKey: 'ultima_receta',
+    accessorKey: 'fechaUltimaAudiometria',
     header: ()=> h('div', 'Fecha Ultima Audiometría'),
-    cell: ({row})=>{
-        const fechas = row.original.audiometrias.map((a)=>a.fechaInforme)
-        return fechas.reduce((max, current)=>(current > max ? current : max), new Date(0)).toISOString().split("T")[0] || 0
-       
-    }
+    cell: ({row})=>row.original.fechaUltimaAudiometria ? formatDate(row.original.fechaUltimaAudiometria.toString()) : ' - ' 
   },
   {
     accessorKey: 'acciones',
@@ -38,7 +30,7 @@ export const columns: ColumnDef<ClienteConAudiometria>[] = [
         variant: 'outline',
         size: 'icon',
         onClick: () => {
-         router.replace( `/audiometrias/${row.original.id}`)
+         router.push( `/audiometrias/${row.original.clienteId}`)
         }
       }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }

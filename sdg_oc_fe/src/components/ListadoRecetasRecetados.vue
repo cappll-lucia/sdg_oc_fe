@@ -18,16 +18,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate, generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
 import { PlusIcon } from 'lucide-vue-next';
+import router from '@/router';
 
 
 const props = defineProps<{
     recetas: RecetasAereos[],
-    nombreCliente: string
+    nombreCliente: string,
+    idCliente: number
 }>();
 const currentRec = ref<RecetasAereos|undefined>();
 const detalleCerca = ref<DetalleRecetaAereos|undefined>();
 const detalleLejos = ref<DetalleRecetaAereos|undefined>();
 const selectedToPrint = ref<RecetasAereos[]>([]);
+const printOpen = ref<boolean>(false);
 
 onMounted(()=>{
     currentRec.value = props.recetas[0];
@@ -48,7 +51,14 @@ const printRecetas = () => {
         return;
     }
     generateRecetasRecetadosPDF(selectedToPrint.value, props.nombreCliente)
+    printOpen.value=false
 };
+
+const handleChangeReceta = (receta: RecetasAereos)=>{
+    currentRec.value=receta;
+    detalleCerca.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Cerca')
+    detalleLejos.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Lejos')
+}
 
 
 </script>
@@ -57,12 +67,12 @@ const printRecetas = () => {
 <template>
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
-            <div class="flex justify-between mr-2">
-                <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
+            <div class="flex justify-between mr-2 h-10">
+                <Button @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)" variant="outline" class="bg-transparent hover:bg-[#d7e5ec]" >
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
-                <Dialog>
+                <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
                         <Button  variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
                             Imprimir
@@ -101,7 +111,7 @@ const printRecetas = () => {
                     </DialogContent>
                 </Dialog>
             </div>
-            <Separator class="my-2 w-[95%]" />
+            <Separator class="my-6 w-[95%]" />
             <div v-for="receta in recetas" class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': currentRec === receta }">
@@ -110,7 +120,7 @@ const printRecetas = () => {
                         <p class="font-bold ">{{ formatDate(receta.fecha.toString())}}</p>
                         <p class="font-light  ">{{receta.tipoReceta}}</p>
                     </div>
-                    <Button variant="outline" size="icon" class="bg-transparent hover:bg-[#d7e5ec]">
+                    <Button variant="outline" size="icon" @click="handleChangeReceta(receta)" class="bg-transparent hover:bg-[#d7e5ec]">
                         <ChevronRightIcon class="w-4 h-4" />
                     </Button>
                 </div>
@@ -121,20 +131,20 @@ const printRecetas = () => {
         
         <div class="view w-[75%] h-[100%] px-8">
             <div class="datos flex flex-col" v-if="currentRec">
-                <div class="flex flex-row justify-between items-center">
+                <div class="flex flex-row justify-between items-center h-10">
                     <div class="flex flex-col">
                         <div class="flex flex-row">
-                            <span class="text-lg font-bold w-[10rem]">Tipo Receta: </span>
+                            <span class="text-lg font-bold w-[10rem]">Receta: </span>
                             <span>{{currentRec.tipoReceta}}</span>
                         </div>
                         <div class="flex flex-row ">
-                            <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
+                            <span class="text-lg font-bold w-[10rem]">Fecha: </span>
                             <span>{{formatDate(currentRec.fecha.toString())}}</span>
                         </div>
                     </div>
                     <div class="flex flex-col ">
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                            @click="() => { console.log('editar historia clinica'); }">
+                            @click="() => {router.push(`/recetas/recetados/edit/${currentRec?.id}`)}">
                             Editar
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>
@@ -172,10 +182,24 @@ const printRecetas = () => {
                         <span>{{ currentRec.tratamiento ?? '--' }}</span>
                     </div>
                 </div>
-                <!-- <div class="flex flex-col items-start mt-6">
+                <Separator class="my-8" />
+                <div class="flex flex-row  justify-between ">
+                    <div class="flex flex-col w-[12rem]">
+                        <span class="text font-bold ">Oftalmólogo: </span>
+                        <span>{{ currentRec.oftalmologo ?? '--' }}</span>
+                    </div>
+                    <div class="flex flex-col  w-[12rem]">
+                        <span class="text font-bold ">Armazón: </span>
+                        <span>{{ currentRec.armazon ?? '---' }}</span>
+                    </div>
+                    <div class="flex flex-col  w-[12rem]">
+                    </div>
+                </div>
+                <Separator class="my-8" />
+                <div class="flex flex-col items-start">
                     <span class="text font-bold">Observaciones: </span>
-                    <span>{{ currentRec.observaciones ?? '--' }}</span>
-                </div> -->
+                    <span class="min-h-[5rem]">{{ currentRec.observaciones ?? '--' }}</span>
+                </div>
             </div>
         </div>
     </div>

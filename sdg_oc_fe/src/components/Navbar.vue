@@ -19,36 +19,27 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
 import router from '@/router';
+import { useUserStore } from '@/stores/UsersStore';
+import { onMounted, ref } from 'vue';
+import { JwtUser } from '@/api/entities/jwtUser';
+import { ArrowDownUpIcon, BanknoteIcon, ChartColumnIcon, GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
 
-const ventasItems: { title: string, href: string, description?: string; }[] = [
-    {
-        title: 'Nueva Venta',
-        href: '/ventas/new',
-    },
-    {
-        title: 'Historial de Ventas',
-        href: '/ventas',
-    },
-    {
-        title: 'Facturación Electrónica',
-        href: '/docs/components/progress',
-        description:
-            'Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.',
-    }
-];
 
-const parametrosItems: { title: string, href: string}[] = [
+const userStore = useUserStore();
+const userData = ref<JwtUser|null>();
+
+onMounted(async()=>{
+    userData.value = userStore.getMe
+})
+
+const reportes: { title: string, href: string}[] = [
     {
-        title: 'Obras Sociales',
-        href: '/obras-sociales'
+        title: 'Reportes Obras Sociales',
+        href: '/reportes/obras-sociales'
     },
     {
-        title: 'Marcas',
-        href: '/marcas'
-    },
-    {
-        title: 'Proveedores',
-        href: '/proveedores'
+        title: 'Reportes Ventas',
+        href: '/reportes/ventas'
     }
 ];
 
@@ -57,54 +48,54 @@ const parametrosItems: { title: string, href: string}[] = [
 <template>
     <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
         <NavigationMenuList>
-            <NavigationMenuItem>
-                <NavigationMenuLink href="/recetas" :class="navigationMenuTriggerStyle()">
-                    Recetas
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/" :class="navigationMenuTriggerStyle()">
+                    <HomeIcon class="w-5 h-5 mr-2" />
+                    Inicio
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuTrigger >Ventas</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                    <ul class=" grid w-[300px] gap-3 p-4 md:w-[300px] md:grid-cols-1 lg:w-[300px] item-venta ">
-                        <li v-for="item in ventasItems" :key="item.title">
-                            <NavigationMenuLink as-child>
-                                <a :href="item.href"
-                                    class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                                    <div class="text-sm font-medium leading-none">{{ item.title }}</div>
-                                    <p v-if="item.description" class="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                        {{ item.description }}
-                                    </p>
-                                </a>
-                            </NavigationMenuLink>
-                        </li>
-                    </ul>
-                </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]" >
                 <NavigationMenuLink href="/clientes" :class="navigationMenuTriggerStyle()">
+                    <UserIcon class="w-5 h-5 mr-2"  />
                     Clientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuLink href="/docs/introduction" :class="navigationMenuTriggerStyle()">
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/ventas" :class="navigationMenuTriggerStyle()">
+                    <ShoppingBag class="w-5 h-5 mr-2" />
+                    Ventas
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/comprobantes" :class="navigationMenuTriggerStyle()">
+                    <Receipt class="w-5 h-5 mr-2"/>
+                    Comprobantes
+                </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/cuentas-corrientes" :class="navigationMenuTriggerStyle()">
+                    <Wallet2Icon  class="w-5 h-5 mr-2" />
                     Cuentas Corrientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem class="mr-[1rem]">
                 <NavigationMenuLink href="/productos" :class="navigationMenuTriggerStyle()">
+                    <GlassesIcon  class="w-5 h-5 mr-2" />
                     Productos
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuLink href="/audiometrias" :class="navigationMenuTriggerStyle()">
-                    Audiometrías
+            <NavigationMenuItem class="mr-[1rem]">
+                <NavigationMenuLink href="/caja" :class="navigationMenuTriggerStyle()">
+                    <BanknoteIcon class="w-6 h-6" />
+                    <ArrowDownUpIcon  class="w-4 h-4 mr-2" />
+                    Caja
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-                <NavigationMenuTrigger>Parámetros</NavigationMenuTrigger>
+            <NavigationMenuItem v-if="userData?.role=='admin'" class="mr-[1rem]">
+                <NavigationMenuTrigger> <ChartColumnIcon  class="w-5 h-5 mr-2" />Reportes</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
-                        <li v-for="item in parametrosItems" :key="item.title">
+                        <li v-for="item in reportes" :key="item.title">
                             <NavigationMenuLink as-child>
                                 <a :href="item.href"
                                     class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
@@ -115,23 +106,28 @@ const parametrosItems: { title: string, href: string}[] = [
                     </ul>
                 </NavigationMenuContent>
             </NavigationMenuItem>
+            <NavigationMenuItem  v-if="userData?.role=='admin'" class="mr-[1rem]">
+                <NavigationMenuLink href="/parametros" :class="navigationMenuTriggerStyle()">
+                    <SettingsIcon  class="w-5 h-5 mr-2" />
+                    Parámetros
+                </NavigationMenuLink>
+            </NavigationMenuItem>
         </NavigationMenuList>
         <div class="px-2 flex justify-between w-[13rem] items-center ">
-            <Button class="text-xs" @click="router.replace('/ventas/new')" >Nueva Venta</Button>
+            <Button class="text-xs" @click="router.push('/ventas/new')" >Nueva Venta</Button>
             <DropdownMenu>
                 <DropdownMenuTrigger>
-                    <Avatar>
-                        <AvatarImage src="https://github.com/radix-vue.png" alt="@radix-vue" />
+                    <Avatar class="border border-gray-950">
+                        <AvatarImage src="/favicon.svg" alt="@radix-vue" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent class="mr-4 w-[8rem]">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuContent class="px-4 w-[15rem]">
+                    <DropdownMenuLabel>{{ userData?.username }}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem>
+                    <DropdownMenuItem @click="router.push('/preguntas')" >Preguntas Frecuentes</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem @click="userStore.signOut()" >Cerrar sesión</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

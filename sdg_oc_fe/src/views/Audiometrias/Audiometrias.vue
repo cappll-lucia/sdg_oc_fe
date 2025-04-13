@@ -8,22 +8,21 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import type { ClienteConAudiometria } from '@/api/entities/entities';
-import { clientesConAudiometria } from '@/api/data/clientesConAudiometria';
 import DataTable from '@/components/tables/audiometrias/data-table.vue';
 import {columns} from '@/components/tables/audiometrias/columns'
 import { onMounted, ref } from 'vue';
+import { audiometriasApi } from '@/api/libs/audiometrias';
+import { ClienteAudiometriasFecha } from '@/api/entities/audiometrias';
 
-const data = ref<ClienteConAudiometria[]>([]);
+ const data = ref<ClienteAudiometriasFecha[]>([]);
 
-async function getData(): Promise<ClienteConAudiometria[]>{
-    return clientesConAudiometria as ClienteConAudiometria[]
-}
+
 
 
 onMounted(async () => {
-    data.value = await getData();
+    data.value = await audiometriasApi.getAllGroupByCliente();
 });
+
 </script>
 <template>
     <div class="page">

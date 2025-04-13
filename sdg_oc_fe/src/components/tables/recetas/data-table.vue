@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button';
 import { valueUpdater } from '@/lib/utils.recetas'
+import router from '@/router';
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];
@@ -44,7 +45,10 @@ const table = useVueTable({
             <Input class="max-w-sm" placeholder="Buscar Cliente"
                 :model-value="table.getColumn('nombre')?.getFilterValue() as string"
                 @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
-            <Button class="text-xs">Registrar Nueva Receta</Button>
+                <div>
+                    <Button class="text-xs mr-2 " @click="router.push('/recetas/recetados/new')" >Nueva Receta Anteojos Recetados </Button>
+                    <Button class="text-xs" @click="router.push('/recetas/contacto/new')" >Nueva Receta Lentes de Contacto </Button>
+                </div>
         </div>
     <div class="border rounded-md">
         <Table>

@@ -1,6 +1,5 @@
 <script setup lang="ts" generic="TData, TValue">
-import { ref } from 'vue'
-import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
+import type { ColumnDef } from '@tanstack/vue-table';
 import {
     Table,
     TableBody,
@@ -15,9 +14,6 @@ import {
     useVueTable,
     getFilteredRowModel, 
 } from '@tanstack/vue-table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button';
-import { valueUpdater } from '@/lib/utils.recetas'
 
 
 const props = defineProps<{
@@ -25,27 +21,16 @@ const props = defineProps<{
     data: TData[];
 }>();
 
-const columnFilters = ref<ColumnFiltersState>([])
 
 const table = useVueTable({
     get data() { return props.data; },
     get columns() { return props.columns; },
     getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: updaterOrValue =>valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
-    state:{
-        get columnFilters() {return columnFilters.value}
-    }
 })
 </script>
 
 <template>
-        <div class="flex flex-row justify-between items-center py-4">
-            <Input class="max-w-sm" placeholder="Buscar Cliente"
-                :model-value="table.getColumn('telefono')?.getFilterValue() as string"
-                @update:model-value=" table.getColumn('telefono')?.setFilterValue($event)" />
-            <Button class="text-xs"><a href="/clientes/create">Registrar Nuevo Cliente</a></Button>
-        </div>
     <div class="border rounded-md">
         <Table>
             <TableHeader>
@@ -68,7 +53,7 @@ const table = useVueTable({
                 <template v-else>
                     <TableRow>
                         <TableCell :colspan="columns.length" class="h-24 text-center">
-                            Cliente no encontrado
+                            Ningún cliente coincide con los criterios de búsqueda
                         </TableCell>
                     </TableRow>
                 </template>

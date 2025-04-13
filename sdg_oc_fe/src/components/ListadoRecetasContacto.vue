@@ -19,11 +19,14 @@ import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
 import Input from './ui/input/Input.vue';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
+import router from '@/router';
 
+const printOpen = ref<boolean>(false);
 const props = defineProps<{
     historiaClinica: HistoriaClinica | undefined,
     recetas: RecetaContacto[],
-    nombreCliente: string
+    nombreCliente: string,
+    idCliente: number
 }>();
 
 const currentRec = ref<RecetaContacto|undefined>();
@@ -48,7 +51,9 @@ const printRecetas = () => {
         alert("Por favor, selecciona al menos una receta para imprimir.");
         return;
     }
-    generateRecetasContactoPDF(selectedToPrint.value, props.nombreCliente)
+    generateRecetasContactoPDF(selectedToPrint.value, props.nombreCliente);
+    printOpen.value=false;
+
 };
 
 
@@ -61,11 +66,11 @@ const printRecetas = () => {
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2">
                 <!-- TODO add link to create -->
-                <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
+                <Button variant="outline" @click="router.push(`/recetas/contacto/new?cliente=${props.idCliente}`)" class="bg-transparent hover:bg-[#d7e5ec]">
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
                 </Button>
-                <Dialog>
+                <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
                         <Button variant="outline" class="bg-transparent hover:bg-[#d7e5ec]">
                             Imprimir
@@ -96,7 +101,7 @@ const printRecetas = () => {
                     </DialogContent>
                 </Dialog>
             </div>
-            <Separator class="my-2 w-[95%]" />
+            <Separator class="my-6 w-[95%]" />
             <div class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': selectedHistoriaClinica }">
@@ -138,17 +143,13 @@ const printRecetas = () => {
         <div v-else class="view w-[75%] h-[100%] px-8">
             <div class="datos flex flex-col" v-if="currentRec">
                 <div class="flex flex-row justify-between items-center ">
-                    <!-- <div class="flex flex-col ">
-                        <span class="text-lg font-bold">Tipo Receta: </span>
-                        <span>{{ currentRec.tipo }}</span>
-                    </div> -->
                     <div class="flex flex-row ">
                         <span class="text-lg font-bold w-[10rem]">Fecha Receta: </span>
                         <span>{{ formatDate(currentRec.fecha.toString()) }}</span>
                     </div>
                         <div class="flex flex-col ">
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                            @click="() => { console.log('editar historia clinica'); }">
+                            @click="() => { router.push(`/recetas/contacto/edit/${currentRec?.id}`)}">
                             Editar
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>
@@ -215,25 +216,30 @@ const printRecetas = () => {
                     </div>
                 </div>
                 <Separator class="my-6" />
-                <div class="datos flex flex-col" v-if="currentRec">
-                    <div class="mt-6">
-                        <span class="text font-bold mr-2">Marca O.D.: </span>
-                        <span class="mr-6">{{ currentRec.od_marca ?? '--' }}</span> |
-                        <span class="text font-bold mr-2 ml-6">Marca O.I.: </span>
-                        <span>{{ currentRec.oi_marca ?? '--' }}</span>
+                <div class="datos flex flex-row " v-if="currentRec">
+                    <div class="flex flex-col w-[20rem]">
+                        <span class="text-lg font-bold mr-8 ">Marcas </span>
+                        <div class="flex flex-row">
+                            <span class="text w-16 font-bold mr-2">O.D.: </span>
+                            <span class="mr-6">{{ currentRec.od_marca}}</span>
+                        </div>
+                        <div class="flex flex-row">
+                            <span class="text w-16 font-bold mr-2 ">O.I. : </span>
+                            <span>{{ currentRec.oi_marca }}</span>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-start mt-6">
-                        <span class="text font-bold">Observaciones: </span>
+                    <div class="flex flex-col items-start ">
+                        <span class="text-lg font-bold ">Observaciones: </span>
                         <span>{{ currentRec.observaciones ?? '--' }}</span>
                     </div>
                 </div>
     
             <Separator class="my-8" />  
 
-            <div class="flex flex-row justify-start items-start" v-if="currentRec" >
-                <div class="flex flex-row justify-start items-start">
-                    <h1 class="mr-[1rem] mt-2 text-xl font-extrabold w-[11rem] ">Queterometría </h1>
-                    <div class="flex flex-col items-start" v-if="currentRec.quet_m1_oi ">
+            <div class="flex flex-row items-start" v-if="currentRec" >
+                <div class="flex flex-col justify-start items-start w-[20rem] ">
+                    <h1 class="mr-[1rem] mt-2 text-xl font-extrabold  ">Queterometría </h1>
+                    <div class="flexm mt-6 flex-col items-start" v-if="currentRec.quet_m1_oi ">
                         <div class="flex  h-10 items-center">
                             <p class="font-bold w-20 text-lg">O.D.</p>
                             <p class="w-14">{{ currentRec.quet_m1_od.toFixed(2) || '-' }}</p>
@@ -247,68 +253,70 @@ const printRecetas = () => {
                             <Separator orientation="vertical" class="mx-4" />
                             <p class="w-14">{{ currentRec.quet_m2_oi.toFixed(2) }}</p>
                         </div>
-                        
+                        <div class="flex flex-col flex-wrap items-start mt-6">
+                            <span class="text font-bold">Notas: </span>
+                            <span class="w-[14rem] text-wrap  min-h-[3rem]">{{ currentRec.observaciones_queterometria ?? '--' }}</span>
+                        </div>
                     </div>
                     <div class="flex flex-col items-start" v-else>
                         <p class="font-light mt-4 w-[10rem] text-sm">No hay registros de Queterometría para esta receta</p>
                     </div>
-                </div>
+                </div>                
                 
-                
-                <div class="flex flex-row justify-end items-start ">
-                    <h1 class="mr-[2rem] mt-2 text-xl font-extrabold w-[11rem] text-right">Evaluación General </h1>
-                    <div class="flex flex-col items-start gap-3 w-[13rem] mt-3" >
-                    
-                        <div class="items-center flex gap-x-2">
+                <div class="flex flex-col justify-start items-start w-[35rem]  ">
+                    <h1 class="mt-2 text-xl font-extrabold w-[full]  text-right">Evaluación General </h1>
+                    <div class="flex flex-row flex-wrap gap-y-4 mt-6" >
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
                             <Checkbox v-model:checked="currentRec.maquillaje" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Maquillaje
                             </label>
                         </div>
-                        <div class="items-center flex gap-x-2">
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
                             <Checkbox v-model:checked="currentRec.tonicidad" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Tonicidad
                             </label>
                         </div>
-                        <div class="items-center flex gap-x-2">
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
                             <Checkbox v-model:checked="currentRec.hendidura_palpebral" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Hendidura Palpebral
                             </label>
                         </div>
-                        <div class="items-center flex gap-x-2">
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
                             <Checkbox v-model:checked="currentRec.altura_palpebral" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Altura Palpebral
                             </label>
                         </div>
-                        <div class="items-center flex gap-x-2">
-                            <label
-                                class="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                               Estesiometria: 
-                            </label>
-                            <Input type="text"  class="text-black bg-transparent pointer-events-none cursor-not-allowed w-100 text-xs  h-8" :model-value="currentRec.estesiometria" />
-                        </div>
-                        <div class="items-center flex gap-x-2">
+                        
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
                             <Checkbox v-model:checked="currentRec.buen_parpadeo_amplitud" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                Parpadeo: Buena Amplitud
                             </label>
                         </div>
-                        <div class="items-center flex gap-x-2">
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
                             <Checkbox v-model:checked="currentRec.buen_parpadeo_ritmo" class="pointer-events-none" />
                             <label for="terms1"
                                 class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Parpadeo: Buen Ritmo
                             </label>
                         </div>
-                </div>
+                        <div class="items-center w-[15rem] flex gap-x-2 min-h-[1.5rem]">
+                            <label
+                                class="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                               Estesiometria: 
+                            </label>
+                            <Input type="text"  class="text-black bg-transparent pointer-events-none cursor-not-allowed w-100 text-xs  h-8" :model-value="currentRec.estesiometria" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -318,7 +326,7 @@ const printRecetas = () => {
             <div class="flex flex-row justify-start items-start" v-if="currentRec" > 
                 <h1 class="mr-[3rem] mt-2 text-xl font-extrabold ">Pruebas </h1>
                 <div class="flex flex-col items-start" v-if="currentRec?.pruebasLentesContacto?.length">
-                    <Accordion type="single" collapsible class="w-[50rem]" v-for="prueba in currentRec.pruebasLentesContacto">
+                    <Accordion type="single" collapsible class="w-[45rem]" v-for="prueba in currentRec.pruebasLentesContacto">
                         <AccordionItem value="item-1">
                         <AccordionTrigger>Prueba {{ prueba.numeroPrueba }}</AccordionTrigger>
                         <AccordionContent>
@@ -326,25 +334,25 @@ const printRecetas = () => {
                             <p class="font-bold w-20 text-lg">O.D.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-14">{{ prueba.od_cb.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.od_cb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-14">{{ prueba.od_esferico.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.od_esferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-14">{{ prueba.od_cilindrico.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.od_cilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje:</p>
-                            <p class="w-14">{{ prueba.od_eje.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.od_eje.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-14">{{ prueba.od_cilindrico.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.od_cilindrico.toFixed(2) }}</p>
 
                         </div>
 
@@ -353,25 +361,90 @@ const printRecetas = () => {
                             <p class="font-bold w-20 text-lg">O.I.</p>
 
                             <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                            <p class="w-14">{{ prueba.oi_cb.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.oi_cb.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                            <p class="w-14">{{ prueba.oi_esferico.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.oi_esferico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4" />
 
                             <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                            <p class="w-14">{{ prueba.oi_cilindrico.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.oi_cilindrico.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-12 text-right pr-4">Eje:</p>
-                            <p class="w-14">{{ prueba.oi_eje.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.oi_eje.toFixed(2) }}</p>
                             <Separator orientation="vertical" class="mx-4 " />
 
                             <p class="font-bold w-16 text-right flex justify-start items-center">
                                 <ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span>
                             </p>
-                            <p class="w-14">{{ prueba.oi_cilindrico.toFixed(2) }}</p>
+                            <p class="w-10">{{ prueba.oi_cilindrico.toFixed(2) }}</p>
+                        </div>
+                        <div class="mt-6">
+                            <div class="flex flex-row flex-wrap gap-y-4 mb-8">
+                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.confort"  />
+                                    <label for="confort"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Confort
+                                    </label>
+                                </div>
+                                <div class="items-center w-[12rem]  flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.movilidad"  />
+                                    <label for="movilidad"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Movilidad
+                                    </label>
+                                </div>
+                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.centraje"  />
+                                    <label for="centraje"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Centraje
+                                    </label>
+                                </div>
+                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.hiperemia"  />
+                                    <label for="hiperemia"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Hiperemia
+                                    </label>
+                                </div>
+                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.agudeza_visual"  />
+                                    <label for="agudeza_visual"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Agudeza visual
+                                    </label>
+                                </div>
+                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.od_edema"  />
+                                    <label for="od_edema"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    OD Edema 
+                                    </label>
+                                </div>
+                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.oi_edema"  />
+                                    <label for="oi_edema"
+                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    OI Edema 
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-row ">
+                                    <p class="text-sm w-24 text-right flex justify-start items-center">Marcas:</p>
+                                    <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem] mr-8">
+                                        <p class="text-sm text-right flex justify-start items-center font-bold ">OD:</p>
+                                        <p type="decimal" class="w-32 ml-2" >{{ prueba.od_marca }}</p>
+                                    </div>
+                                    <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
+                                        <p class="text-sm text-right flex justify-start items-center font-bold ">OI:</p>
+                                        <p type="decimal" class="w-32 ml-2" >{{ prueba.oi_marca }}</p>
+                                    </div>
+                            </div>
                         </div>
                         </AccordionContent>
                         </AccordionItem>

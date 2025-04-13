@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon, PlusIcon, Cross2Icon, ArrowRightIcon, MagicWandIcon } from '@radix-icons/vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import {
   Select,
   SelectContent,
@@ -18,27 +18,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Cliente } from '@/api/entities/clientes';
-import { createVentaValidator } from '@/api/entities/venta';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 import SelectProductoDialog from '@/components/SelectProductoDialog.vue';
-import { toTypedSchema } from '@vee-validate/zod';
 import { Producto } from '@/api/entities/producto';
 import { toast } from '@/components/ui/toast'
 import Label from '@/components/ui/label/Label.vue';
-import { TipoMedioDePagoEnum, RedDePago } from '@/api/entities/mediosDePago';
-import { useForm } from 'vee-validate';
+import { TipoMedioDePagoEnum, RedDePago, createMedioPagoCustomValidator } from '@/api/entities/mediosDePago';
+import { createLineaVentaCustomValidator } from '@/api/entities/lineaVenta';
+import { CondicionIva, createVentaCustomValidator, ventaObrasSocialesCustomValidator } from '@/api/entities/venta';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
+import AlertError from '@/components/AlertError.vue';
 import { ventasApi } from '@/api/libs/ventas';
+import { Textarea } from '@/components/ui/textarea';
 import router from '@/router';
+import { condicionIvaDisplay } from '@/lib/utils';
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -46,102 +43,191 @@ const selectedCliente = ref<Cliente>();
 const searchClienteOpen =ref<boolean>(false);
 const searchProductoOpen =ref<boolean>(false);
 const showMedioPago = ref<boolean>(false);
-const submitted = ref<boolean>(false);
-const lineasDeVenta = ref<{producto: {id:number, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
-const mediosDePago = ref<{importe: number, tipoMedioPago: TipoMedioDePagoEnum|string, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
-const porcDto = ref<number>(0);
-const dto=ref<boolean>(false)
+const loading = ref<boolean>(false);
 
-const agregarLineaVenta = () => {
+const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
+const mediosDePago = ref<{importe: number, tipoMedioDePago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
+const ventaObrasSociales = ref<{obraSocial: {id: number| undefined}, importe: number, condicionIva: CondicionIva | undefined}[]>([]);
+const porcDto = ref<number>(0);
+const dto=ref<boolean>(false);
+const obrasSociales=ref<boolean>(false);
+const observaciones=ref<string>('');
+
+const fechaVenta = ref<Date>(new Date());
+
+const condicionIvaVenta = ref<CondicionIva>(CondicionIva.CONSUMIDOR_FINAL)
+const availableCondicionIva = ref<CondicionIva[]>([CondicionIva.CONSUMIDOR_FINAL]);
+
+
+const isValidVenta = ref<{
+    cliente: boolean,
+    descuentoPorcentaje: boolean,
+    condicionIvaVenta: boolean,
+}>({
+    cliente: true,
+    descuentoPorcentaje: true,
+    condicionIvaVenta: true,
+})
+
+const isvalidLineasVenta = ref<{
+    producto: boolean,
+    cantidad: boolean,
+    precioIndividual: boolean,
+}[]>([])
+
+const isvalidVentaObraSocial = ref<{
+    obraSocial: boolean,
+    importe: boolean,
+    condicionIva: boolean,
+}[]>([])
+
+const isValidMediosPago = ref<{
+    tipoMedioDePago: boolean,
+    entidadBancaria :boolean,
+    redDePago :boolean,
+    importe :boolean,
+}[]>([])
+const isValidImporteMedios = ref<boolean>(true);
+const isValidImporteObrasSociales = ref<boolean>(true);
+
+
+const addLineaVenta = () => {
     lineasDeVenta.value.push({
-        producto: {id: 0, descripcion:''},
+        producto: {id: undefined, descripcion:''},
         cantidad: 1,
         precioIndividual: 0
     });
+    isvalidLineasVenta.value.push({
+        producto: true,
+        cantidad: true,
+        precioIndividual: true,
+    })
 };
 
-const agregarMedioPago=()=>{
+const addMedioPago=async()=>{
+    isValidMediosPago.value.push({
+        tipoMedioDePago: true,
+        entidadBancaria :true,
+        redDePago :true,
+        importe :true, 
+    })
     mediosDePago.value.push({
         importe: 0,
-        tipoMedioPago: '',
+        tipoMedioDePago: undefined,
         redDePago: undefined,
         entidadBancaria: undefined
     })
+    await nextTick();
 }
 
-const eliminarLineaVenta = (index: number) => {
+const removeLineaVenta = (index: number) => {
     lineasDeVenta.value.splice(index, 1);
 };
 
-const eliminarMedioPago = (index: number) => {
+const removeMedioPago = (index: number) => {
     mediosDePago.value.splice(index, 1);
 };
 
-const agregarPagoDefault = ()=>{
+const removeVentaObraSocial = (index: number) => {
+    ventaObrasSociales.value.splice(index, 1);
+};
+
+const addPagoDefault = async ()=>{
     mediosDePago.value.push({
-        importe: totalVentaNeto.value,
-        tipoMedioPago: TipoMedioDePagoEnum.EFECTIVO,
+        importe: caluclateImportePago.value,
+        tipoMedioDePago: TipoMedioDePagoEnum.EFECTIVO,
         redDePago: undefined,
         entidadBancaria: undefined
+    });
+    isValidMediosPago.value.push({
+        tipoMedioDePago: true,
+        entidadBancaria :true,
+        redDePago :true,
+        importe :true, 
+    });    
+};
+
+
+const addVentaObraSocial = ()=>{
+    isvalidVentaObraSocial.value.push({
+        obraSocial: true,
+        importe: true,
+        condicionIva: true,
+    })
+    ventaObrasSociales.value.push({
+        obraSocial: {id: undefined},
+        importe: 0,
+        condicionIva: undefined
     })
 }
 
 
 
-
-const formSchema = toTypedSchema(createVentaValidator);
-const {handleSubmit, setFieldValue, errors} = useForm({
-    validationSchema: formSchema,
-        initialValues: {
-        fecha: new Date().toISOString(),
-        descuentoPorcentaje: 0,
-        cliente: { id: undefined },
-        lineasDeVenta: [],
-        mediosDePago: []
-    }
-})
-
-const onSubmit = handleSubmit(async(values)=>{
+const onSubmit = (async()=>{
     try{
-        await ventasApi.create(values)
-        router.replace('/ventas');
-        toast({ title: 'Venta registrada' });
+        const newVenta ={
+            cliente: {id: selectedCliente.value?.id},
+            condicionIva: condicionIvaVenta.value,
+            descuentoPorcentaje: porcDto.value,
+            mediosDePago: mediosDePago.value,
+            lineasDeVenta: lineasDeVenta.value,
+            ventaObraSocial: ventaObrasSociales.value,
+            observaciones: observaciones.value
+        }
+        const createdVenta = await ventasApi.create(newVenta)
+        loading.value=false;
+        router.push(`/ventas/view/${createdVenta.venta.id}`)
+        toast({
+            title: 'Venta registrada con éxito',
+        })
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
-  }
+    }
 })
 
 const validateAndSubmit = async()=>{
-    submitted.value=true
-    setFieldValue("descuentoPorcentaje", porcDto.value);
-    if(isLastLineaEmpty.value){
-        lineasDeVenta.value.pop();
-    }    
-    setFieldValue("lineasDeVenta", lineasDeVenta.value.map(linea => ({
-        producto: { id: linea.producto.id ?? 0 },
-        cantidad: linea.cantidad,
-        precioIndividual: linea.precioIndividual ?? 0
-    })));
-    setFieldValue("mediosDePago", mediosDePago.value.map(medio => ({
-        importe: medio.importe ?? 0,  
-        tipoMedioDePago: medio.tipoMedioPago,
-        redDePago: medio.redDePago ?? undefined,
-        entidadBancaria: medio.entidadBancaria ?? undefined
-    })));
-    submitted.value = true;
-    await onSubmit();
+    loading.value=true;
+    const resultVenta = createVentaCustomValidator({
+        cliente: {id: selectedCliente.value?.id},
+      //  fecha: fechaVenta.value,
+        descuentoPorcentaje: porcDto.value,
+        condicionIvaVenta: condicionIvaVenta.value
+    })
+    isValidVenta.value =resultVenta.isValid;
+
+    const resultLineasVenta = createLineaVentaCustomValidator(lineasDeVenta.value);
+    isvalidLineasVenta.value= resultLineasVenta.isValid;
+
+    const resultMedios= createMedioPagoCustomValidator(mediosDePago.value)
+    isValidMediosPago.value = resultMedios.isValid;
+
+    const resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
+    isvalidVentaObraSocial.value = resultVentasOS.isValid;
+
+    if(resultLineasVenta?.success && resultMedios?.success && resultVentasOS?.success && resultVenta.success){
+        isValidImporteMedios.value = caluclateImportePago.value == importeIngresado.value;
+        isValidImporteObrasSociales.value = !(totalVentaFinal.value < montoObrasSociales.value);
+        if(isValidImporteMedios.value && isValidImporteObrasSociales.value){
+            await onSubmit();
+        }
+    }
+    loading.value=true;
 }
 
 
 onMounted(async () => {
-    agregarLineaVenta();
+    addLineaVenta();
 });
 
 
-const handleSelectCliente = (cliente:Cliente)=>{
-    selectedCliente.value=cliente;
-    setFieldValue("cliente.id", selectedCliente.value.id);
+const handleSelectCliente = async(cliente:Cliente)=>{
+    availableCondicionIva.value = [CondicionIva.CONSUMIDOR_FINAL]
+    if(cliente.categoriaFiscal!= CondicionIva.CONSUMIDOR_FINAL){
+        availableCondicionIva.value.push(cliente.categoriaFiscal as CondicionIva);
+        condicionIvaVenta.value=cliente.categoriaFiscal;
+    }
+    selectedCliente.value=cliente; 
     searchClienteOpen.value=false;
 }
 
@@ -149,7 +235,7 @@ const hanldeSelectProducto = (_producto: Producto)=>{
     const existingLinea = lineasDeVenta.value.find(linea => linea.producto.id === _producto.id);
     if(existingLinea){
         existingLinea.cantidad+=1;
-        eliminarLineaVenta(lineasDeVenta.value.length-- )
+        if(lineasDeVenta.value.length>1) removeLineaVenta(lineasDeVenta.value.length-- )
         toast({
             title: 'Producto ya seleccionado',
             description: 'Se agregó una unidad.',
@@ -182,11 +268,22 @@ const totalVentaBruto = computed(()=>{
 })
 
 const montoDto = computed(()=>{
-    return totalVentaBruto.value * porcDto.value / 100
+    return totalVentaFinal.value * porcDto.value / 100
 })
 
-const totalVentaNeto = computed(()=>{
-    return totalVentaBruto.value - montoDto.value
+
+const totalVentaFinal = computed(()=>{
+    return totalVentaBruto.value - montoObrasSociales.value 
+})
+
+const caluclateImportePago = computed(()=>{
+    return totalVentaFinal.value - montoDto.value
+})
+
+const montoObrasSociales = computed(()=>{
+    return ventaObrasSociales.value.reduce((total, os)=>{
+        return total + os.importe
+    }, 0)
 })
 
 const importeIngresado = computed<number>(() => {
@@ -195,23 +292,33 @@ const importeIngresado = computed<number>(() => {
     }, 0);
 });
 
-const getProductoIdDisplay = (id: number) => {
-    return id === 0 ? '' : id;
-};
-
-
-const autocompleteMedioPagoImporte=(index: number)=>{
-    if(mediosDePago.value[index]){    
-        mediosDePago.value[index].importe = totalVentaNeto.value - importeIngresado.value
-    }else{
-        console.log('as')
+const moveToMediosPago =()=>{
+    isValidImporteObrasSociales.value = !(totalVentaBruto.value < montoObrasSociales.value);
+    if (isValidImporteObrasSociales.value){
+        addPagoDefault()
+        showMedioPago.value=true; 
     }
-    
 }
 
 
 
+
+const autocompleteMedioPagoImporte=(index: number)=>{
+    if(mediosDePago.value[index]){    
+        mediosDePago.value[index].importe = caluclateImportePago.value - importeIngresado.value
+    }
+}
+
+const tipoFactura = computed(()=>{
+    if(condicionIvaVenta.value==CondicionIva.MONOTRIBUTISTA || condicionIvaVenta.value == CondicionIva.RESPONSABLE_INSCRIPTO){
+        return "A"
+    }else{
+        return "B"
+    }
+})
+
 </script>
+
 
 
 <template>
@@ -237,32 +344,72 @@ const autocompleteMedioPagoImporte=(index: number)=>{
         </Breadcrumb>
         <h1 class="page-title">Nueva Venta</h1>
         <div class="pt-2">
-            <div class="flex flex-row justify-between items-center py-4 ">
+            <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4 ">
                 <div class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start">
                     <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8">
-                        <FormField v-slot="{ errorMessage }" name="cliente.id">
-                            <FormItem class="h-[3rem] w-[60%] flex items-center justify-start">
-                                <FormLabel class="form-label w-[8rem]  h-[1.2rem] text-lg">Cliente</FormLabel>
-                                <div class="flex flex-row justify-start items-center w-full">
-                                    <FormControl>
-                                        <Input type="text" 
-                                            class="w-full sm:w-[20rem] h-10"
-                                            readonly
-                                            :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
-                                            @click="searchClienteOpen = true"
-                                        />
-                                    </FormControl>
+                        <div class="h-[8rem] w-[60%] flex flex-row items-center justify-start">
+                            <div class=" w-full flex flex-col items-center justify-start">
+                                <div class="flex  flex-row justify-start items-center w-full">
+                                    <Label class="form-label w-[8rem]  h-10 mt-4 text-lg">Cliente</Label>
+                                    <Input type="text" 
+                                        class="w-full sm:w-[20rem] h-10"
+                                        readonly
+                                        :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
+                                        @click="searchClienteOpen = true"
+                                    />
                                     <SelectClienteDialog
                                         v-model="searchClienteOpen"
                                         title="Nueva Venta: Seleccionar Cliente"
                                         @select-cliente="handleSelectCliente"
                                     />
+                                    <TooltipProvider  v-if="!isValidVenta.cliente" >
+                                        <Tooltip>
+                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                            <p>Seleccionar cliente</p>
+                                        </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
-                                <FormMessage class="ml-[1rem] w-[20rem] " v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
-                            </FormItem>
-                        </FormField>
-                        <div class="date w-auto sm:w-[10rem] text-center">
-                            <Label>Fecha: {{ new Date().toLocaleDateString('es-ES') }}</Label>
+                                <div class="flex  flex-row justify-start items-center w-full">
+                                    <Label class="form-label w-[8rem]  h-10 mt-6 text-sm">Condición Fiscal</Label>
+                                    <Select 
+                                        :model-value="condicionIvaVenta.toString()" 
+                                        @update:model-value="(value) => condicionIvaVenta = value as unknown as CondicionIva"
+                                    >
+                                            <SelectTrigger class="text-black w-[20rem] ">
+                                                <SelectValue   />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem 
+                                                        v-for="condicion in availableCondicionIva" 
+                                                        :key="condicion" 
+                                                        :value="condicion.toString()"
+                                                    >
+                                                        {{ condicionIvaDisplay(condicion) }}
+                                                    </SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <TooltipProvider  v-if="!isValidVenta.condicionIvaVenta" >
+                                            <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Seleccionar condición fiscal</p>
+                                            </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
+                            <div class="flex flex-col w-[8rem] h-[6rem] border justify-center items-center rounded-lg">
+                                <span>Factura</span>
+                                <span class="text-[3rem] leading-[3rem] ">{{ tipoFactura }}</span>
+                            </div>
+                            <Label class="text-[1rem]">Fecha: {{ fechaVenta.toLocaleDateString('es-ES') }}</Label>
                         </div>
                     </div>
 
@@ -281,20 +428,35 @@ const autocompleteMedioPagoImporte=(index: number)=>{
                         <div v-for="(linea, index) in lineasDeVenta" :key="index" class="linea-venta-item">
                             <Input
                                 @click="searchProductoOpen = true" 
-                                :model-value="getProductoIdDisplay(linea.producto.id)" 
-                                readonly class="rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input" 
+                                :model-value="linea.producto.id" 
+                                readonly 
+                                :class="{'rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input': (isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto),
+                                        'rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input border-destructive' : !(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)
+                                }" 
                                 type="text" 
                             />
                             <Input
                                 @click="searchProductoOpen = true" 
                                 :model-value="linea.producto.descripcion" 
-                                readonly class="rounded-lg cursor-default focus:outline-none focus:border-none text-left descripcion-input" 
+                                readonly 
+                                :class="{'rounded-lg cursor-default focus:outline-none focus:border-none text-left descripcion-input': (isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto),
+                                        'rounded-lg cursor-default focus:outline-none focus:border-none text-left descripcion-input border-destructive' : !(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)
+                                }" 
                                 type="text"
                             />
                             <Input
-                                :value="linea.precioIndividual?.toFixed(2)" 
-                                readonly class="rounded-lg cursor-default border-none focus:outline-none  focus:border-none  text-center" 
-                            />
+                                :model-value="linea.precioIndividual" 
+                                @update:model-value="(value)=>{
+                                    if(lineasDeVenta[index]){
+                                        lineasDeVenta[index].precioIndividual=Number(value)
+                                    }
+                                }"
+                                v-decimal
+                                :class="{'rounded-lg cursor-default focus:outline-none  focus:border-none  text-center': (isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto),
+                                        'rounded-lg cursor-default focus:outline-none  focus:border-none  text-center border-destructive' : !(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)
+                                }" 
+                            /> 
+                            <!-- // TODO disable edition -->
                             <Input
                                 :model-value="linea.cantidad" 
                                 @update:model-value="(value)=>{
@@ -302,16 +464,27 @@ const autocompleteMedioPagoImporte=(index: number)=>{
                                         lineasDeVenta[index].cantidad=Number(value)
                                     }
                                 }"
-                                class="rounded-lg text-center focus:outline-none focus:border-none " 
+                                :class="{'rounded-lg text-center focus:outline-none focus:border-none ': (isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto),
+                                        'rounded-lg text-center focus:outline-none focus:border-none border-destructive' : !(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)
+                                }" 
                                 type="number"  min="1" 
                             />
-                            <Input
-                                readonly class="rounded-lg cursor-default border-none focus:outline-none focus:border-none text-center" 
-                                :value="linea.precioIndividual ? (linea.precioIndividual * linea.cantidad).toFixed(2) : ''"  
-                            />
+                            <Label class="rounded-lg cursor-default border-none focus:outline-none focus:border-none text-center" 
+                            >{{ (linea.cantidad*linea.precioIndividual).toFixed(2) }}</Label>
                             
-                            <Button size="icon" variant="ghost" @click="eliminarLineaVenta(index)"> <Cross2Icon /> </Button>
+                            <Button size="icon" variant="ghost" type="button"  @click="removeLineaVenta(index)"> <Cross2Icon /> </Button>
                             
+                            <TooltipProvider  v-if="!(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)" >
+                                <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive"> <AlertCircleIcon :size="18" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p v-if="!isvalidLineasVenta[index]?.producto">- Seleccionar Producto</p>
+                                    <p v-if="!isvalidLineasVenta[index]?.cantidad">- Ingresar cantidad mayor que 0 (cero)</p>
+                                    <p v-if="!isvalidLineasVenta[index]?.precioIndividual">- Indicar precio Individual</p>
+                                </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
                             <SelectProductoDialog 
                                 v-model="searchProductoOpen"
                                 title="Seleccionar Producto"
@@ -319,103 +492,261 @@ const autocompleteMedioPagoImporte=(index: number)=>{
                             />
                         </div>
 
-                         <div v-if="submitted && Object.keys(errors).length && errors.lineasDeVenta" class="text-destructive">
-                            <p>
-                                {{ errors.lineasDeVenta }}
-                            </p>
-                        </div>
+                        <Button variant="outline" type="button" class="mt-4" :disabled="isLastLineaEmpty"  @click="addLineaVenta">Agregar <PlusIcon /></Button>
 
-                        <Button variant="outline" class="mt-4" :disabled="isLastLineaEmpty"  @click="agregarLineaVenta">Agregar <PlusIcon /></Button>
+                
 
                         
-                        <div class="w-full flex flex-row justify-start mt-10">
-                            <div class="w-[25%] flex flex-col justify-start  items-start">
-                            <div class="w-full flex flex-row justify-between  items-center">
-                                <h3 class="page-subtitle">Aplicar Descuento</h3>
-                                <Switch :model-value="dto" @update:model-value="dto=!dto"></Switch>
-                            </div>
-                            <div v-if="dto" class="flex flex-row items-center">
-                                    <Label class="w-[5.5rem]">Porcentaje: </Label>
-                                    <Input 
-                                    class="w-14 mr-2 text-center" 
+                        <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
+                            <div class="w-[70%]  flex flex-col justify-start  items-start">
+
+                                <div class="border rounded-lg w-full  min-h-[3rem] p-4">
+                                    <div class="w-full flex flex-row justify-between  items-center">
+                                        <h3 class="page-subtitle">Obras Sociales</h3>
+                                        <Switch 
+                                            :model-value="obrasSociales" 
+                                            @update:model-value="()=>{
+                                                obrasSociales=!obrasSociales
+                                                if(obrasSociales){
+                                                    addVentaObraSocial()
+                                                }else{
+                                                    ventaObrasSociales=[]
+                                                }
+                                            }"
+                                        ></Switch>
+                                    </div>
+                                    <div v-if="obrasSociales" class="flex flex-row items-center">
+                                        <div v-if=" selectedCliente && selectedCliente?.clienteObrasSociales.length > 0">
+                                            <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
+                                                <div class="flex flex-row w-[15rem] ">
+                                                <Select 
+                                                        :modelValue="os.obraSocial.id?.toString()" 
+                                                         @update:modelValue="(value:string) => {
+                                                            if (ventaObrasSociales[index]) {
+                                                                ventaObrasSociales[index].obraSocial.id = Number(value);
+                                                            }}"
+                                                        >
+                                                            <SelectTrigger class="text-black w-[12rem] text-xs ">
+                                                                <SelectValue   />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectGroup>
+                                                                    <SelectItem 
+                                                                    class="text-xs"
+                                                                    v-for="os in selectedCliente?.clienteObrasSociales" 
+                                                                    :key="os.obraSocial.id" 
+                                                                    :value="os.obraSocial.id.toString()"
+                                                                    >
+                                                                    {{ os.obraSocial.nombre  }}
+                                                                </SelectItem>
+                                                            </SelectGroup>
+                                                        </SelectContent>
+                                                </Select>
+                                                <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.obraSocial" >
+                                                        <Tooltip>
+                                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                                <p>Seleccionar obra social</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                </TooltipProvider>
+                                                </div>
+                                                <div class="flex flex-row w-[11rem] items-center ">
+                                                    <Label>$</Label>
+                                                    <Input
+                                                        :model-value="os.importe" 
+                                                        @update:model-value="(value)=>{
+                                                            if(ventaObrasSociales[index]){
+                                                                ventaObrasSociales[index].importe=Number(value)
+                                                            }
+                                                        }"
+                                                        v-decimal
+                                                        class="w-[7rem] ml-2 text-xs"
+                                                        placeholder="Importe"
+                                                        type="decimal"
+                                                    /> 
+                                                    <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.importe" >
+                                                        <Tooltip>
+                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                            <p>Ingresar Importe</p>
+                                                        </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                </div>
+                                                <div class="flex flex-row w-[15rem]">
+                                                    <Select 
+                                                            :modelValue="os.condicionIva?.toString() ?? undefined" 
+                                                            @update:model-value="(value) => os.condicionIva = Number(value)"
+                                                        >
+                                                                <SelectTrigger class="text-black w-[13rem] text-xs ">
+                                                                    <SelectValue   />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectGroup>
+                                                                        <SelectItem 
+                                                                            class="text-xs"
+                                                                            v-for="condicion in Object.values(CondicionIva).filter(val => typeof val === 'number') as CondicionIva[]" 
+                                                                            :key="condicion" 
+                                                                            :value="condicion.toString()"
+                                                                        >
+                                                                            {{ condicionIvaDisplay(condicion) }}
+                                                                        </SelectItem>
+                                                                    </SelectGroup>
+                                                                </SelectContent>
+                                                    </Select>
+                                                    <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.condicionIva" >
+                                                            <Tooltip>
+                                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                                    <p>Seleccionar obra social</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                    </TooltipProvider>
+                                                </div>
+                                            <Button variant="ghost"  type="button" class="text-destructive"  @click="removeVentaObraSocial(index)"><Cross2Icon /></Button>
+                                            </div>
+                                            <p v-if="!isValidImporteObrasSociales " class="text-destructive text-md py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe por obras sociales no puede ser superior al importe total</p>               
+                                            <Button variant="outline"  type="button" class="mt-8"  @click="addVentaObraSocial()">Agregar Obra Social <PlusIcon /></Button>
+                                        </div>
+                                        <div v-else>
+                                            <p>No hay obras sociales registradas para el cliente</p>
+                                            <Button>Registrar Obra Social</Button>
+                                        </div>
+                                    
+                                    </div>
+                                </div>
+                                <div class="border min-h-[3rem] p-4 w-full rounded-lg  mt-4">
+                                    <div class="w-full flex flex-row justify-between  items-center">
+                                        <h3 class="page-subtitle">Descuento</h3>
+                                        <Switch :model-value="dto" @update:model-value="()=>{dto=!dto; porcDto=0}"></Switch>
+                                    </div>
+                                    <div v-if="dto" class="flex flex-row items-center">
+                                        <Label class="w-[5.5rem]">Porcentaje: </Label>
+                                        <Input 
+                                        class="w-14 mr-2 text-center" 
                                         :model-value="porcDto" 
                                         @update:model-value="(value) => {
                                             porcDto = Number(value) || 0;
                                         }"
-                                    />
-                                    <Label>%</Label>
+                                        />
+                                        <Label>%</Label>
+                                        
+                                        <TooltipProvider  v-if="!isValidVenta.descuentoPorcentaje" >
+                                            <Tooltip>
+                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                    <p>Porcentaje Inválido</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
                                 </div>
                             </div>
-                            <div v-if="!porcDto" class="w-full flex justify-end mt-4">
-                                <Label class="page-subtitle w-[10rem]">Importe Final: </Label>
-                                <Label class="page-subtitle w-[11rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
+                            <div class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-centerr">
+                                <div v-if="(obrasSociales && montoObrasSociales > 0) || porcDto" class=" flex  justify-center mt-4">
+                                    <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
+                                    <Label class=" w-[9rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
+                                </div>
+                                <div v-if="obrasSociales && montoObrasSociales > 0" class=" flex  justify-center items-center mt-4">
+                                    <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
+                                    <Label class=" w-[9rem]  ">- $ {{ montoObrasSociales.toFixed(2) }}</Label>
+                                </div>
+                                <div v-if="porcDto" class=" flex  justify-center items-center mt-4">
+                                    <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
+                                    <Label class=" w-[9rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
+                                </div>
+                                <div class=" flex  justify-center mt-4">
+                                    <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
+                                    <Label class="page-subtitle  w-[9rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
+                                </div>
                             </div>
-                            <div v-if="porcDto" class="w-full flex flex-col">
-                                <div class=" flex  justify-end mt-4">
-                                    <Label class=" w-[10rem]">Importe Total: </Label>
-                                    <Label class=" w-[11rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
-                                </div>
-                                <div class=" flex  justify-end items-center mt-4">
-                                    <Label class=" w-[10rem]">Descuento: </Label>
-                                    <Label class=" w-[11rem]">- $ {{ montoDto.toFixed(2) }}</Label>
-                                </div>
-                                <div class=" flex  justify-end mt-4">
-                                    <Label class="page-subtitle w-[10rem]">Importe Final: </Label>
-                                    <Label class="page-subtitle w-[11rem]">$ {{ totalVentaNeto.toFixed(2) }}</Label>
-                                </div>
-                            </div>
+                            
+
                         </div>
                     </div>
 
+                    <div class="rounded-lg border mt-10 w-full p-8">
+
+                        <h3 class="page-subtitle">Observaciones</h3>
+                        <Textarea
+                        v-model="observaciones"
+                        class="resize-none"
+                        />
+                        
+                    </div>
+
                     <div  v-if="!showMedioPago" class="w-full flex justify-end mt-4">
-                        <Button @click="()=>{showMedioPago=true; agregarPagoDefault()}">Continuar <ArrowRightIcon /></Button>
+                        <Button @click="()=>{moveToMediosPago()}">Continuar <ArrowRightIcon /></Button>
+                        <!-- <Button @click="()=>{showMedioPago=true; addPagoDefault()}">Continuar <ArrowRightIcon /></Button> -->
                     </div>
 
 
                     <div v-if="showMedioPago" class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
                         <h3 class="page-subtitle mb-4">Medios de Pago</h3>
-                        <div v-for="(medio, index) in mediosDePago" class="medio-pago-item items-center flex flex-row w-full justify-start gap-5 mb-4">
+                        
+                        <div v-for="(medio, index) in mediosDePago" class="medio-pago-item items-center flex flex-row w-full justify-start mb-4">
                             <Select 
-                                :modelValue="medio.tipoMedioPago" 
+                                :modelValue="medio.tipoMedioDePago" 
                                 @update:modelValue="(value) => {
                                     if (mediosDePago[index]) {
-                                        mediosDePago[index].tipoMedioPago = value as TipoMedioDePagoEnum;
+                                        mediosDePago[index].tipoMedioDePago = value as TipoMedioDePagoEnum;
                                     }
                                 }"
                             >
-
-                                <SelectTrigger  class="w-[15rem]">
+                                <SelectTrigger  :class="{'w-[15rem]': !isValidMediosPago[index]?.tipoMedioDePago, 'w-[15rem] mr-[2rem]': isValidMediosPago[index]?.tipoMedioDePago}">
                                 <SelectValue placeholder="Medio De Pago" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectItem 
-                                            v-for="tipo in TipoMedioDePagoEnum" 
-                                            :key="tipo" 
-                                            :value="tipo"
+                                            v-for="tipo in Object.entries(TipoMedioDePagoEnum)" 
+                                            :key="tipo[0]" 
+                                            :value="tipo[0]"
                                         >
-                                            {{ tipo }}
+                                            {{ tipo[1] }}
                                         </SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <div class=" w-[13rem] flex flex-row justify-start items-center">
+                            
+                            <TooltipProvider  v-if="!isValidMediosPago[index]?.tipoMedioDePago" >
+                                <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Seleccionar Tipo Medio Pago</p>
+                                </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
 
+                            <div class=" w-[16rem] flex flex-row justify-start items-center">
                                 <Label class=" ml-6 mr-2">$</Label>
                                 <Input
+                                type="decimal"
                                 :model-value="medio.importe" 
                                 @update:model-value="(value)=>{
                                     if(mediosDePago[index]){
                                         mediosDePago[index].importe=Number(value)
                                     }
                                 }"
-                                 class=" w-[8rem] cursor-default  focus:outline-none focus:border-none " 
+                                v-decimal
+                                 :class="{'w-[8rem] cursor-default  focus:outline-none focus:border-none ': !isValidMediosPago[index]?.importe, 'w-[8rem] cursor-default  focus:outline-none focus:border-none  mr-7': isValidMediosPago[index]?.importe}"
                                  placeholder="Importe"
                                  /> 
-                                 <Button size="sm" variant="ghost"  v-if=" index && mediosDePago.length>1" @click="autocompleteMedioPagoImporte(index)"  > <MagicWandIcon/> </Button>
+                                <TooltipProvider  v-if="!isValidMediosPago[index]?.importe" >
+                                    <Tooltip>
+                                    <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                    <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                        <p>Ingresar Importe</p>
+                                    </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                 <Button size="sm" variant="ghost" type="button"   v-if=" index && mediosDePago.length>1" @click="autocompleteMedioPagoImporte(index)"  > <MagicWandIcon/> </Button>
                                 </div>
+
+                            <div class="flex flex-row w-[16rem]"  v-if="medio.tipoMedioDePago &&  !['EFECTIVO', 'CUENTA_CORRIENTE'].includes(medio.tipoMedioDePago)">
                             <Select 
-                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO && medio.tipoMedioPago!=TipoMedioDePagoEnum.CUENTA_CORRIENTE"
+                               
                                 :modelValue="medio.redDePago" 
                                 @update:modelValue="(value) => {
                                     if (mediosDePago[index]) {
@@ -424,51 +755,70 @@ const autocompleteMedioPagoImporte=(index: number)=>{
                                 }"
                             >
 
-                                <SelectTrigger  class="w-[15rem]">
+                                <SelectTrigger :class="{'w-[12rem]': !isValidMediosPago[index]?.redDePago, 'w-[12rem] mr-[2rem]': isValidMediosPago[index]?.redDePago}" >
                                 <SelectValue placeholder="Red De Pago" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectItem 
-                                            v-for="red in RedDePago" 
-                                            :key="red" 
-                                            :value="red"
+                                            v-for="red in Object.entries(RedDePago)" 
+                                            :key="red[0]" 
+                                            :value="red[0]"
                                         >
-                                            {{ red }}
+                                            {{ red[1] }}
                                         </SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
+                            <TooltipProvider  v-if="!isValidMediosPago[index]?.redDePago" >
+                                <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Seleccionar Red de Pago</p>
+                                </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            </div>
+
+                            
+                            <div class="flex flex-row w-[16rem]"  v-if="medio.tipoMedioDePago &&  !['EFECTIVO', 'CUENTA_CORRIENTE'].includes(medio.tipoMedioDePago)">
+                            
                             <Input
-                                v-if="medio.tipoMedioPago && medio.tipoMedioPago!=TipoMedioDePagoEnum.EFECTIVO && medio.tipoMedioPago!=TipoMedioDePagoEnum.CUENTA_CORRIENTE"
                                 :model-value="medio.entidadBancaria" 
                                  @update:modelValue="(value) => {
                                     if (mediosDePago[index]) {
                                         mediosDePago[index].entidadBancaria = value as RedDePago;
                                     }
                                 }"
-                                 class=" w-[15rem] cursor-default  focus:outline-none focus:border-none " 
+                                 class=" w-[12rem] cursor-default  focus:outline-none focus:border-none " 
                                 placeholder="Entidad Bancaria"
                             /> 
-                            <Button size="icon" variant="ghost" @click="eliminarMedioPago(index)"> <Cross2Icon /> </Button>
-
-                        </div>
-                        <div v-if="submitted && Object.keys(errors).length && errors.mediosDePago" class="text-destructive">
-                            <p>
-                                {{ errors.mediosDePago }}
-                            </p>
-                        </div>
-                        <Button variant="outline" class="mt-4"  @click="agregarMedioPago">Agregar Medio de Pago <PlusIcon /></Button>
+                            <TooltipProvider  v-if="!isValidMediosPago[index]?.entidadBancaria" >
+                                <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Indicar entidad bancaria</p>
+                                </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            
+                        </div>        
+                        <Button size="icon" type="button"  variant="ghost" @click="removeMedioPago(index)"> <Cross2Icon /> </Button>
+                        </div>        
+                        <Button variant="outline"  type="button" class="mt-4"  @click="addMedioPago()">Agregar Medio de Pago <PlusIcon /></Button>
+                        <p v-if="!isValidImporteMedios && caluclateImportePago > importeIngresado" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago no cubren el importe final</p>               
+                        <p v-if="!isValidImporteMedios  && caluclateImportePago < importeIngresado" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago ingresados superan el importe final</p>               
 
                     </div>
+
 
                     <div  v-if="showMedioPago" class="w-full flex justify-end mt-4">
-                        <Button @click="()=>validateAndSubmit()">Confirmar Venta <ArrowRightIcon /></Button>
+                        <Button type="submit">Confirmar Venta <ArrowRightIcon /></Button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
-        <AlertError 
+        <AlertError
             v-model="showError"
             title="Error"
             :message="errorMessage"
@@ -486,7 +836,7 @@ const autocompleteMedioPagoImporte=(index: number)=>{
 
 .linea-venta-header {
     display: grid;
-    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 0.2fr;
+    grid-template-columns: 0.4fr 3fr 1fr 0.5fr 1fr 0.1fr 0.1fr;
     gap: 0.5rem;
     font-weight: bold;
     text-align: center;
@@ -500,7 +850,7 @@ const autocompleteMedioPagoImporte=(index: number)=>{
 
 .linea-venta-item {
     display: grid;
-    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 0.1fr;
+    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 0.1fr 0.1fr;
     gap: 0.5rem;
     align-items: center;
     padding: 0.5rem 0;

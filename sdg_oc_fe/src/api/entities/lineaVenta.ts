@@ -16,3 +16,25 @@ export const createLineaVentaValidator = z.object({
     precioIndividual: z.number()
 })
 export type CreateLineaVentaValidator = z.infer<typeof createLineaVentaValidator>
+
+export const createLineaVentaCustomValidator = (_lineasVenta: {
+    producto: {id: number | undefined},
+    cantidad: number,
+    precioIndividual: number,
+}[])=>{
+    const isValidArray = _lineasVenta.map(_linea => ({
+        producto: Boolean(_linea.producto.id),
+        cantidad: Number.isInteger(_linea.cantidad) && _linea.cantidad>0,
+        precioIndividual:  _linea.precioIndividual>0,
+    }))
+    const success = _lineasVenta.length > 0 && isValidArray.every(isValid => 
+        Object.values(isValid).every(Boolean)
+    );
+    return { success, isValid: isValidArray };
+}
+
+export type NewLineaVentaType = {
+    producto: { id: undefined | number },
+    cantidad: number,
+    precioIndividual: number
+}
