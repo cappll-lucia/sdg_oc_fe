@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import { ArrowDownUpIcon, BanknoteIcon, EarIcon, EyeIcon, Glasses, Receipt, Shield, ShoppingBag, Users2Icon } from 'lucide-vue-next';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import router from '@/router';
+
 </script>
 
 <template>

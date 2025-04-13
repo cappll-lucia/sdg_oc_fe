@@ -24,7 +24,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import router from '@/router';
 import { RangeCalendar } from '@/components/ui/range-calendar'
 import {
   CalendarDate,

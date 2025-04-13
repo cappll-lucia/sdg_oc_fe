@@ -1,6 +1,4 @@
 import { UUID } from "crypto";
-import type { Marca } from "./marca";
-import { Proveedor } from "./proveedor";
 
 export interface BaseEntity {
 	id: number;

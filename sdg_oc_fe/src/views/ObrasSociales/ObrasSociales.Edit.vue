@@ -117,7 +117,7 @@ const onSubmit = handleSubmit(async (values) => {
                                 <Input type="text" v-bind="componentField" />
                             </FormControl>
                         </div>
-                        <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}
+                        <FormMessage class="form-message" v-if="errorMessage">{{ errorMessage }}
                         </FormMessage>
                     </FormItem>
                 </FormField>
