@@ -5,7 +5,7 @@ import Loader from './components/Loader.vue';
 </script>
 
 <template>
-  <main>
+  <main class="w-full px-4">
     <Navbar />
     <Toaster />
     <RouterView />
@@ -14,8 +14,11 @@ import Loader from './components/Loader.vue';
 </template>
 
 <style scoped>
-main{
-  width: 100%;
+/* #app {
+  width: 100vw;
 }
+main {
+  width: 100%;
+} */
 
 </style>

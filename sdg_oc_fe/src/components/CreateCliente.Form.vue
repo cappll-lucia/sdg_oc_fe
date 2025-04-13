@@ -175,7 +175,7 @@ const availableObrasSociales = computed(() => {
 </script>
 
 <template>
-    <form @submit.prevent="validateAndSubmit" class="forms-wide flex flex-col justify-between items-start p2-[5rem] ">
+    <form @submit.prevent="validateAndSubmit" class="forms-wide w-full flex flex-col justify-between items-start p2-[5rem] ">
                 <div class="w-full ">
                     <h3 class="page-subtitle text-center" >Registrar Nuevo Cliente</h3>
                     <Separator class="my-6 w-full" />
@@ -183,8 +183,7 @@ const availableObrasSociales = computed(() => {
                 <div class="flex flex-col w-full  justify-evenly items-start">
 
                     <div class="flex flex-row w-full  justify-evenly items-start">
-                        <div class="flex flex-col w-[45%] mt-4">
-                        
+                    <div class="flex flex-col w-[45%] mt-4 items-center mr-4">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
                                 <Label  class="w-[7rem]  pr-[2rem] text-right ">Tipo Documento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
@@ -339,7 +338,7 @@ const availableObrasSociales = computed(() => {
                             </div>                        
                     </div>
                     
-                    <div class="flex flex-col w-[45%] mt-4">
+                    <div class="flex flex-col w-[45%] mt-4 items-center ml-4">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
                                 <Label  class="w-[7rem]  pr-[2rem] text-right ">Fecha Nacimiento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
@@ -430,7 +429,7 @@ const availableObrasSociales = computed(() => {
 
                     
 
-                        </div>
+                    </div>
 
                     </div>
                     <Separator class="my-10 w-full" />

@@ -178,7 +178,7 @@ const availableObrasSociales = computed(() => {
                 </div>
                 <div v-if="currentCliente" class="flex flex-col w-full  justify-evenly items-start">
                     <div class="flex flex-row w-full  justify-evenly items-start">
-                        <div class="flex flex-col w-[45%] mt-4">
+                        <div class="flex flex-col w-[45%] mt-4 mr-4 items-center">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
                                 <Label  class="w-[7rem]  pr-[2rem] text-right ">Tipo Documento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
@@ -335,7 +335,7 @@ const availableObrasSociales = computed(() => {
                             </div>                        
                     </div>
                     
-                    <div class="flex flex-col w-[45%] mt-4">
+                    <div class="flex flex-col w-[45%] mt-4 ml-4 items-center">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
                                 <Label  class="w-[7rem]  pr-[2rem] text-right ">Fecha Nacimiento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">

@@ -76,13 +76,13 @@ export type CreateVentaValidator = z.infer<typeof createVentaValidator>
 
 export const createVentaCustomValidator = (_newVenta: {
     cliente: {id: undefined | number},
-    fecha: Date,
+    //fecha: Date,
     descuentoPorcentaje: number | undefined,
     condicionIvaVenta: CondicionIva | undefined,
 })=>{
     const isValid = {
         cliente: _newVenta.cliente.id===0 || Boolean(_newVenta.cliente.id),
-        fecha: _newVenta.fecha instanceof Date,
+       // fecha: _newVenta.fecha instanceof Date,
         descuentoPorcentaje: isValidNumber(_newVenta.descuentoPorcentaje) && 0 <= _newVenta.descuentoPorcentaje && _newVenta.descuentoPorcentaje<=100 ,
         condicionIvaVenta: _newVenta.condicionIvaVenta ? Object.values(CondicionIva).includes(Number(_newVenta.condicionIvaVenta)) :false,
     }
@@ -116,7 +116,7 @@ export type NewVentaOsType = {
 export type NewVentaType ={
     cliente: { id: undefined | number },
     descuentoPorcentaje: number,
-    fecha: Date,
+   // fecha: Date,
     condicionIva: CondicionIva
     lineasDeVenta : Array<NewLineaVentaType>,
     mediosDePago: Array<NewMedioPagoType>,

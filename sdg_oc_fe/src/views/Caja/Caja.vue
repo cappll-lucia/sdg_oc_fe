@@ -205,7 +205,7 @@ const generateCierreCajaPDF = (cierreCaja:SaldoCaja, fecha:string) => {
     doc.text("CIERRE DE CAJA", 105, 20, { align: "center" });
 
     doc.setFontSize(12);
-    doc.text(`Fecha de Cierre: ${ cierreMov ? new Date(cierreMov.fechaMovimiento).toLocaleString() : fecha}`, 105, 30, {align: "center"});
+    doc.text(`Fecha de Cierre: ${ cierreMov ? new Date(cierreMov.fechaMovimiento).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }) : fecha}`, 105, 30, {align: "center"});
     if(aperturaMov){
         doc.text(`Apertura de Caja: $ ${ aperturaMov.importe} (Efectivo)`, 20, 40, {align: "left"});
     }

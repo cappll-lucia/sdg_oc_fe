@@ -63,12 +63,10 @@ const isValidVenta = ref<{
     cliente: boolean,
     descuentoPorcentaje: boolean,
     condicionIvaVenta: boolean,
-    fecha: boolean
 }>({
     cliente: true,
     descuentoPorcentaje: true,
     condicionIvaVenta: true,
-    fecha: true,
 })
 
 const isvalidLineasVenta = ref<{
@@ -169,7 +167,6 @@ const onSubmit = (async()=>{
     try{
         const newVenta ={
             cliente: {id: selectedCliente.value?.id},
-            fecha: fechaVenta.value,
             condicionIva: condicionIvaVenta.value,
             descuentoPorcentaje: porcDto.value,
             mediosDePago: mediosDePago.value,
@@ -193,7 +190,7 @@ const validateAndSubmit = async()=>{
     loading.value=true;
     const resultVenta = createVentaCustomValidator({
         cliente: {id: selectedCliente.value?.id},
-        fecha: fechaVenta.value,
+      //  fecha: fechaVenta.value,
         descuentoPorcentaje: porcDto.value,
         condicionIvaVenta: condicionIvaVenta.value
     })
