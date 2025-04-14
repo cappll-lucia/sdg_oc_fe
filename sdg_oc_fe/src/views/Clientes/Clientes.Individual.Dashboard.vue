@@ -320,7 +320,7 @@ const onSubmit = async()=>{
                             </div>
                         </div>
                         <ScrollArea v-if="audiometriasCliente.length" class=" mt-2 w-full h-[12rem] pr-4  rounded-lg bg-white border">
-                            <div v-for="(audiom, index) in audiometriasCliente" @click="router.push(`/audiometria/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-start items-center h-[3rem] p-4 rounded-lg bg-secondary border mx-2 my-4 mr-4">
+                            <div v-for="(audiom, index) in audiometriasCliente" @click="router.push(`/audiometrias/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-start items-center h-[3rem] p-4 rounded-lg bg-secondary border mx-2 my-4 mr-4">
                                 <Label class=" cursor-pointer mr-4  text-sm" > {{formatDate(audiom.fechaInforme.toString())}} </Label>     
                                 <div class=" cursor-pointer flex flex-col">
                                     <Label class=" cursor-pointer text-sm font-thin" >Audiometía {{ index }}</Label>                    

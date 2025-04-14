@@ -11,8 +11,8 @@ import router from '@/router';
 </script>
 
 <template>
-    <div class="page lg:px-60">
-         <div class="grid grid-cols-3 grid-rows-[auto_auto_auto_auto] gap-4 p-6 0 h-[90vh]">
+    <div class="page lg:px-60 ">
+         <div class="grid grid-cols-3 grid-rows-[auto_auto_auto_auto] gap-4 p-6 0 h-[90vh] ">
             <div @click="router.push(`/caja`)" class="box caja">
                 <div class="flex flex-row items-center justify-center">
                     <BanknoteIcon class="mb-2" :size="25" />
@@ -20,7 +20,7 @@ import router from '@/router';
                 </div>
                 <span>Caja</span>
             </div>
-            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/logo_no_bg.png" /> </div>
+            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/logo_no_bg.png" class="w-[300px]" /> </div>
 
             <div @click="router.push(`/ventas/new`)" class="box menu-venta">
                 <ShoppingBag class="mb-2" :size="25" />
