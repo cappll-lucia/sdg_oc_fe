@@ -9,20 +9,18 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input';
+import Label from '@/components/ui/label/Label.vue';
 import router from '@/router/index';
 import { useUserStore } from '@/stores/UsersStore';
-import { toTypedSchema } from '@vee-validate/zod';
-import { useForm } from 'vee-validate';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
+import { AsteriskIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { z } from 'zod';
 
 const userStore = useUserStore();
 
@@ -31,30 +29,35 @@ const signinError = ref(false);
 const errorMessage =ref<string>('');
 const loading = ref<boolean>(false);
 
-
-
-const formSchema = toTypedSchema(
-    z.object({
-        username: z.string({message:"Requerido"}),
-        password: z.string({message:"Requerido"})
-    })
-);
-const {handleSubmit} = useForm({
-    validationSchema: formSchema
+const loginData = ref<{username: string|undefined; password: string|undefined}>({
+    username: undefined,
+    password: undefined
 })
 
-const onSignin = handleSubmit(async (values)=>{
+const isValidLogin = ref<{username: boolean, password: boolean}>({
+    username: true,
+    password: true
+})
+
+
+const onSignin = async ()=>{
     loading.value=true;
-    try{
-        await userStore.singin(values.username, values.password);
-        router.push('/');
-    }catch(err: any){
-        console.log(err)
-        errorMessage.value = err?.response?.data.message as string;
-        signinError.value=true;
-        loading.value=false;
+    if(loginData.value.username && loginData.value.password){
+
+        try{
+            await userStore.singin(loginData.value.username, loginData.value.password);
+            router.push('/');
+        }catch(err: any){
+            console.log(err)
+            errorMessage.value = err?.response?.data.message as string;
+            signinError.value=true;
+            loading.value=false;
+        }
+    }else{
+        isValidLogin.value.username = Boolean(loginData.value.username)
+        isValidLogin.value.password = Boolean(loginData.value.password)
     }
-})
+}
 
 
 
@@ -63,7 +66,7 @@ const onSignin = handleSubmit(async (values)=>{
 
 <template>
     <div class="flex justify-center items-top h-[100vh] w-[100vw]">
-        <form @submit="onSignin">
+        <form @submit.prevent="onSignin">
         <Card class="w-[350px] h-[450px] relative top-[200px]">
             <CardHeader class="text-center gap-0">
                 <CardTitle><img src="../assets/logo_no_bg.png" /></CardTitle>
@@ -71,32 +74,44 @@ const onSignin = handleSubmit(async (values)=>{
             </CardHeader>
             <CardContent>
                 <div class="grid items-center w-full gap-4">
-                    <FormField v-slot="{ componentField }" name="username">
-                        <FormItem class="h-[5rem]">
+                        <div class="h-[5rem]">
                             <div class="form-item">
-                                <FormLabel class="form-label">Nombre de Usuario</FormLabel>
-                                <FormControl>
-                                    <Input type="text" v-bind="componentField" />
-                                </FormControl>
+                                <Label class="form-label">Nombre de Usuario</Label>
+                                <div class="flex flex-row">
+
+                                    <Input type="text" v-model="loginData.username" />
+                                    <TooltipProvider  v-if="!isValidLogin.password" >
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Ingrese su Nombre de Usuario</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                             </div>
-                            <FormMessage/>
-                        </FormItem>
-                    </FormField>
+                        </div>
                     
-                    <FormField v-slot="{ componentField }" name="password">
-                        <FormItem class="h-[5rem]">
+                        <div class="h-[5rem]">
                             <div class="form-item">
-                                <FormLabel class="form-label">contraseña</FormLabel>
-                                <FormControl>
-                                    <Input type="password" v-bind="componentField" />
-                                </FormControl>
+                                <Label class="form-label">Contraseña</Label>
+                                <div class="flex flex-row">
+
+                                    <Input type="password" v-model="loginData.password" />
+                                    <TooltipProvider  v-if="!isValidLogin.password" >
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Ingrese su Contraseña</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                             </div>
-                            <FormMessage/>
-                        </FormItem>
-                    </FormField>
+                        </div>
                 </div>
                 </CardContent>
-                <CardFooter class="flex justify-end px-6 pb-6">
+                <CardFooter class="flex justify-center px-6 pb-6">
                     <Button type="submit">Iniciar Sesión</Button>
                 </CardFooter>
             </Card>
