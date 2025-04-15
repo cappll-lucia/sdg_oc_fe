@@ -88,8 +88,10 @@ const create = async (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id:
             ..._cliente,
             clienteObrasSociales: _obrasSociales
         };
+        console.log('new cliente --> ', newCliente)
 
         const resp = await http.post(`/cliente`, newCliente);
+        console.log(resp)
         return resp.data.data as Cliente;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
