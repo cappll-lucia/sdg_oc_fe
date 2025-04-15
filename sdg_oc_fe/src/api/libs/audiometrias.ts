@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
 import { http_files } from '../http.files';
-import { Audiometria, EditAudiometriaValidator, CreateAudiometriaValidator, ClienteAudiometriasFecha } from '../entities/audiometrias';
+import { Audiometria, ClienteAudiometriasFecha, NewAudiometriaDTO } from '../entities/audiometrias';
 
 const getAll = async ()=>{
     try{
@@ -30,7 +30,7 @@ const getOne = async (_id: number)=>{
     }
 }
 
-const create = async (_audiometria: CreateAudiometriaValidator, _pdf: File | undefined)=>{
+const create = async (_audiometria: NewAudiometriaDTO, _pdf: File | undefined)=>{
     try{
         const formData = new FormData();
         formData.append('audiometriaDTO', JSON.stringify(_audiometria));
@@ -48,7 +48,7 @@ const create = async (_audiometria: CreateAudiometriaValidator, _pdf: File | und
     }
 }
 
-const edit = async (_id: number, _audiometria: EditAudiometriaValidator, _pdf: File|undefined)=>{
+const edit = async (_id: number, _audiometria: Audiometria, _pdf: File|undefined)=>{
     try{
         const formData = new FormData();
         formData.append('audiometriaDTO', JSON.stringify(_audiometria));
@@ -66,6 +66,6 @@ export const audiometriasApi = {
     getAll: ()=> getAll(),
     getAllGroupByCliente: ()=> getAllGroupByCliente(),
     getOne: (_id: number)=> getOne(_id),
-    create: (_audiometria: CreateAudiometriaValidator, _pdf: File)=> create(_audiometria, _pdf),
-    edit: (_id: number, _audiometria: EditAudiometriaValidator, _pdf?: File)=> edit(_id, _audiometria, _pdf)
+    create: (_audiometria: NewAudiometriaDTO, _pdf: File)=> create(_audiometria, _pdf),
+    edit: (_id: number, _audiometria: Audiometria, _pdf?: File)=> edit(_id, _audiometria, _pdf)
 }

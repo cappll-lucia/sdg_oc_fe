@@ -30,6 +30,7 @@ import {
 import { AsteriskIcon } from 'lucide-vue-next';
 import { condicionIvaDisplay } from '@/lib/utils';
 import { clientesApi } from '@/api/libs/clientes';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
 const tipoDocumentoOptions = [
   { value: TipoDocumento.CUIT, label: "CUIT" },
@@ -38,10 +39,10 @@ const tipoDocumentoOptions = [
 
 const emit = defineEmits(['handleCreateCliente']);
 
+const loader = useLoaderStore();
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
-const loading = ref<boolean>(false);
 
 const localidades = ref<Localidad[]>([]);
 const obrasSociales = ref<ObraSocial[]>([]);
@@ -144,14 +145,18 @@ const validateAndSubmit = async()=>{
 
 
 const onSubmit = async()=>{
+    loader.show();
     try{
         newCliente.value.fechaNac = new Date(parseInt(fechaNac.value.year), parseInt(fechaNac.value.month)-1, parseInt(fechaNac.value.day))
         const createdCliente = await clientesApi.create(newCliente.value, clienteObrasSociales.value)
         emit('handleCreateCliente', createdCliente);
+        loader.hide();
     }catch (err: any) {
         errorMessage.value = err.message as string;
+        loader.hide();
         showError.value = true;
     }
+    
 }
 
 
@@ -501,7 +506,7 @@ const availableObrasSociales = computed(() => {
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-[6rem]">
                     <Button variant="outline" class="w-[15%] mr-5">Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                    <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
             </form>
         <AlertError 
