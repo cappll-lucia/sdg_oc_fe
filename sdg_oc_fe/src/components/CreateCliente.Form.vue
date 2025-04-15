@@ -136,11 +136,14 @@ const condicionIvaOptions = Object.values(CondicionIva)
 const validateAndSubmit = async()=>{
     const validCliente = createClienteCustomValidator (newCliente.value, fechaNac.value);
     isValidCliente.value = validCliente.isValid;
-    const validOS = createClienteObraSocialCustomValidator(clienteObrasSociales.value)
-    isValidClienteObraSocial.value =validOS.isValid;
+    let validOS
+    if(clienteObrasSociales.value.length){
+        validOS = createClienteObraSocialCustomValidator(clienteObrasSociales.value)
+        isValidClienteObraSocial.value =validOS.isValid;
+    }
     console.log(validCliente)
     console.log(validOS)
-    if(validCliente.success && validOS.success){
+    if((validCliente.success && !clienteObrasSociales.value.length) || (validCliente.success && validOS?.success)){
         await onSubmit()
     }else{
         console.log('no')
