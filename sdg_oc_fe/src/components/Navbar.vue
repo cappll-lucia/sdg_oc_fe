@@ -22,7 +22,8 @@ import router from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { onMounted, ref } from 'vue';
 import { JwtUser } from '@/api/entities/jwtUser';
-import { ArrowDownUpIcon, BanknoteIcon, ChartColumnIcon, GlassesIcon, HomeIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
+import { ArrowDownUpIcon, BanknoteIcon, ChartColumnIcon, GlassesIcon, HomeIcon, LogOutIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
+import { QuestionMarkCircledIcon } from '@radix-icons/vue';
 
 
 const userStore = useUserStore();
@@ -46,53 +47,53 @@ const reportes: { title: string, href: string}[] = [
 </script>
 
 <template>
-    <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 px-4 justify-between">
+    <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 justify-between ">
         <NavigationMenuList>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/" :class="navigationMenuTriggerStyle()">
-                    <HomeIcon class="w-5 h-5 mr-2" />
+                    <HomeIcon class="w-4 h-4 mr-2" />
                     Inicio
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]" >
+            <NavigationMenuItem class="mr-[1rem] " >
                 <NavigationMenuLink href="/clientes" :class="navigationMenuTriggerStyle()">
-                    <UserIcon class="w-5 h-5 mr-2"  />
+                    <UserIcon class="w-4 h-4 mr-2"  />
                     Clientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/ventas" :class="navigationMenuTriggerStyle()">
-                    <ShoppingBag class="w-5 h-5 mr-2" />
+                    <ShoppingBag class="w-4 h-4 mr-2" />
                     Ventas
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/comprobantes" :class="navigationMenuTriggerStyle()">
-                    <Receipt class="w-5 h-5 mr-2"/>
+                    <Receipt class="w-4 h-4 mr-2"/>
                     Comprobantes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/cuentas-corrientes" :class="navigationMenuTriggerStyle()">
-                    <Wallet2Icon  class="w-5 h-5 mr-2" />
+                    <Wallet2Icon  class="w-4 h-4 mr-2" />
                     Cuentas Corrientes
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/productos" :class="navigationMenuTriggerStyle()">
-                    <GlassesIcon  class="w-5 h-5 mr-2" />
+                    <GlassesIcon  class="w-4 h-4 mr-2" />
                     Productos
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem class="mr-[1rem]">
+            <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/caja" :class="navigationMenuTriggerStyle()">
-                    <BanknoteIcon class="w-6 h-6" />
-                    <ArrowDownUpIcon  class="w-4 h-4 mr-2" />
+                    <BanknoteIcon class="w-5 h-5" />
+                    <ArrowDownUpIcon  class="w-3 h-3 mr-2" />
                     Caja
                 </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem v-if="userData?.role=='admin'" class="mr-[1rem]">
-                <NavigationMenuTrigger> <ChartColumnIcon  class="w-5 h-5 mr-2" />Reportes</NavigationMenuTrigger>
+            <NavigationMenuItem v-if="userData?.role=='admin'" class="mr-[1rem] ">
+                <NavigationMenuTrigger> <ChartColumnIcon  class="w-4 h-4 mr-2" />Reportes</NavigationMenuTrigger>
                 <NavigationMenuContent>
                     <ul class=" grid w-[100vw] gap-3 p-4 md:w-[100vw] md:grid-cols-1 lg:w-[100vw]">
                         <li v-for="item in reportes" :key="item.title">
@@ -106,14 +107,8 @@ const reportes: { title: string, href: string}[] = [
                     </ul>
                 </NavigationMenuContent>
             </NavigationMenuItem>
-            <NavigationMenuItem  v-if="userData?.role=='admin'" class="mr-[1rem]">
-                <NavigationMenuLink href="/parametros" :class="navigationMenuTriggerStyle()">
-                    <SettingsIcon  class="w-5 h-5 mr-2" />
-                    Parámetros
-                </NavigationMenuLink>
-            </NavigationMenuItem>
         </NavigationMenuList>
-        <div class="px-2 flex justify-between w-[13rem] items-center ">
+        <div class="px-2 flex justify-between w-[13rem] items-center z-40 ">
             <Button class="text-xs" @click="router.push('/ventas/new')" >Nueva Venta</Button>
             <DropdownMenu>
                 <DropdownMenuTrigger>
@@ -125,9 +120,11 @@ const reportes: { title: string, href: string}[] = [
                 <DropdownMenuContent class="px-4 w-[15rem]">
                     <DropdownMenuLabel>{{ userData?.username }}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="router.push('/preguntas')" >Preguntas Frecuentes</DropdownMenuItem>
+                    <DropdownMenuItem @click="router.push('/preguntas')" ><QuestionMarkCircledIcon /> Preguntas Frecuentes</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="userStore.signOut()" >Cerrar sesión</DropdownMenuItem>
+                    <DropdownMenuItem @click="router.push('/parametros')" > <SettingsIcon />Pámetros</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem class="font-bold" @click="userStore.signOut()"> <LogOutIcon/> Cerrar sesión</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
