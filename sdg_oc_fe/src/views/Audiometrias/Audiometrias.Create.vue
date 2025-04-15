@@ -33,7 +33,6 @@ import { useLoaderStore } from '@/stores/LoaderStore';
 
 const loader = useLoaderStore();
 
-const showSuccess = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 const errorPDF =ref<string>('');
@@ -86,7 +85,6 @@ const onSubmit = async () => {
     try {
         newAudiometria.value.fechaInforme = new Date(parseInt(fechaInforme.value.year), parseInt(fechaInforme.value.month)-1, parseInt(fechaInforme.value.day))
         await audiometriasApi.create(newAudiometria.value, audiometriaFile.value )
-        showSuccess.value = true;
         router.push(`/clientes/dashboard/${newAudiometria.value.cliente.id}`)
         loader.hide();
         toast({
@@ -104,7 +102,6 @@ const validateAndSubmit = async () => {
     errorPDF.value = '';
     const resultAudiometria = audiometriaCustomValidator(newAudiometria.value, fechaInforme.value, audiometriaFile.value);
     isValidAudiometria.value = resultAudiometria.isValid;
-    console.log("result--> ", resultAudiometria)
     if(resultAudiometria.success){
         await onSubmit();
     }else {

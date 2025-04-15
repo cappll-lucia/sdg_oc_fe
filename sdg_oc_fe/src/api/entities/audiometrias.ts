@@ -30,6 +30,21 @@ export const audiometriaCustomValidator = (_audiometria: {
   return {success, isValid};
 }
 
+export const editAudiometriaCustomValidator = (_audiometria: {
+  cliente: {id: number | undefined},
+  observaciones: string | undefined,
+}, _fecha: {day: string, month: string, year: string }, _file: any)=>{
+  console.log('_file')
+  console.log(_file)
+  const isValid = {
+    cliente: Boolean(_audiometria.cliente.id),
+    fechaInforme: fechaValidator.safeParse(_fecha).success,
+    file: _file==undefined ? true :  _file.type == 'application/pdf'
+  }
+  const success = Object.values(isValid).every(Boolean);
+  return {success, isValid};
+}
+
 export type NewAudiometriaDTO = {
   cliente: {id: number | undefined},
   fechaInforme: Date | undefined,
