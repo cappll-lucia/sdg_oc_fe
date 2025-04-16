@@ -145,8 +145,6 @@ const validateAndSubmit = async()=>{
     console.log(validOS)
     if((validCliente.success && !clienteObrasSociales.value.length) || (validCliente.success && validOS?.success)){
         await onSubmit()
-    }else{
-        console.log('no')
     }
 }
 

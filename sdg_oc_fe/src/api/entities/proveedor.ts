@@ -1,6 +1,5 @@
 import { BaseEntity } from "./entities";
-import { z } from 'zod';
-import { isCuit } from "@/lib/utils.recetas";
+import { emailValidator, isValidNumber } from "@/lib/utils";
 
 
 export interface Proveedor extends BaseEntity {
@@ -10,38 +9,38 @@ export interface Proveedor extends BaseEntity {
     telefono: string;
 }
 
-export const createProveedorValidator = z.object({
-    cuit: z
-        .string()
-        .refine(isCuit, { message: "El CUIT debe tener el formato XX-XXXXXXXX-X" }),
-    razonSocial: z
-        .string({message: 'Requerido'})
-        .min(2, {message: 'La razón social debe contener entre 2 y 50 caracteres'})
-        .max(50, {message: 'La razón social debe contener entre 2 y 50 caracteres'}),
-    email: z
-        .string({message: 'Requerido'})
-        .email({ message: "El email no es válido" }),
-    telefono: z
-        .string({message: 'Requerido'})
-        .min(6, { message: "El teléfono debe tener al menos 6 caracteres" })
-});
-export type CreateProveedorValidator = z.infer<typeof createProveedorValidator>;
+export const createProveedorCustomValidator  = (_newProveedor: {
+    razonSocial: string|undefined,
+    cuit: string|undefined,
+    telefono: string|undefined,
+    email: string|undefined
+})=>{
+    const isValid = {
+        razonSocial: _newProveedor.razonSocial ? _newProveedor.razonSocial.trim().length>0 : false,
+        cuit: _newProveedor.cuit ? ( _newProveedor.cuit.trim().length >=10 &&  _newProveedor.cuit.trim().length<=11 && isValidNumber(_newProveedor.cuit)  ) : false,
+        email: emailValidator.safeParse(_newProveedor.email).success,
+        telefono: _newProveedor.telefono? isValidNumber(_newProveedor.telefono) : false,
+    }
+    const success = Object.values(isValid).every(Boolean);
+    return { success, isValid}
+}
 
 
-export const editProveedorValidator = z.object({
-    cuit: z
-        .string()
-        .refine(isCuit, { message: "El CUIT debe tener el formato XX-XXXXXXXX-X" }),
-    razonSocial: z
-        .string({message: 'Requerido'})
-        .min(2, {message: 'La razón social debe contener entre 2 y 50 caracteres'})
-        .max(50, {message: 'La razón social debe contener entre 2 y 50 caracteres'}),
-    email: z
-        .string({message: 'Requerido'})
-        .email({ message: "El email no es válido" }),
-    telefono: z
-        .string({message: 'Requerido'})
-        .min(6, { message: "El teléfono debe tener al menos 6 caracteres" })
-});
-export type EditProveedorValidator = z.infer<typeof editProveedorValidator>;
+export type NewProveedorType = {
+  cuit: string| undefined,
+  razonSocial: string | undefined, 
+  email: string | undefined, 
+  telefono: string | undefined, 
+}
+
+export const editProveedorCustomValidator  = (_proveedor: Proveedor)=>{
+    const isValid = {
+        razonSocial: _proveedor.razonSocial ? _proveedor.razonSocial.trim().length>0 : false,
+        cuit: _proveedor.cuit ? ( _proveedor.cuit.trim().length >=10 &&  _proveedor.cuit.trim().length<=11 && isValidNumber(_proveedor.cuit)  ) : false,
+        email: emailValidator.safeParse(_proveedor.email).success,
+        telefono: _proveedor.telefono? isValidNumber(_proveedor.telefono) : false,
+    }
+    const success = Object.values(isValid).every(Boolean);
+    return { success, isValid}
+}
 

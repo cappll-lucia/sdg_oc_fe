@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios';
-import { CreateObraSocialValidator, EditObraSocialValidator } from '../entities/obraSocial';
 import { ObraSocial } from '../entities/obraSocial';
 import {http} from '../http';
 import { CondicionIva } from '../entities/venta';
@@ -23,7 +22,7 @@ const getOne = async (_id: number) => {
     }
 };
 
-const create = async(_obraSocial: CreateObraSocialValidator ) =>{
+const create = async(_obraSocial: {nombre: string} ) =>{
     try {
         const resp = await http.post('/obra-social', _obraSocial);
         return resp.data.data as ObraSocial[];
@@ -32,7 +31,7 @@ const create = async(_obraSocial: CreateObraSocialValidator ) =>{
     }
 }
 
-const edit = async(_id: number, _obraSocial: EditObraSocialValidator ) =>{
+const edit = async(_id: number, _obraSocial: {nombre: string} ) =>{
     try {
         const resp = await http.patch(`/obra-social/${_id}`, _obraSocial);
         return resp.data.data as ObraSocial[];
@@ -53,12 +52,10 @@ const remove = async(_id: number ) =>{
 
 const getReporteMontos = async (_fechaDesde: string | undefined, _fechaHasta: string | undefined) => {
     try {
-
         const params = new URLSearchParams();
 
         if (_fechaDesde) params.append("fechaDesde", _fechaDesde);
         if (_fechaHasta) params.append("fechaHasta", _fechaHasta);
-
 
         const url = `/os/reporte?${params.toString()}`
         console.log(url)
@@ -74,8 +71,8 @@ const getReporteMontos = async (_fechaDesde: string | undefined, _fechaHasta: st
 export const obrasSocialesApi = {
     getAll: ()=> getAll(),
     getOne: (_id: number)=> getOne(_id),
-    create: (_obraSocial: CreateObraSocialValidator)=> create(_obraSocial),
-    edit: (_id: number, _obraSocial: EditObraSocialValidator)=> edit(_id, _obraSocial),
+    create: (_obraSocial: {nombre: string})=> create(_obraSocial),
+    edit: (_id: number, _obraSocial: {nombre: string})=> edit(_id, _obraSocial),
     remove: (_id: number)=> remove(_id),
     getReporteMontos: (_fechaDesde: string | undefined, _fechaHasta:string | undefined) => getReporteMontos(_fechaDesde, _fechaHasta)
 }

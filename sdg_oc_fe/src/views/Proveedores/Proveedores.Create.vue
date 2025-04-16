@@ -8,61 +8,62 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { toast } from '@/components/ui/toast'
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
 import { SlashIcon } from '@radix-icons/vue';
-import { toTypedSchema } from '@vee-validate/zod'
-import { createProveedorValidator } from '@/api/entities/proveedor';
-import { useForm } from 'vee-validate';
+import { createProveedorCustomValidator } from '@/api/entities/proveedor';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { AsteriskIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
 import { proveedoresApi } from '@/api/libs/proveedores';
 import { ref } from 'vue'
+import { useLoaderStore } from '@/stores/LoaderStore';
+import Label from '@/components/ui/label/Label.vue';
+
+const loader = useLoaderStore();
 
 
-const showSuccess = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
-const loading = ref<boolean>(false);
-const submitted = ref<boolean>(false);
 
-
-
-const formSchema = toTypedSchema(createProveedorValidator)
-const {handleSubmit} = useForm({
-    validationSchema: formSchema
+const newProveedor = ref<{razonSocial: string|undefined, cuit: string|undefined, email: string|undefined, telefono:string|undefined}>({
+    razonSocial:undefined,
+    cuit:undefined,
+    email:undefined, 
+    telefono:undefined,
+})
+const isValidNewProveedor = ref<{razonSocial: boolean, cuit: boolean, email: boolean, telefono:boolean}>({
+    razonSocial:true,
+    cuit:true,
+    email:true, 
+    telefono:true,
 })
 
 
-
-const onSubmit = handleSubmit(async (values) => {
-    loading.value=true;
+const onSubmit = async () => {
+    loader.show()
     try {
-        await proveedoresApi.create(values)
-        loading.value=false;
-        showSuccess.value = true;
+        await proveedoresApi.create(newProveedor.value)
         router.push('/proveedores')
         toast({
             title: 'Proveedor registrado con éxito',
         })
+        loader.hide();
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loading.value=false;
+        loader.hide();
     };
-})
+}
 
 const validateAndSubmit = async () => {
-    submitted.value = true;
-    await onSubmit();
+    const validProveedor = createProveedorCustomValidator(newProveedor.value);
+    isValidNewProveedor.value = validProveedor.isValid;
+    if(validProveedor.success){
+        await onSubmit();
+    }
 }
 
 
@@ -106,58 +107,72 @@ const validateAndSubmit = async () => {
                 <h3 class="page-subtitle text-center" >Registrar Nuevo Proveedor</h3>
                 <Separator class="my-6" />
                 
-                <FormField v-slot="{ componentField, errorMessage }" name="razonSocial">
-                <FormItem class="h-[5rem] mt-6">
-                    <div class="form-item">
-                        <FormLabel class="form-label">Razon Social</FormLabel>
-                        <FormControl>
-                            <Input type="text" v-bind="componentField" />
-                        </FormControl>
+                <div class="h-[5rem] w-full flex justify-center">
+                    <div class="flex w-[33rem] flex-row items-center justify-start ">
+                        <Label class="w-[7rem] text-right pr-4">Razón Social</Label>
+                        <Input class="w-[24rem]" type="text" v-model="newProveedor.razonSocial"  />
+                        <TooltipProvider  v-if="!isValidNewProveedor.razonSocial" >
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Ingresar razón social del proveedore</p>
+                                    <p>Al menos dos caracteres</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
-                     <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
-                </FormItem>
-                </FormField>
+                </div>
 
-                <FormField v-slot="{ componentField, errorMessage }" name="cuit">
-                <FormItem class="h-[5rem] mt-6">
-                    <div class="form-item">
-                        <FormLabel class="form-label">CUIT</FormLabel>
-                        <FormControl>
-                            <Input type="text" v-bind="componentField" />
-                        </FormControl>
+                <div class="h-[5rem] w-full flex justify-center">
+                    <div class="flex w-[33rem] flex-row items-center justify-start ">
+                        <Label class="w-[7rem] text-right pr-4">CUIT</Label>
+                        <Input class="w-[24rem]" type="text" v-decimal v-model="newProveedor.cuit"  />
+                        <TooltipProvider  v-if="!isValidNewProveedor.cuit" >
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Ingresar CUIT proveedore</p>
+                                    <p>Entre 10 y 11 caracteres</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
-                     <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
-                </FormItem>
-                </FormField>
+                </div>
                 
-                <FormField v-slot="{ componentField, errorMessage }" name="email">
-                <FormItem class="h-[5rem] mt-6">
-                    <div class="form-item">
-                        <FormLabel class="form-label">Email</FormLabel>
-                        <FormControl>
-                            <Input type="text" v-bind="componentField" />
-                        </FormControl>
+                <div class="h-[5rem] w-full flex justify-center">
+                    <div class="flex w-[33rem] flex-row items-center justify-start ">
+                        <Label class="w-[7rem] text-right pr-4">Email</Label>
+                        <Input class="w-[24rem]" type="text" v-model="newProveedor.email"  />
+                        <TooltipProvider  v-if="!isValidNewProveedor.email" >
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Ingresar email proveedore</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
-                     <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
-                </FormItem>
-                </FormField>
+                </div>
 
-                <FormField v-slot="{ componentField, errorMessage }" name="telefono">
-                <FormItem class="h-[5rem] mt-6">
-                    <div class="form-item">
-                        <FormLabel class="form-label">Telefono</FormLabel>
-                        <FormControl>
-                            <Input type="text" v-bind="componentField" />
-                        </FormControl>
+                <div class="h-[5rem] w-full flex justify-center">
+                    <div class="flex w-[33rem] flex-row items-center justify-start ">
+                        <Label class="w-[7rem] text-right pr-4">Telefono</Label>
+                        <Input class="w-[24rem]" type="text" v-model="newProveedor.telefono"  />
+                        <TooltipProvider  v-if="!isValidNewProveedor.telefono" >
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Ingresar telefono proveedore</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
-                     <FormMessage class="form-message" v-if="submitted && errorMessage">{{ errorMessage }}</FormMessage>
-                </FormItem>
-                </FormField>
+                </div>
 
-                <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                    <Button variant="outline" class="w-[25%] mr-5" @click="router.push('/proveedores')"  >Cancelar</Button>
-
-                    <Button type="submit" class="w-[25%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                <div class="w-full flex flex-row justify-end mt-8 mb-6 pr-14 ">
+                    <Button variant="outline" class="w-[25%] mr-5"
+                        :onclick="() => { router.push('/proveedores'); }">Cancelar</Button>
+                    <Button type="submit" class="w-[25%]">Guardar</Button>
                 </div>
             </form>
         </div>
