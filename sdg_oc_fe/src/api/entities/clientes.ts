@@ -36,72 +36,6 @@ export enum TipoDocumento {
 }
 
 
-export const createClienteValidator = z.object({
-  nroDocumento: z.number().int().positive(), 
-  TipoDocumento: z.enum(Object.keys(TipoDocumento) as [string, ...string[]]), 
-  nombre: z.string({message: "Ingrese el nombre del cliente"}).min(1,{message: "Ingrese el nombre del cliente"}), 
-  apellido: z.string({message: "Ingrese el apellido del cliente"}).min(1, {message: "Ingrese el apellido del cliente"}),
-  email: z.string({message: "Ingrese el email del cliente"}).email("Email inválido"),
-  telefono: z.string().regex(/^\d+$/, "Telefono inválido"),
-  sexo: z.enum(["Masculino", "Femenino"]),
-  fechaNac: z
-    .object({
-      day: z.string(),
-      month: z.string(),
-      year: z.string(),
-    })
-    .transform(({ day, month, year }) => {
-      console.log('d: '+ day+'- m: '+month+' - y: '+year)
-      let dayNumber = Number(day) +1 ;
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${(dayNumber.toString()).padStart(2, '0')}T00:00:00.000Z`;
-      console.log(formattedDate)
-      return formattedDate;
-    })
-    .refine((date) => !isNaN(Date.parse(date)), {
-      message: "Fecha de nacimiento inválida",
-    }),
-  observaciones: z.string().optional(),
-  domicilio: z.string({message: "Ingrese el domicilio del cliente"}).min(1, "El domicilio es requerido"),
-  localidad: z.object({
-    id: z.number().int().positive(),
-  })
-});
-export type CreateClienteValidator = z.infer<typeof createClienteValidator>;
-
-
-
-export const editClienteValidator = z.object({
-  dni: z.number().int().positive(), 
-  nombre: z.string().min(1, "El nombre es requerido"), 
-  apellido: z.string().min(1, "El apellido es requerido"),
-  email: z.string().email("Formato de email inválido"),
-  telefono: z.string().regex(/^\d+$/, "El teléfono solo debe contener números"),
-  sexo: z.enum(["Masculino", "Femenino"]),
-  fechaNac: z
-    .object({
-      day: z.string({message: 'hola'}),
-      month: z.string({message: 'hola'}),
-      year: z.string({message: 'hola'}),
-    })
-    .transform(({ day, month, year }) => {
-      let dayNumber = Number(day) +1 ;
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${(dayNumber.toString()).padStart(2, '0')}T00:00:00.000Z`;
-      return formattedDate;
-    })
-    .refine((date) => !isNaN(Date.parse(date)), {
-      message: "Fecha de nacimiento inválida",
-    }),
-  observaciones: z.string().optional(), 
-  domicilio: z.string().min(1, "El domicilio es requerido"),
-  localidad: z.object({
-    id: z.number().int().positive(),
-  })
-});
-export type EditClienteValidator = z.infer<typeof editClienteValidator>;
-
-
-
-
 export const createClienteCustomValidator = (_newCliente: {
     nroDocumento: number| undefined,
     tipoDocumento: TipoDocumento| undefined,
@@ -128,7 +62,7 @@ export const createClienteCustomValidator = (_newCliente: {
       apellido:  _newCliente.apellido ? _newCliente.apellido?.trim().length > 0 : false,
       email: emailValidator.safeParse(_newCliente.email).success,
       sexo: _newCliente.sexo ? ['Femenino', 'Masculino'].includes(_newCliente.sexo) :false,
-      telefono: _newCliente.telefono? isValidNumber(_newCliente.tipoDocumento) : false,
+      telefono: _newCliente.telefono? isValidNumber(_newCliente.telefono) : false,
       domicilio: _newCliente.domicilio ? _newCliente.domicilio?.trim().length > 0 : false, 
       fechaNac: fechaValidator.safeParse(_fecha).success,
       localidad: _newCliente.localidad ? Boolean(_newCliente.localidad.id) : false,
@@ -164,7 +98,7 @@ export const editClienteCustomValidator = (_cliente: Cliente, _fecha : {
       apellido:  _cliente.apellido ? _cliente.apellido?.trim().length > 0 : false,
       email: emailValidator.safeParse(_cliente.email).success,
       sexo: _cliente.sexo ? ['Femenino', 'Masculino'].includes(_cliente.sexo) :false,
-      telefono: _cliente.telefono? isValidNumber(_cliente.tipoDocumento) : false,
+      telefono: _cliente.telefono? isValidNumber(_cliente.telefono) : false,
       domicilio: _cliente.domicilio ? _cliente.domicilio?.trim().length > 0 : false, 
       fechaNac: fechaValidator.safeParse(_fecha).success,
       localidad: _cliente.localidad ? Boolean(_cliente.localidad.id) : false,
