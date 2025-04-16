@@ -34,8 +34,6 @@ export const editAudiometriaCustomValidator = (_audiometria: {
   cliente: {id: number | undefined},
   observaciones: string | undefined,
 }, _fecha: {day: string, month: string, year: string }, _file: any)=>{
-  console.log('_file')
-  console.log(_file)
   const isValid = {
     cliente: Boolean(_audiometria.cliente.id),
     fechaInforme: fechaValidator.safeParse(_fecha).success,

@@ -1,5 +1,4 @@
 import { BaseEntity } from "./entities";
-import { z} from 'zod';
 import { Localidad } from "./localidad";
 import { ClienteObraSocial } from "./clienteObraSocial";
 import { CondicionIva } from "./venta";

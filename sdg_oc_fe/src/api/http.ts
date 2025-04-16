@@ -21,7 +21,7 @@ http.interceptors.response.use(
 				const userStore = useUserStore();
 				await userStore.signOut();
 			}catch (logoutError) {
-        		console.error('Error durante logout:', logoutError);
+        		console.error(logoutError);
       		}
     	}
     	return Promise.reject(error);

@@ -68,10 +68,7 @@ onMounted(async()=>{
         currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme)
         fechaInforme.value.day = currentAudiometria.value.fechaInforme.getDate().toString()
         fechaInforme.value.month = (currentAudiometria.value.fechaInforme.getMonth()+1).toString()
-        fechaInforme.value.year = currentAudiometria.value.fechaInforme.getFullYear().toString()
-        fechaInforme.value.day= fechaInforme.value.day;
-        fechaInforme.value.month= fechaInforme.value.month;
-        fechaInforme.value.year= fechaInforme.value.year; 
+        fechaInforme.value.year = currentAudiometria.value.fechaInforme.getFullYear().toString() 
         currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme);
         audiometriaFile.value = await uploadsApi.getFile(`audiometrias/${currentAudiometria.value?.linkPDF}`)
     }
