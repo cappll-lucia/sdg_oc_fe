@@ -11,7 +11,6 @@ router.beforeEach((to: RouteLocationNormalized, _ , next: NavigationGuardNext)=>
     const auth: boolean = to.meta.auth as boolean;
     const userStore = useUserStore();
 	const user = userStore.getMe
-	console.log(userStore.user.role)
     if ( auth && !userStore.isSignedIn){
 		next('/login');
 	} else if (to.fullPath === '/login' && userStore.isSignedIn) {

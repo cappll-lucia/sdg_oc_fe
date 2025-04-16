@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { CreateMarcaValidator, EditMarcaValidator, Marca } from '../entities/marca';
+import { Marca } from '../entities/marca';
 import {http} from '../http';
 
 const getAll = async () => {
@@ -20,7 +20,7 @@ const getOne = async (_id: number) => {
 	}
 };
 
-const create = async(_marca: CreateMarcaValidator ) =>{
+const create = async(_marca: {nombre: string} ) =>{
     try {
 		const resp = await http.post('/marca', _marca);
 		return resp.data.data as Marca;
@@ -29,7 +29,7 @@ const create = async(_marca: CreateMarcaValidator ) =>{
 	}
 }
 
-const edit = async(_id: number, _marca: EditMarcaValidator ) =>{
+const edit = async(_id: number, _marca: {nombre: string} ) =>{
     try {
 		const resp = await http.patch(`/marca/${_id}`, _marca);
 		return resp.data.data as Marca;
@@ -51,7 +51,7 @@ const remove = async(_id: number ) =>{
 export const marcasApi = {
     getAll: ()=> getAll(),
     getOne: (_id: number)=> getOne(_id),
-    create: (_marca: CreateMarcaValidator)=> create(_marca),
-    edit: (_id: number, _marca: EditMarcaValidator)=> edit(_id, _marca),
+    create: (_marca: {nombre: string})=> create(_marca),
+    edit: (_id: number, _marca: {nombre: string} )=> edit(_id, _marca),
     remove: (_id: number)=> remove(_id),
 }
