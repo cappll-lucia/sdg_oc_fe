@@ -353,6 +353,14 @@ function setObraSocialIdAtIndex(index: number, id: number) {
   }
 }
 
+const availableMedioDePago = computed(() => {
+  const entries = Object.entries(TipoMedioDePagoEnum);
+  if(!selectedCliente.value) return;
+  if (selectedCliente.value.id === 0) {
+    return entries.filter(([key]) => key !== 'CUENTA_CORRIENTE');
+  }
+  return entries;
+});
 
 </script>
 
@@ -740,7 +748,7 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                     </div>
 
 
-                    <div v-if="showMedioPago" class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
+                    <div v-if="showMedioPago && selectedCliente" class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
                         <h3 class="page-subtitle mb-4">Medios de Pago</h3>
                         
                         <div v-for="(medio, index) in mediosDePago" class="medio-pago-item items-center flex flex-row w-full justify-start mb-4">
@@ -758,7 +766,7 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectItem 
-                                            v-for="tipo in Object.entries(TipoMedioDePagoEnum)" 
+                                            v-for="tipo in availableMedioDePago" 
                                             :key="tipo[0]" 
                                             :value="tipo[0]"
                                         >

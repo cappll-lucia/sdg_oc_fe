@@ -279,7 +279,7 @@ const validateDetalles = ()=>{
             </div>
             <form v-else @submit.prevent="validateAndEdit" class="forms-wide flex flex-col justify-between items-start px-[5rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Editar Recta - Anteojos Recetados</h3>
+                    <h3 class="page-subtitle text-center">Editar Receta - Anteojos Recetados</h3>
                     <Separator class="my-6 w-full" />
                 </div>
                 <div class="flex flex-col w-full  justify-between items-start">

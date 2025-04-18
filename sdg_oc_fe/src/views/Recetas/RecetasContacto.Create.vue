@@ -321,7 +321,7 @@ const onSubmit = async()=>{
         <div class="pt-2 mb-4 " >
             <form @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Nueva Recta - Lentes de contacto</h3>
+                    <h3 class="page-subtitle text-center">Nueva Receta - Lentes de contacto</h3>
                     <Separator class="my-10 w-full" />
                 </div>
                 <div class="flex flex-col w-full justify-between items-start">
