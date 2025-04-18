@@ -17,6 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent
+} from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -30,12 +34,14 @@ import { TipoMedioDePagoEnum, RedDePago, createMedioPagoCustomValidator } from '
 import { createLineaVentaCustomValidator } from '@/api/entities/lineaVenta';
 import { CondicionIva, createVentaCustomValidator, ventaObrasSocialesCustomValidator } from '@/api/entities/venta';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
+import { AlertCircleIcon, AsteriskIcon, PlusCircleIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
 import { ventasApi } from '@/api/libs/ventas';
 import { Textarea } from '@/components/ui/textarea';
 import router from '@/router';
-import { condicionIvaDisplay } from '@/lib/utils';
+import { condicionIvaDisplay, isValidNumber } from '@/lib/utils';
+import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue';
+import { clientesApi } from '@/api/libs/clientes';
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -44,6 +50,10 @@ const searchClienteOpen =ref<boolean>(false);
 const searchProductoOpen =ref<boolean>(false);
 const showMedioPago = ref<boolean>(false);
 const loading = ref<boolean>(false);
+const openSelectOS = ref<boolean>(false);
+const openSelectOSIndex = ref<number>(0);
+const openNewClienteOS = ref<boolean>(false);
+const newOsIndex = ref<number>();
 
 const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
 const mediosDePago = ref<{importe: number, tipoMedioDePago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
@@ -57,7 +67,6 @@ const fechaVenta = ref<Date>(new Date());
 
 const condicionIvaVenta = ref<CondicionIva>(CondicionIva.CONSUMIDOR_FINAL)
 const availableCondicionIva = ref<CondicionIva[]>([CondicionIva.CONSUMIDOR_FINAL]);
-
 
 const isValidVenta = ref<{
     cliente: boolean,
@@ -315,7 +324,32 @@ const tipoFactura = computed(()=>{
     }else{
         return "B"
     }
-})
+});
+
+const  handleShowNewObraSocialCliente= async(index: number)=>{
+    openSelectOS.value =false;
+    openSelectOSIndex.value =index;
+    newOsIndex.value=index;
+    openNewClienteOS.value =true;
+};
+
+const handleAddObraSocialCliente = async(obraSocialId: number)=>{
+    if(selectedCliente.value?.id){
+        selectedCliente.value = await clientesApi.getOne(selectedCliente.value?.id)
+        if(!isValidNumber(newOsIndex.value)) return;
+        setObraSocialIdAtIndex(newOsIndex.value, obraSocialId);
+        openNewClienteOS.value=false;   
+        openSelectOS.value=false;
+    }
+}
+
+
+function setObraSocialIdAtIndex(index: number, id: number) {
+  if (ventaObrasSociales.value[index]) {
+    ventaObrasSociales.value[index].obraSocial.id = id;
+  }
+}
+
 
 </script>
 
@@ -520,7 +554,12 @@ const tipoFactura = computed(()=>{
                                             <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
                                                 <div class="flex flex-row w-[15rem] ">
                                                 <Select 
-                                                        :modelValue="os.obraSocial.id?.toString()" 
+                                                        :model-value="os.obraSocial.id?.toString()" 
+                                                          :open="openSelectOS && openSelectOSIndex === index"
+                                                            @update:open="(isOpen) => {
+                                                                openSelectOS = isOpen;
+                                                                openSelectOSIndex = index;
+                                                            }"
                                                          @update:modelValue="(value:string) => {
                                                             if (ventaObrasSociales[index]) {
                                                                 ventaObrasSociales[index].obraSocial.id = Number(value);
@@ -529,19 +568,27 @@ const tipoFactura = computed(()=>{
                                                             <SelectTrigger class="text-black w-[12rem] text-xs ">
                                                                 <SelectValue   />
                                                             </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectGroup>
-                                                                    <SelectItem 
-                                                                    class="text-xs"
+                                                            <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                                                            <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                                                <SelectItem class="w-[14rem] text-sm" 
                                                                     v-for="os in selectedCliente?.clienteObrasSociales" 
                                                                     :key="os.obraSocial.id" 
                                                                     :value="os.obraSocial.id.toString()"
                                                                     >
                                                                     {{ os.obraSocial.nombre  }}
                                                                 </SelectItem>
+                                                                <Button @click="()=>{handleShowNewObraSocialCliente(index)}" variant="ghost" class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"><PlusCircleIcon/> <span class="w-[9rem] text-wrap text-left"> Asociar nueva obra social al cliente</span></Button>
                                                             </SelectGroup>
                                                         </SelectContent>
                                                 </Select>
+                                                   <Dialog  v-model:open="openNewClienteOS" >
+                                                        <DialogContent class="max-w-[33rem]">
+                                                                <AddObraSocialClienteForm 
+                                                                :cliente="selectedCliente"
+                                                                @handle-add-obra-social-cliente="handleAddObraSocialCliente"
+                                                            />
+                                                        </DialogContent>
+                                                    </Dialog>
                                                 <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.obraSocial" >
                                                         <Tooltip>
                                                             <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
@@ -599,7 +646,7 @@ const tipoFactura = computed(()=>{
                                                             <Tooltip>
                                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                                    <p>Seleccionar obra social</p>
+                                                                    <p>Seleccionar condición IVA</p>
                                                                 </TooltipContent>
                                                             </Tooltip>
                                                     </TooltipProvider>
