@@ -128,7 +128,7 @@ const changeSelectedAudiom = async(audiometria: Audiometria) =>{
             </div>
 
             <div v-else>
-                <h1>No hay audiometrias registradas</h1>
+                <h1>No hay audiometrías registradas.</h1>
             </div>
         </div>
     </div>

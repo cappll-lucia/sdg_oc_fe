@@ -224,7 +224,7 @@ const getTipoNotaDebito = (tipoFactura: number)=>{
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
                                 <div class="flex flex-col w-[8rem] h-[6rem] border justify-center items-center rounded-lg">
-                                    <span>Nota Debito</span>
+                                    <span>Nota Débito</span>
                                     <span v-if="tipoComprobante" class="text-[3rem] leading-[3rem]">{{ tipoComprobanteDisplay(tipoComprobante)?.letra}}</span>
                                 </div>
                                 <Label class="text-[1rem]">Fecha: {{ fechaComprobante.toLocaleDateString('es-ES') }}</Label>

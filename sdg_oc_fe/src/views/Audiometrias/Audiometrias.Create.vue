@@ -30,15 +30,16 @@ import { Cliente } from '@/api/entities/clientes';
 import { clientesApi } from '@/api/libs/clientes';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 import { useLoaderStore } from '@/stores/LoaderStore';
+import { useRoute } from 'vue-router';
 
 const loader = useLoaderStore();
+const route = useRoute()
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 const errorPDF =ref<string>('');
 const searchClienteOpen = ref<boolean>(false);
 const selectedCliente = ref<Cliente | null>(null);
-const foundClientes = ref<Cliente[]>([]);
 const audiometriaFile = ref<any>(null);
 const audiometriaURL = ref(); //TODO REMOVE
 
@@ -76,8 +77,11 @@ const isValidAudiometria = ref<{
 
 onMounted(async()=>{
     // TODO pagination
-    const res= await clientesApi.getAll({});
-    foundClientes.value = res.items
+    const query = route.query
+    if(query.cliente){
+        const foundCliente = await clientesApi.getOne(Number(query.cliente))
+        if(foundCliente) handleSelectCliente(foundCliente)
+    }
 })
 
 const onSubmit = async () => {

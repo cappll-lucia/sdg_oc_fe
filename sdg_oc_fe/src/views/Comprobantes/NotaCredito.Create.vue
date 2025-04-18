@@ -228,7 +228,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
                                 <div class="flex flex-col w-[8rem] h-[6rem] border justify-center items-center rounded-lg">
-                                    <span>Nota Credito</span>
+                                    <span>Nota Crédito</span>
                                     <span v-if="tipoComprobante" class="text-[3rem] leading-[3rem]">{{ tipoComprobanteDisplay(tipoComprobante)?.letra}}</span>
                                 </div>
                                 <Label class="text-[1rem]">Fecha: {{ fechaComprobante.toLocaleDateString('es-ES') }}</Label>
@@ -252,7 +252,7 @@ const getTipoNotaCredito = (tipoFactura: number)=>{
                                     <SelectGroup>
                                         <SelectItem value="Anulación" >Anulación</SelectItem>
                                         <SelectItem value="Descuento" >Descuento</SelectItem>
-                                        <SelectItem value="Devolución" >Devolucion</SelectItem>
+                                        <SelectItem value="Devolución" >Devolución</SelectItem>
                                         <SelectItem value="Diferencia de Precio">Diferencia de precio</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>

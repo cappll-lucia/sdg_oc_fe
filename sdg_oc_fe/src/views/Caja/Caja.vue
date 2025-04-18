@@ -55,7 +55,7 @@ const df = new DateFormatter('es-AR', {
 })
 
 const loader = useLoaderStore();
-const loadingForm = ref<boolean>(false)
+const loadingForm = ref<boolean>(false);
 
 const saldoActual = ref<number>();
 const aperturaToday = ref<Caja>();
