@@ -9,7 +9,9 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { toast } from '@/components/ui/toast';
-import router from '@/router/index';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 import { SlashIcon } from 'lucide-vue-next';
 
 

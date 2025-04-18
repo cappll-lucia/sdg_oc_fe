@@ -8,6 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent
+} from '@/components/ui/dialog'
 import Label from '@/components/ui/label/Label.vue';
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator';
@@ -27,10 +31,11 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import { AsteriskIcon } from 'lucide-vue-next';
-import { condicionIvaDisplay } from '@/lib/utils';
+import { AsteriskIcon, PlusCircleIcon } from 'lucide-vue-next';
+import { condicionIvaDisplay, isValidNumber } from '@/lib/utils';
 import { clientesApi } from '@/api/libs/clientes';
 import { useLoaderStore } from '@/stores/LoaderStore';
+import CreateObrasSocialForm from './CreateObrasSocial.Form.vue';
 
 const tipoDocumentoOptions = [
   { value: TipoDocumento.CUIT, label: "CUIT" },
@@ -46,6 +51,9 @@ const errorMessage =ref<string>('');
 
 const localidades = ref<Localidad[]>([]);
 const obrasSociales = ref<ObraSocial[]>([]);
+const openSelectOS = ref<boolean>(false);
+const openNewOS = ref<boolean>(false);
+const newOsIndex = ref<number>()
 
 const fechaNac = ref({
   day: '',
@@ -148,7 +156,6 @@ const validateAndSubmit = async()=>{
     }
 }
 
-
 const onSubmit = async()=>{
     loader.show();
     try{
@@ -165,7 +172,6 @@ const onSubmit = async()=>{
 }
 
 
-
 const availableObrasSociales = computed(() => {
   const assignedIds = new Set(
     clienteObrasSociales.value
@@ -180,6 +186,21 @@ const availableObrasSociales = computed(() => {
       nombre: os.nombre,
     }));
 });
+
+
+const handleCreateObraSocial = async(newObraSocial: ObraSocial)=>{
+    openNewOS.value=false;
+    obrasSociales.value.push(newObraSocial);
+    if(isValidNumber(newOsIndex.value) && newOsIndex.value >=0) {
+        setObraSocialIdAtIndex(newOsIndex.value, newObraSocial.id);
+    }
+}
+
+function setObraSocialIdAtIndex(index: number, id: number) {
+  if (clienteObrasSociales.value[index]) {
+    clienteObrasSociales.value[index].obraSocial.id = id;
+  }
+}
 
 
 </script>
@@ -447,17 +468,18 @@ const availableObrasSociales = computed(() => {
                         <h3 class="font-bold mb-4">Obras Sociales</h3>
                         <div v-for="(_, index) in clienteObrasSociales" class="w-full flex flex-row justify-start items-center mb-6">
                             <div v-if="clienteObrasSociales[index]" class="flex flex-row justify-start items-center w-[28rem]">
-
                                 <Label  class="w-[7rem]  pr-[2rem] text-right ">Obra Social</Label>
-                                <Select 
-                                :v-model="clienteObrasSociales[index].obraSocial.id " 
-                                @update:model-value="(value)=>{
-                                    if (!clienteObrasSociales[index]) {
+                                <Select
+                                    :model-value="clienteObrasSociales[index].obraSocial.id?.toString()"
+                                    v-model:open="openSelectOS"
+                                    @update:model-value="(value: string) => {
+                                        const id = parseInt(value, 10);
+                                        if (!clienteObrasSociales[index]) {
                                         clienteObrasSociales[index] = { obraSocial: { id: undefined }, numeroSocio: '' };
-                                    }
-                                    clienteObrasSociales[index].obraSocial.id = Number(value);
-                                }"
-                                     >
+                                        }
+                                        clienteObrasSociales[index].obraSocial.id = isNaN(id) ? undefined : id;
+                                    }"
+                                    >
                                      <SelectTrigger class="w-[15rem] mr-4">
                                          <SelectValue class="text-black"  >
                                             {{
@@ -467,18 +489,29 @@ const availableObrasSociales = computed(() => {
                                             }}
                                          </SelectValue>
                                         </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectItem 
+                                        <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                                            <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                                <SelectItem class="w-[14rem]" 
                                                 v-for="os in availableObrasSociales " 
                                                 :key="os.id" 
                                                 :value="os.id.toString()"
                                                 >
                                                 {{ os.nombre}}
                                             </SelectItem>
+                                            <Button @click="()=>{openSelectOS=false; openNewOS=true; newOsIndex=index}" variant="ghost" class="w-full px-8 mb-2 pb-2 bg-secondary rounded-none items-start justify-start"><PlusCircleIcon/> Nueva obra social</Button>
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
+                                
+                                <Dialog  v-model:open="openNewOS" >
+                                    <DialogContent class="max-w-[45rem]">
+                                        <CreateObrasSocialForm 
+                                            @handle-create-obra-social="handleCreateObraSocial"
+                                        />
+                                    </DialogContent>
+                                </Dialog>
+                                    
+                            
                                 <TooltipProvider  v-if="!isValidClienteObraSocial[index]?.obraSocial" >
                                     <Tooltip>
                                         <TooltipTrigger class="bg-transparent text-xs text-destructive"> <AsteriskIcon :size="14" /> </TooltipTrigger>
@@ -495,7 +528,7 @@ const availableObrasSociales = computed(() => {
                                     <Tooltip>
                                         <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                         <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                            <p>Seleccionar obra social</p>
+                                            <p>Ingresar número de socio</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
@@ -528,4 +561,4 @@ const availableObrasSociales = computed(() => {
 #add-os{
     color: gray;
 }
-</style>
+</style>    

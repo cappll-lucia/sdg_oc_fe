@@ -8,13 +8,13 @@ import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
 import { ref } from 'vue'
-import { useLoaderStore } from '@/stores/LoaderStore';
 import Label from '@/components/ui/label/Label.vue';
+import LoaderForm from './LoaderForm.vue';
 
-const loader = useLoaderStore();
 
 const newObraSocial = ref<string>();
 const isValidNewObraSocial = ref<boolean>(true);
+const loadingForm = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -23,7 +23,7 @@ const emit = defineEmits(['handleCreateObraSocial']);
 
 
 const onSubmit = async () => {
-    loader.show();
+    loadingForm.value=true;
     try {
         if(!newObraSocial.value){
             isValidNewObraSocial.value=false;
@@ -31,11 +31,13 @@ const onSubmit = async () => {
         } 
         const createdObraSocial = await obrasSocialesApi.create({nombre: newObraSocial.value})
         emit('handleCreateObraSocial', createdObraSocial )
-        loader.hide();
+        loadingForm.value=false;
+        newObraSocial.value=undefined;
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loader.hide();
+        loadingForm.value=false;
+        newObraSocial.value=undefined;
     };
 }
 
@@ -51,7 +53,7 @@ const validateAndSubmit = async () => {
 
 <template>
     <div class="flex w-full justify-center items-center">
-        <form @submit.prevent="validateAndSubmit" class="forms">
+        <form @submit.prevent="validateAndSubmit" class="forms" v-if="!loadingForm">
             <h3 class="page-subtitle text-center">Registrar Nueva Obra Social</h3>
             <Separator class="my-6" />
                 <div class="h-[5rem] w-full flex justify-center">
@@ -75,6 +77,9 @@ const validateAndSubmit = async () => {
                 <Button type="submit" class="w-[25%]">Guardar</Button>
             </div>
         </form>
+        <div v-else  class="flex w-full justify-center items-center h-[10rem]">
+            <LoaderForm />
+        </div>
     </div>
 
     <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
