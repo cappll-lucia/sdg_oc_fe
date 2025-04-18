@@ -32,6 +32,7 @@ import { condicionIvaDisplay } from '@/lib/utils';
 import { clientesApi } from '@/api/libs/clientes';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import { useRoute } from 'vue-router';
+import router from '@/router';
 
 const tipoDocumentoOptions = [
   { value: TipoDocumento.CUIT, label: "CUIT" },
@@ -497,7 +498,7 @@ const availableObrasSociales = computed(() => {
                     </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-[6rem]">
-                    <Button variant="outline" class="w-[15%] mr-5">Cancelar</Button>
+                    <Button @click="router.push(`/clientes/dashboard/${currentCliente?.id}`)" variant="outline" type="button" class="w-[15%] mr-5">Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>
