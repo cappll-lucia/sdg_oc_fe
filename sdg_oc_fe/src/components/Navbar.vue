@@ -120,9 +120,9 @@ const reportes: { title: string, href: string}[] = [
                 <DropdownMenuContent class="px-4 w-[15rem]">
                     <DropdownMenuLabel>{{ userData?.username }}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="router.push('/preguntas')" ><QuestionMarkCircledIcon /> Preguntas Frecuentes</DropdownMenuItem>
+                    <DropdownMenuItem @click="router.push('/preguntas')" ><QuestionMarkCircledIcon /> Preguntas frecuentes</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="router.push('/parametros')" > <SettingsIcon />Pámetros</DropdownMenuItem>
+                    <DropdownMenuItem @click="router.push('/parametros')" > <SettingsIcon />Parámetros</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem class="font-bold" @click="userStore.signOut()"> <LogOutIcon/> Cerrar sesión</DropdownMenuItem>
                 </DropdownMenuContent>

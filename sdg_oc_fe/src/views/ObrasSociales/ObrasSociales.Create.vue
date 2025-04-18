@@ -18,7 +18,7 @@ import { SlashIcon } from 'lucide-vue-next';
 const handleCreateObraSocial = async()=>{
     router.push(`/obras-sociales`)
     toast({
-        title: 'Obra Social regitrado con éxito',
+        title: 'Obra Social registrado con éxito',
     })
 }
 

@@ -24,6 +24,7 @@ import {
     CircleDot,
     Eye,
     Fingerprint,
+    HandCoinsIcon,
     IdCard,
     InspectIcon,
     Mail,
@@ -55,7 +56,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createMovimientoCtaCte, TipoMovimiento } from '@/api/entities/movimiento';
@@ -65,6 +73,7 @@ import { toast } from '@/components/ui/toast';
 import AlertError from '@/components/AlertError.vue';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import LoaderForm from '@/components/LoaderForm.vue';
+import Badge from '@/components/ui/badge/Badge.vue';
 
 const loader = useLoaderStore();
 const route = useRoute();
@@ -104,8 +113,8 @@ onMounted( async()=>{
 
 const loadData = async()=>{
     // TODO pagination
-    loader
     currentCliente.value = await clientesApi.getOne(Number(route.params.id));
+    if(!currentCliente.value) return;
     recetasCliente.value = await clientesApi.getRecetasSummaryByCliente(currentCliente.value.id);
     audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(currentCliente.value.id);
     ctaCorriente.value = await cuentaCorrienteApi.getOneByCliente(currentCliente.value.id);    
@@ -226,7 +235,7 @@ const onSubmit = async()=>{
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2">
-            <div v-if="currentCliente" class="w-full flex flex-row justify-between h-[15rem]">
+            <div v-if="currentCliente" class="w-full flex flex-row justify-between h-[16rem]">
                 <div class="w-[72%] bg-secondary rounded-lg p-10 flex flex-col justify-between">
                     <div class="flex flex-row  w-full items-center justify-between ">
                         <div class="flex flex-row items-center justify-start">
@@ -239,7 +248,7 @@ const onSubmit = async()=>{
                             <Pencil1Icon class="w-4 h-4" />
                         </Button>
                     </div>
-                    <div class="w-full flex flex-row justify-start items-start h-[5rem]">
+                    <div class="w-full flex flex-row mt-4 justify-start items-start h-[5rem] ">
                         <div class="text-gray-700 w-[50%] h-[5rem] flex flex-col justify-between items-start">
                             <div class="flex flex-row justify-start">
                                 <IdCard class=" text-gray-900 w-5 h-5 mr-2" />
@@ -265,7 +274,7 @@ const onSubmit = async()=>{
                             </div>
                             <div class="flex flex-row justify-start  items-center">
                                 <Phone class="text-gray-900 w-5 h-5 mr-2"/>
-                                <span class="text-sm w-[6rem]">Telefono : </span>
+                                <span class="text-sm w-[6rem]">Teléfono : </span>
                                 <span class="text-sm" >{{ currentCliente.telefono }}</span>
                             </div>
                             <div class="flex flex-row justify-start  items-center">
@@ -274,6 +283,14 @@ const onSubmit = async()=>{
                                 <span class="text-sm" >{{ currentCliente.email }}</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="flex flex-row mt-4 justify-start items-center h-[1rem] text-gray-700 ">
+                        <HandCoinsIcon class=" text-gray-900 w-5 h-5 mr-2" />
+                        <span class="text-sm w-[8rem]">Obras Sociales : </span>
+                        <div  v-if="currentCliente.clienteObrasSociales.length" >
+                            <Badge v-for="os in currentCliente.clienteObrasSociales" variant="outline" class="font-normal border-gray-700 mr-4">{{os.obraSocial.nombre}}</Badge>
+                        </div>
+                        <span v-else class="text-sm"> - </span>
                     </div>
                 </div>
                 <div class="w-[25%] bg-secondary rounded-lg p-4 flex flex-col justify-center items-center">
@@ -293,7 +310,14 @@ const onSubmit = async()=>{
                             <h2 class="page-subtitle">Recetas</h2>
                             <div>
                                 <Button @click="router.push(`/recetas/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent mr-4 hover:bg-white"><Eye/> </Button>
-                                <Button @click="router.push(`/recetas/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger> <Button variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button></DropdownMenuTrigger>
+                                    <DropdownMenuContent class="w-[16rem] font-normal" >
+                                        <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"  >Nueva receta anteojos recetados</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)" >Nueva receta lentes de contacto</DropdownMenuLabel>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                         <ScrollArea v-if="recetasCliente.length" class=" mt-2 w-full h-[20rem] rounded-lg  bg-white border pr-4 scroll-ml-2">
@@ -309,14 +333,21 @@ const onSubmit = async()=>{
                         </ScrollArea>
                         <div v-else class=" mt-2 w-full flex flex-col items-center justify-center text-center h-[20rem] border rounded-lg bg-white py-4">
                                 <Label class="text-sm">El cliente no tiene recetas registradas</Label>   
-                                <Button class="mt-4 text-xs w-36" variant="outline" size="sm">Nueva Receta</Button>  
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger> <Button class="mt-4 text-xs w-36" variant="outline" size="sm">Nueva Receta</Button>  </DropdownMenuTrigger>
+                                    <DropdownMenuContent class="w-[16rem] font-normal" >
+                                        <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"  >Nueva receta anteojos recetados</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)" >Nueva receta lentes de contacto</DropdownMenuLabel>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                         </div>
                         <div class=" mt-8">
                         <div class="flex flex-row justify-between">
                             <h2 class="page-subtitle">Audiometrías</h2>
                             <div>
                                 <Button @click="router.push(`/audiometrias/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent mr-4 hover:bg-white"><Eye/> </Button>
-                                <Button @click="router.push(`/audiometrias/create/${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
+                                <Button @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)" variant="outline" class="p-2 bg-transparent hover:bg-white"><PlusIcon/> </Button>
                             </div>
                         </div>
                         <ScrollArea v-if="audiometriasCliente.length" class=" mt-2 w-full h-[12rem] pr-4  rounded-lg bg-white border">
@@ -329,7 +360,7 @@ const onSubmit = async()=>{
                         </ScrollArea>
                         <div v-else class=" mt-2 w-full text-center flex flex-col items-center justify-center h-[12rem] border rounded-lg bg-white py-4">
                                 <Label class="text-sm">El cliente no tiene audiometrías registradas</Label>   
-                                <Button class="mt-4 text-xs w-36" variant="outline" size="sm">Nueva Audiometría</Button>  
+                                <Button @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)" class="mt-4 text-xs w-36" variant="outline" size="sm">Nueva Audiometría</Button>  
                         </div>
                     </div>
                 </div>

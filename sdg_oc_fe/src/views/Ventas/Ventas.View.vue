@@ -180,7 +180,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                                 currentVenta?.cliente.nombre }}</Label>
                         </div>
                         <div class="flex  flex-row justify-start items-center w-full">
-                            <Label class="form-label w-[11rem] text-md font-bold">Condicion Fiscal: </Label>
+                            <Label class="form-label w-[11rem] text-md font-bold">Condición Fiscal: </Label>
                             <!-- //TODO update por categFiscal de la venta -->
                             <Label class="form-label w-[15rem] text-md">{{
                                 condicionIvaDisplay(currentVenta.cliente.categoriaFiscal) }}</Label>
@@ -290,7 +290,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                 </div>
                 <div class="w-full mt-8 ">
                     <h3 class="text-md font-bold">Observaciones</h3>
-                    <span class="text-sm">{{ currentVenta?.observaciones ?? "---" }}</span>
+                    <span class="text-sm">{{ currentVenta?.observaciones?.trim().length>0  ? currentVenta.observaciones : "Sin observaciones" }}</span>
                 </div>
             </div>
             <div class=" w-full min-h-[10rem] flex flex-col justify-start my-12 items-start">
@@ -316,7 +316,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         class="w-full flex flex-row justify-start  items-start py-2 bg-secondary font-bold rounded-t-lg p-[0.75rem] px-8">
                         <span class="text-xs w-[9rem]">FECHA</span>
                         <span class="text-xs w-[12rem]">TIPO COMPROBANTE</span>
-                        <span class="text-xs w-[15rem] ">NUMERO COMPROBANTE</span>
+                        <span class="text-xs w-[15rem] ">NÚMERO COMPROBANTE</span>
                         <!-- <span class="text-xs w-[6rem] ">ENTIDAD BANCARIA</span> -->
                     </div>
                     <div class="border-x">

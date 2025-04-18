@@ -41,7 +41,7 @@ export const columns: ColumnDef<Venta>[]=[
     },
     {
         accessorKey: 'numeroFactura',
-        header: () => h('div', 'Numero Factura'),
+        header: () => h('div', 'Número Factura'),
         cell: ({row})=>  row.original.factura ? row.original.factura.numeroComprobante : ' Pendiente '
     },
     {

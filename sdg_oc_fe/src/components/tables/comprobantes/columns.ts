@@ -30,7 +30,7 @@ export const columns: ColumnDef<Comprobante>[]=[
     },
     {
         accessorKey: 'numeroComprobante',
-        header: () => h('div', 'Numero Comprobante'),
+        header: () => h('div', 'Número Comprobante'),
         cell: ({row})=>  row.original.numeroComprobante ? row.original.numeroComprobante : ' Pendiente '
     },
     {

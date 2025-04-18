@@ -21,7 +21,7 @@ export const columns: ColumnDef<Proveedor>[] =[
     },
     {
         accessorKey: 'telefono',
-        header: () => h('div', 'Telefono'),
+        header: () => h('div', 'Teléfono'),
         cell: info=> info.getValue(),
     },
     {

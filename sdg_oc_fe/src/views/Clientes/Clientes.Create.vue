@@ -15,7 +15,7 @@ import { toast } from '@/components/ui/toast';
 const handleCreateCliente = async()=>{
     router.push(`/clientes`)
     toast({
-        title: 'Cliente regitrado con éxito',
+        title: 'Cliente registrado con éxito',
     })
 }
 
