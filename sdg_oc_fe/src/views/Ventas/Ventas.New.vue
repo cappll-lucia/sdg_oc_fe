@@ -345,8 +345,11 @@ const handleAddObraSocialCliente = async(obraSocialId: number)=>{
 
 
 function setObraSocialIdAtIndex(index: number, id: number) {
-  if (ventaObrasSociales.value[index]) {
+  if (ventaObrasSociales.value[index] && isvalidVentaObraSocial.value[index]) {
     ventaObrasSociales.value[index].obraSocial.id = id;
+    isvalidVentaObraSocial.value[index].importe= true;
+    isvalidVentaObraSocial.value[index].obraSocial= true;
+    isvalidVentaObraSocial.value[index].condicionIva= true;
   }
 }
 
@@ -537,7 +540,14 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                                 <div class="border rounded-lg w-full  min-h-[3rem] p-4">
                                     <div class="w-full flex flex-row justify-between  items-center">
                                         <h3 class="page-subtitle">Obras Sociales</h3>
+                                        <div v-if="!selectedCliente">
+                                            <p class="text-xs">Para agregar una obra social, seleccione un cliente</p>
+                                        </div>
+                                        <div v-else-if="selectedCliente?.id==0">
+                                            <p class="text-xs" >No es posible asociar obras sociales al cliente Consumidor Final</p>
+                                        </div>
                                         <Switch 
+                                            v-else
                                             :model-value="obrasSociales" 
                                             @update:model-value="()=>{
                                                 obrasSociales=!obrasSociales
@@ -550,117 +560,118 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                                         ></Switch>
                                     </div>
                                     <div v-if="obrasSociales" class="flex flex-row items-center">
-                                        <div v-if=" selectedCliente && selectedCliente?.clienteObrasSociales.length > 0">
-                                            <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
-                                                <div class="flex flex-row w-[15rem] ">
-                                                <Select 
-                                                        :model-value="os.obraSocial.id?.toString()" 
-                                                          :open="openSelectOS && openSelectOSIndex === index"
-                                                            @update:open="(isOpen) => {
-                                                                openSelectOS = isOpen;
-                                                                openSelectOSIndex = index;
-                                                            }"
-                                                         @update:modelValue="(value:string) => {
-                                                            if (ventaObrasSociales[index]) {
-                                                                ventaObrasSociales[index].obraSocial.id = Number(value);
-                                                            }}"
-                                                        >
-                                                            <SelectTrigger class="text-black w-[12rem] text-xs ">
-                                                                <SelectValue   />
-                                                            </SelectTrigger>
-                                                            <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
-                                                            <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
-                                                                <SelectItem class="w-[14rem] text-sm" 
-                                                                    v-for="os in selectedCliente?.clienteObrasSociales" 
-                                                                    :key="os.obraSocial.id" 
-                                                                    :value="os.obraSocial.id.toString()"
-                                                                    >
-                                                                    {{ os.obraSocial.nombre  }}
-                                                                </SelectItem>
-                                                                <Button @click="()=>{handleShowNewObraSocialCliente(index)}" variant="ghost" class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"><PlusCircleIcon/> <span class="w-[9rem] text-wrap text-left"> Asociar nueva obra social al cliente</span></Button>
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                </Select>
-                                                   <Dialog  v-model:open="openNewClienteOS" >
-                                                        <DialogContent class="max-w-[33rem]">
-                                                                <AddObraSocialClienteForm 
-                                                                :cliente="selectedCliente"
-                                                                @handle-add-obra-social-cliente="handleAddObraSocialCliente"
-                                                            />
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.obraSocial" >
-                                                        <Tooltip>
-                                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                                <p>Seleccionar obra social</p>
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                </TooltipProvider>
-                                                </div>
-                                                <div class="flex flex-row w-[11rem] items-center ">
-                                                    <Label>$</Label>
-                                                    <Input
-                                                        :model-value="os.importe" 
-                                                        @update:model-value="(value)=>{
-                                                            if(ventaObrasSociales[index]){
-                                                                ventaObrasSociales[index].importe=Number(value)
-                                                            }
-                                                        }"
-                                                        v-decimal
-                                                        class="w-[7rem] ml-2 text-xs"
-                                                        placeholder="Importe"
-                                                        type="decimal"
-                                                    /> 
-                                                    <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.importe" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Ingresar Importe</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-                                                </div>
-                                                <div class="flex flex-row w-[15rem]">
-                                                    <Select 
-                                                            :modelValue="os.condicionIva?.toString() ?? undefined" 
-                                                            @update:model-value="(value) => os.condicionIva = Number(value)"
-                                                        >
-                                                                <SelectTrigger class="text-black w-[13rem] text-xs ">
-                                                                    <SelectValue   />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectGroup>
-                                                                        <SelectItem 
-                                                                            class="text-xs"
-                                                                            v-for="condicion in Object.values(CondicionIva).filter(val => typeof val === 'number') as CondicionIva[]" 
-                                                                            :key="condicion" 
-                                                                            :value="condicion.toString()"
-                                                                        >
-                                                                            {{ condicionIvaDisplay(condicion) }}
+                                        <div v-if=" selectedCliente">
+                                            <div v-if="selectedCliente?.clienteObrasSociales.length > 0">
+                                                    <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
+                                                        <div class="flex flex-row w-[15rem] ">
+                                                        <Select 
+                                                                :model-value="os.obraSocial.id?.toString()" 
+                                                                :open="openSelectOS && openSelectOSIndex === index"
+                                                                    @update:open="(isOpen) => {
+                                                                        openSelectOS = isOpen;
+                                                                        openSelectOSIndex = index;
+                                                                    }"
+                                                                @update:modelValue="(value:string) => {
+                                                                    if (ventaObrasSociales[index]) {
+                                                                        ventaObrasSociales[index].obraSocial.id = Number(value);
+                                                                    }}"
+                                                                >
+                                                                    <SelectTrigger class="text-black w-[12rem] text-xs ">
+                                                                        <SelectValue   />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                                                                    <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                                                        <SelectItem class="w-[14rem] text-sm" 
+                                                                            v-for="os in selectedCliente?.clienteObrasSociales" 
+                                                                            :key="os.obraSocial.id" 
+                                                                            :value="os.obraSocial.id.toString()"
+                                                                            >
+                                                                            {{ os.obraSocial.nombre  }}
                                                                         </SelectItem>
+                                                                        <Button @click="()=>{handleShowNewObraSocialCliente(index)}" variant="ghost" class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"><PlusCircleIcon/> <span class="w-[9rem] text-wrap text-left"> Asociar nueva obra social al cliente</span></Button>
                                                                     </SelectGroup>
                                                                 </SelectContent>
-                                                    </Select>
-                                                    <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.condicionIva" >
-                                                            <Tooltip>
+                                                        </Select>
+                                                        <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.obraSocial" >
+                                                                <Tooltip>
+                                                                    <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                                    <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                                        <p>Seleccionar obra social</p>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                        </TooltipProvider>
+                                                        </div>
+                                                        <div class="flex flex-row w-[11rem] items-center ">
+                                                            <Label>$</Label>
+                                                            <Input
+                                                                :model-value="os.importe" 
+                                                                @update:model-value="(value)=>{
+                                                                    if(ventaObrasSociales[index]){
+                                                                        ventaObrasSociales[index].importe=Number(value)
+                                                                    }
+                                                                }"
+                                                                v-decimal
+                                                                class="w-[7rem] ml-2 text-xs"
+                                                                placeholder="Importe"
+                                                                type="decimal"
+                                                            /> 
+                                                            <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.importe" >
+                                                                <Tooltip>
                                                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                                                 <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                                    <p>Seleccionar condición IVA</p>
+                                                                    <p>Ingresar Importe</p>
                                                                 </TooltipContent>
-                                                            </Tooltip>
-                                                    </TooltipProvider>
-                                                </div>
-                                            <Button variant="ghost"  type="button" class="text-destructive"  @click="removeVentaObraSocial(index)"><Cross2Icon /></Button>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        </div>
+                                                        <div class="flex flex-row w-[15rem]">
+                                                            <Select 
+                                                                    :modelValue="os.condicionIva?.toString() ?? undefined" 
+                                                                    @update:model-value="(value) => os.condicionIva = Number(value)"
+                                                                >
+                                                                        <SelectTrigger class="text-black w-[13rem] text-xs ">
+                                                                            <SelectValue   />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            <SelectGroup>
+                                                                                <SelectItem 
+                                                                                    class="text-xs"
+                                                                                    v-for="condicion in Object.values(CondicionIva).filter(val => typeof val === 'number') as CondicionIva[]" 
+                                                                                    :key="condicion" 
+                                                                                    :value="condicion.toString()"
+                                                                                >
+                                                                                    {{ condicionIvaDisplay(condicion) }}
+                                                                                </SelectItem>
+                                                                            </SelectGroup>
+                                                                        </SelectContent>
+                                                            </Select>
+                                                            <TooltipProvider  v-if="!isvalidVentaObraSocial[index]?.condicionIva" >
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                                            <p>Seleccionar condición IVA</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                            </TooltipProvider>
+                                                        </div>
+                                                    <Button variant="ghost"  type="button" class="text-destructive"  @click="removeVentaObraSocial(index)"><Cross2Icon /></Button>
+                                                    </div>
+                                                    <p v-if="!isValidImporteObrasSociales " class="text-destructive text-md py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe por obras sociales no puede ser superior al importe total</p>               
+                                                    <Button variant="outline"  type="button" class="mt-8"  @click="addVentaObraSocial()">Agregar Obra Social <PlusIcon /></Button>
                                             </div>
-                                            <p v-if="!isValidImporteObrasSociales " class="text-destructive text-md py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> El importe por obras sociales no puede ser superior al importe total</p>               
-                                            <Button variant="outline"  type="button" class="mt-8"  @click="addVentaObraSocial()">Agregar Obra Social <PlusIcon /></Button>
+                                            <div v-else>
+                                                <p>No hay obras sociales registradas para el cliente</p>
+                                                <Button @click="()=>{ handleShowNewObraSocialCliente(0)}">Registrar Obra Social</Button>
+                                            </div>
+                                            <Dialog  v-model:open="openNewClienteOS" >
+                                                <DialogContent class="max-w-[33rem]">
+                                                        <AddObraSocialClienteForm 
+                                                        :cliente="selectedCliente"
+                                                        @handle-add-obra-social-cliente="handleAddObraSocialCliente"
+                                                    />
+                                                </DialogContent>
+                                            </Dialog>
                                         </div>
-                                        <div v-else>
-                                            <p>No hay obras sociales registradas para el cliente</p>
-                                            <Button>Registrar Obra Social</Button>
-                                        </div>
-                                    
                                     </div>
                                 </div>
                                 <div class="border min-h-[3rem] p-4 w-full rounded-lg  mt-4">
