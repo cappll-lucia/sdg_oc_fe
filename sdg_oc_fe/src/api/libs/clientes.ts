@@ -88,10 +88,7 @@ const create = async (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id:
             ..._cliente,
             clienteObrasSociales: _obrasSociales
         };
-        console.log('new cliente --> ', newCliente)
-
         const resp = await http.post(`/cliente`, newCliente);
-        console.log(resp)
         return resp.data.data as Cliente;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -104,8 +101,18 @@ const edit = async (_id: number, _cliente: EditedClienteType, _obrasSociales: {o
             ..._cliente,
             clienteObrasSociales: _obrasSociales
         }
-        console.log('----', updatedCliente)
         const resp = await http.patch(`/cliente/${_id}`, updatedCliente);
+        return resp.data.data as Cliente;
+    } catch (error) {
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+};
+
+const addObraSocial = async (_id: number, _obrasSociales: {obraSocial:{id: number|undefined}, numeroSocio: string}[]) => {
+    try {
+        const resp = await http.patch(`/cliente/${_id}`, {
+            clienteObrasSociales: _obrasSociales
+        });
         return resp.data.data as Cliente;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
@@ -128,5 +135,6 @@ export const clientesApi = {
     getAudiometriasByCliente: (_idCliente: number)=> getAudiometriasByCliente(_idCliente),
     create: (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> create(_cliente, _obrasSociales),
     edit: (_id: number, _cliente: EditedClienteType,  _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),
+    addObraSocial: (_id: number, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> addObraSocial(_id, _obrasSociales),
     remove: (_id: number)=> remove(_id),
 }
