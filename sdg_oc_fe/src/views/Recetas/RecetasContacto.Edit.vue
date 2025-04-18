@@ -259,7 +259,7 @@ const onSubmit = async()=>{
             </div>
             <form v-else @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Editar Recta - Lentes de contacto</h3>
+                    <h3 class="page-subtitle text-center">Editar Receta - Lentes de contacto</h3>
                     <Separator class="my-10 w-full" />
                 </div>
                 <div class="flex flex-col w-full justify-between items-start">
