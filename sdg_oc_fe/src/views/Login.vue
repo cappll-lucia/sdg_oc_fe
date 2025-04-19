@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/tooltip'
 import { AsteriskIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { nextTick } from 'vue'
 
 const userStore = useUserStore();
 
@@ -46,6 +47,7 @@ const onSignin = async ()=>{
 
         try{
             await userStore.singin(loginData.value.username, loginData.value.password);
+            await nextTick();
             router.push('/');
         }catch(err: any){
             console.log(err)
