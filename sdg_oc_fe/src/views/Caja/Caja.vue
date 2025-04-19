@@ -37,7 +37,7 @@ import {
   DateFormatter,
   type DateValue,
   getLocalTimeZone,
-} from '@internationalized/date'
+} from '@internationalized/date';
 import { AsteriskIcon, CalendarIcon } from 'lucide-vue-next'
 import { cn } from '@/lib/utils';
 import Input from '@/components/ui/input/Input.vue';
@@ -49,6 +49,8 @@ import autoTable from "jspdf-autotable";
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
 import LoaderForm from '@/components/LoaderForm.vue';
+
+
 
 const df = new DateFormatter('es-AR', {
   dateStyle: 'long',
@@ -488,7 +490,7 @@ const resetNewMovimiento = ()=>{
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent class="w-auto p-0">
-                                <Calendar v-model="selectedDate" initial-focus  @update:model-value="handleDateRangeChange" />
+                                <Calendar :locale="'es'" v-model="selectedDate" initial-focus  @update:model-value="handleDateRangeChange" />
                             </PopoverContent>
                         </Popover>
                     </div>
