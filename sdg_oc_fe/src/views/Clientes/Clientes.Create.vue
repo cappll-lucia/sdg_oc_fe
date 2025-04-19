@@ -11,9 +11,10 @@ import  CreateClienteForm  from '@/components/CreateCliente.Form.vue'
 import { SlashIcon } from '@radix-icons/vue';
 import router from '@/router';
 import { toast } from '@/components/ui/toast';
+import { Cliente } from '@/api/entities/clientes';
 
-const handleCreateCliente = async()=>{
-    router.push(`/clientes`)
+const handleCreateCliente = async(newCliente: Cliente)=>{
+    router.push(`/clientes/dashboard/${newCliente.id}`)
     toast({
         title: 'Cliente registrado con éxito',
     })

@@ -8,7 +8,8 @@ import { EditedRecetaContactoType, NewRecetaContactoType, RecetaContacto } from 
 const getAllGroupByCliente = async () => {
     try {
         const resp = await http.get('/cliente/recetas/count');
-        return resp.data.data as ClienteRecetasCount[];
+        const list = resp.data.data as ClienteRecetasCount[];
+        return list.filter(c=> Number(c.clienteId)!==0)
     } catch (error) {
         throw error instanceof AxiosError ?  
             new Error(error?.response?.data?.message) : 

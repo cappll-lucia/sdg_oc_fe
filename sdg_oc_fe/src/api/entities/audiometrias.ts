@@ -24,7 +24,7 @@ export const audiometriaCustomValidator = (_audiometria: {
   const isValid = {
     cliente: Boolean(_audiometria.cliente.id),
     fechaInforme: fechaValidator.safeParse(_fecha).success,
-    file: _file.type == 'application/pdf' ? true : false
+    file: _file ? _file.type == 'application/pdf' : false
   }
   const success = Object.values(isValid).every(Boolean);
   return {success, isValid};

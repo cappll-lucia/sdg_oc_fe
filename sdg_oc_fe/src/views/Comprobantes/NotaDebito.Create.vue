@@ -136,6 +136,13 @@ const getTipoNotaDebito = (tipoFactura: number)=>{
 }
 
 
+const redirectCancel = ()=>{
+    prevVenta.value 
+    ? router.push(`/ventas/view/${prevVenta.value.id}`) 
+    : router.push(`/ventas`)
+}
+
+
 
 
 
@@ -273,7 +280,7 @@ const getTipoNotaDebito = (tipoFactura: number)=>{
                         </div>
                     </div>
                     <div class="w-full flex justify-end mt-4">
-                        <Button variant="outline" class="w-[12rem] mr-5" @click="router.push('/ventas')">Cancelar</Button>
+                        <Button variant="outline" type="button" class="w-[12rem] mr-5" @click="redirectCancel">Cancelar</Button>
                         <Button type="submit" class="w-[12rem]">Emitir Nota de Débito</Button>
                     </div>
                 </div>

@@ -57,7 +57,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/clientes">
-                        Cliente
+                        Clientes
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>

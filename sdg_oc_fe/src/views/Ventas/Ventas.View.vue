@@ -30,6 +30,7 @@ import { InspectIcon, MailIcon, PrinterIcon } from 'lucide-vue-next';
 import router from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
+import AlertError from '@/components/AlertError.vue';
 
 const route = useRoute()
 const currentVenta = ref<Venta>();
@@ -297,7 +298,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                 <div class="flex flex-row w-full mb-4 justify-between ">
 
                     <h3 class="page-subtitle">Comprobantes</h3>
-                    <DropdownMenu>
+                    <DropdownMenu v-if="currentVenta.factura">
                         <DropdownMenuTrigger><Button variant="outline" class="w-[14rem]">Emitir nuevo
                                 comprobante</Button></DropdownMenuTrigger>
                         <DropdownMenuContent class="w-[14rem]">
@@ -352,6 +353,13 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
             </div>
         </div>
     </div>
+    <AlertError
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
+        />
 </template>
 
 <style scoped>

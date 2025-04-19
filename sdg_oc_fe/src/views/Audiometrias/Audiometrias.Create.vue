@@ -90,10 +90,10 @@ const onSubmit = async () => {
         newAudiometria.value.fechaInforme = new Date(parseInt(fechaInforme.value.year), parseInt(fechaInforme.value.month)-1, parseInt(fechaInforme.value.day))
         await audiometriasApi.create(newAudiometria.value, audiometriaFile.value )
         router.push(`/clientes/dashboard/${newAudiometria.value.cliente.id}`)
-        loader.hide();
         toast({
             title: 'Audiometría registrada con éxito',
         })
+        loader.hide();
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -102,7 +102,6 @@ const onSubmit = async () => {
 }
 
 const validateAndSubmit = async () => {
-    loader.show();
     errorPDF.value = '';
     const resultAudiometria = audiometriaCustomValidator(newAudiometria.value, fechaInforme.value, audiometriaFile.value);
     isValidAudiometria.value = resultAudiometria.isValid;
@@ -148,6 +147,11 @@ const handleSelectCliente = (cliente:Cliente)=>{
     searchClienteOpen.value=false;
 }
 
+const redirectCancel = ()=>{
+    selectedCliente.value
+    ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
+    : router.push(`/`)
+}
 
 
 </script>
@@ -270,7 +274,7 @@ const handleSelectCliente = (cliente:Cliente)=>{
 
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/audiometrias')"  >Cancelar</Button>
+                    <Button variant="outline" class="w-[15%] mr-5" @click="redirectCancel"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
                 

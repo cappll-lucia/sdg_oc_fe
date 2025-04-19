@@ -147,7 +147,7 @@ const onSubmit = async()=>{
 
 const abrirCajaDiaria = async()=>{
     try{
-        if(importeOpenCaja.value > 0){
+        if(importeOpenCaja.value >= 0){
             loadingForm.value=true;
             await cajaApi.apertura(importeOpenCaja.value)
             await loadData();
@@ -459,7 +459,7 @@ const resetNewMovimiento = ()=>{
                         </div>
                         <div class="flex flex-row mb-4 justify-between w-full">
                             <Label class="text-md w-[10rem] ">Saldo Inicial del Día: </Label>
-                            <Label class="text-md ">$ {{aperturaToday?.importe}} </Label>
+                            <Label class="text-md ">$ {{aperturaToday?.importe || aperturaToday?.importe==0 ? aperturaToday.importe : ' - '}} </Label>
                         </div>
                         <div class="flex flex-row mb-4 justify-between w-full">
                             <Label class="text-md w-[10rem] ">Total Ingresos: </Label>
@@ -473,7 +473,7 @@ const resetNewMovimiento = ()=>{
                 </div>
                 <div class="w-[57%] h-[40rem] border rounded-lg p-4 flex flex-col justify-start items-end">
                     <div class="flex flex-row justify-center items-center h-10">
-                        <Button variant="outline" v-if="selectedDate!=todayDate" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
+                        <Button variant="outline" v-if="selectedDate!=todayDate && dateMovements.length" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
                         <Popover>
                             <PopoverTrigger as-child>
                                 <Button

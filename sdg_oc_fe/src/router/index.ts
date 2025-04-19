@@ -4,7 +4,17 @@ import { useUserStore } from "@/stores/UsersStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes: routerRoutes
+    routes: routerRoutes,
+	scrollBehavior(to) {
+		if (to.hash) {
+		const element = document.getElementById(to.hash.replace('#', ''));
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			return { top: 0 };
+		}
+		}
+		return { top: 0 };
+	}
 });
 
 router.beforeEach((to: RouteLocationNormalized, _ , next: NavigationGuardNext)=>{

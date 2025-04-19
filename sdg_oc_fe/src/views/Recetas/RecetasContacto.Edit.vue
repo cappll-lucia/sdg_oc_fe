@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon, AsteriskIcon, PlusIcon} from 'lucide-vue-next';
 import { Separator } from '@/components/ui/separator';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import { RecetaContacto, recetaContactoCustomValidator } from '@/api/entities/recetasContacto';
 import { useRoute } from 'vue-router';
@@ -223,12 +223,20 @@ const onSubmit = async()=>{
     };
 }
 
+const nombreCliente = computed(()=> currentReceta.value?.cliente.apellido +", "+currentReceta.value?.cliente.nombre);
+
+const redirectCancel = ()=>{
+    currentReceta.value?.cliente
+    ? router.push(`/clientes/dashboard/${currentReceta.value.cliente.id}`)
+    : router.push(`/`)
+}
+
 </script>
 
 
 <template>
-    <div class="page">
-        <Breadcrumb>
+    <div class="page" v-if="currentReceta">
+       <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
@@ -239,25 +247,36 @@ const onSubmit = async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>
-                        Recetas
-                    </BreadcrumbPage>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Editar</BreadcrumbPage>
+                    <BreadcrumbLink :href="`/clientes/dashboard/${currentReceta?.cliente.id}`">
+                        {{nombreCliente}}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink :href="`/recetas/${currentReceta?.cliente.id}`">
+                        Recetas
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Editar Receta</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2 mb-4 " >
-            <div v-if="!currentReceta" class="forms-wide flex flex-col justify-between items-start px-[5rem] ">
-                <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Receta con id {{ route.params.id }} no encontrada</h3>
-                </div>
-            </div>
-            <form v-else @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
+            <form @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
                     <h3 class="page-subtitle text-center">Editar Receta - Lentes de contacto</h3>
                     <Separator class="my-10 w-full" />
@@ -854,12 +873,21 @@ const onSubmit = async()=>{
                     </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/recetas')"  >Cancelar</Button>
+                    <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>
         </div>
         <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
             :action="()=>{showError=false}" />
+    </div>
+    <div v-else class="page">
+        <div class="pt-2 mb-4 " >
+            <div  class="forms-wide flex flex-col justify-between items-start px-[5rem] ">
+                <div class="w-full ">
+                    <h3 class="page-subtitle text-center">Receta con id {{ route.params.id }} no encontrada</h3>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

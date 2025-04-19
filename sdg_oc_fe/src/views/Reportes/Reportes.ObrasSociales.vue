@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
 import { CondicionIva } from '@/api/entities/venta';
 import { condicionIvaDisplay } from '@/lib/utils';
@@ -181,8 +181,11 @@ const generateObrasSocialesPDF = () => {
   doc.save(`reporte_obras_sociales_${today.toISOString().split('T')[0]}.pdf`);
 };
 
-
-
+const movimientosQty = computed( () => 
+  reporte.value.reduce((total, { obraSocial }) => 
+    total + obraSocial.condicionesIVA.reduce((sum, { movimientos }) => 
+      sum + movimientos.length, 0), 0)
+);
 
 </script>
 
@@ -241,7 +244,7 @@ const generateObrasSocialesPDF = () => {
                             </PopoverContent>
                         </Popover>
                 </div>
-                <Button class="w-[20rem]" @click="generateObrasSocialesPDF" >Exportar Reporte</Button>
+                <Button v-if="movimientosQty" class="w-[20rem]" @click="generateObrasSocialesPDF" >Exportar Reporte</Button>
             </div>
             <Button variant="ghost" class="underline " @click="router.push(`/obras-sociales`)" > Obras Sociales <Settings :size="14"/> </Button>
             </div>
@@ -271,7 +274,7 @@ const generateObrasSocialesPDF = () => {
                         </Accordion>
                     </div>
             </div>
-            <div v-if="!reporte.length" class="border rounded-lg flex justify-center items-center w-[45rem] h-[10rem]" > <h1> No se encontraron montos para facturar a obras sociales en el rango de fechas seleccionado</h1></div>
+            <div v-if="!reporte.length" class="border rounded-lg flex justify-center items-center w-[45rem] h-[15rem] px-10 text-center" > <h1> No se encontraron montos para facturar a obras sociales en el rango de fechas seleccionado</h1></div>
             </div>
         </div>
     </div>

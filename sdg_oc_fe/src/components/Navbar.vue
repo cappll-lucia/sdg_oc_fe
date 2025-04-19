@@ -20,18 +20,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
 import router from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
-import { onMounted, ref } from 'vue';
-import { JwtUser } from '@/api/entities/jwtUser';
+import { computed } from 'vue';
 import { ArrowDownUpIcon, BanknoteIcon, ChartColumnIcon, GlassesIcon, HomeIcon, LogOutIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';
 import { QuestionMarkCircledIcon } from '@radix-icons/vue';
 
 
 const userStore = useUserStore();
-const userData = ref<JwtUser|null>();
 
-onMounted(async()=>{
-    userData.value = userStore.getMe
-})
+const userData = computed(() => userStore.getMe);
 
 const reportes: { title: string, href: string}[] = [
     {

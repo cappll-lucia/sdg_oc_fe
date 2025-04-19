@@ -6,7 +6,8 @@ import { Audiometria, ClienteAudiometriasFecha, NewAudiometriaDTO } from '../ent
 const getAll = async ()=>{
     try{
         const resp = await http.get('/audiometria');
-        return resp.data.data as Audiometria[];
+        const list = resp.data.data as Audiometria[];
+        return list.filter(c=> c.id!=0)
     }catch(error){
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -15,7 +16,8 @@ const getAll = async ()=>{
 const getAllGroupByCliente = async ()=>{
     try{
         const resp = await http.get('/cliente/audiometrias/fecha');
-        return resp.data.data as ClienteAudiometriasFecha[];
+        const list = resp.data.data as ClienteAudiometriasFecha[];
+        return list.filter(c=> Number(c.clienteId)!=0)
     }catch(error){
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
