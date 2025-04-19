@@ -126,6 +126,7 @@ const handleDateRangeChange = (newRange: DateRange) => {
                             <PopoverContent class="w-auto p-0">
                             <!-- @vue-ignore -->
                             <RangeCalendar
+                                :locale="'es'"
                                 v-model="dateRange"
                                 initial-focus
                                 :number-of-months="2"
