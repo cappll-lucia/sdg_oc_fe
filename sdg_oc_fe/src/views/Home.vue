@@ -8,6 +8,53 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import router from '@/router';
+import { useCajaStore } from '@/stores/CajaStore';
+import { onMounted, ref } from 'vue';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import Label from '@/components/ui/label/Label.vue';
+import Input from '@/components/ui/input/Input.vue';
+import Button from '@/components/ui/button/Button.vue';
+import LoaderForm from '@/components/LoaderForm.vue';
+import { cajaApi } from '@/api/libs/caja';
+
+
+const loadingForm = ref<boolean>(false);
+const cajaStore = useCajaStore();
+
+const importeOpenCaja = ref<number>(0);
+const isValidImporteOpenCaja = ref<boolean>(true);
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
+const openDialogOpenCaja = ref<boolean>(false);
+
+
+onMounted(()=>{
+    openDialogOpenCaja.value = !cajaStore.isCajaOpenedToday;
+})
+
+const abrirCajaDiaria = async()=>{
+    try{
+        if(importeOpenCaja.value >= 0){
+            loadingForm.value=true;
+            await cajaApi.apertura(importeOpenCaja.value);
+            cajaStore.openCaja();
+            openDialogOpenCaja.value=false;
+            loadingForm.value=false;
+        }
+    }catch(e: any){
+        errorMessage.value = e.message as string;
+        loadingForm.value=false
+        showError.value = true;
+    }
+}
 </script>
 
 <template>
@@ -62,6 +109,43 @@ import router from '@/router';
 
         </div>
     </div>
+    <Dialog v-model:open="openDialogOpenCaja" >
+        <DialogContent class="max-w-[35rem] min-h-[15rem] ">
+            <DialogHeader>
+                <DialogTitle>Abrir Caja del Día</DialogTitle>
+                <DialogDescription>
+                    Ingrese el importe en EFECTIVO con el que abre la caja de hoy
+                </DialogDescription>
+            </DialogHeader>
+            <form @submit.prevent="abrirCajaDiaria()" v-if="!loadingForm" >
+            <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-3 items-center mb-4 gap-4">
+                    <Label class="text-right col-span-1">Importe Efectivo</Label>
+                    <div class=" ml-4 mr-12  col-span-2 flex flex-row items-center justify-between">
+                        <Label class="w-[7%] text-left">$</Label>
+                        <Input v-decimal type="number" class="w-[93%]" v-model="importeOpenCaja"   />
+                        <TooltipProvider  v-if="!isValidImporteOpenCaja" >
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Ingresar Importe</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                </div>
+            </div>
+            <DialogFooter>
+                <Button type="submit">
+                Abrir Caja
+                </Button>
+            </DialogFooter>
+            </form>
+            <div v-else>
+                <LoaderForm />
+            </div>
+        </DialogContent>
+    </Dialog>
 </template>
 
 

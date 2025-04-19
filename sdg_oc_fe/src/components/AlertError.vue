@@ -33,10 +33,10 @@ const closeDialog = () => {
           </div>
           <AlertDescription class="text-center">{{ message }}</AlertDescription>
         </Alert>
-        <AlertDialogFooter>
-        <AlertDialogAction @click="action ? action() : closeDialog()">
-          {{ button }}
-        </AlertDialogAction>
+        <AlertDialogFooter class="flex justify-center items-center">
+          <AlertDialogAction @click="action ? action() : closeDialog()">
+            {{ button }}
+          </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
