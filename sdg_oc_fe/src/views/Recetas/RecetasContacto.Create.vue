@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
@@ -289,13 +289,20 @@ const onSubmit = async()=>{
         loading.value=false;
     };
 }
+const nombreCliente = computed(()=> selectedCliente.value?.apellido +", "+selectedCliente.value?.nombre)
+
+const redirectCancel = ()=>{
+    selectedCliente.value
+    ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
+    : router.push(`/`)
+}
 
 </script>
 
 <template>
 
     <div class="page">
-        <Breadcrumb>
+            <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
@@ -306,9 +313,25 @@ const onSubmit = async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="selectedCliente" >
+                    <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
+                        {{nombreCliente}}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator  v-if="selectedCliente">
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">
                         Recetas
-                    </BreadcrumbPage>
+                    </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
                     <SlashIcon />
@@ -945,7 +968,7 @@ const onSubmit = async()=>{
                     </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/recetas')"  >Cancelar</Button>
+                    <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel">Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>

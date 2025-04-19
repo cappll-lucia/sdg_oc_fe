@@ -87,7 +87,7 @@ const validateAndSubmit = async () => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
+                    <BreadcrumbLink href="/parametros">
                         Parámetros
                     </BreadcrumbLink>
                 </BreadcrumbItem>

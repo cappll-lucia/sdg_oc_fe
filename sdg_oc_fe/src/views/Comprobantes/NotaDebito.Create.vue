@@ -139,7 +139,7 @@ const getTipoNotaDebito = (tipoFactura: number)=>{
 const redirectCancel = ()=>{
     prevVenta.value 
     ? router.push(`/ventas/view/${prevVenta.value.id}`) 
-    : router.push(`/ventas/view`)
+    : router.push(`/ventas`)
 }
 
 

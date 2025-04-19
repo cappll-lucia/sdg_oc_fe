@@ -146,22 +146,6 @@ export const routerRoutes = [
                 requireAdmin: true,
 		    },
         },
-        // {
-        //     path: '/recetas',
-        //     name: 'recetas',
-        //     component: () => import('../views/Recetas/Recetas.vue'),
-        //     meta: {
-		// 	    auth: true,
-		//     },
-        // },      
-        {
-            path: '/audiometrias',
-            name: 'recetas_audiometria',
-            component: () => import('../views/Audiometrias/Audiometrias.vue'),
-            meta: {
-			    auth: true,
-		    },
-        },
         {
             path: '/audiometrias/create',
             name: 'create-audiometrias',

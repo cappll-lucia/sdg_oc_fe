@@ -498,7 +498,7 @@ const availableObrasSociales = computed(() => {
                     </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-[6rem]">
-                    <Button @click="router.push(`/clientes/dashboard/${currentCliente?.id}`)" variant="outline" type="button" class="w-[15%] mr-5">Cancelar</Button>
+                    <Button @click="router.push(`/clientes/dashboard/${currentCliente?.id}#dashboard`)" variant="outline" type="button" class="w-[15%] mr-5">Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
             </form>

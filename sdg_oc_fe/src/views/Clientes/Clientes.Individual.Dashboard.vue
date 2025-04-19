@@ -212,7 +212,7 @@ const onSubmit = async()=>{
 </script>
 
 <template>
-    <div class="page">
+    <div class="page"  id="dashboard">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
@@ -224,7 +224,9 @@ const onSubmit = async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage href="/clientes" >Clientes</BreadcrumbPage>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
                     <SlashIcon />
@@ -240,7 +242,7 @@ const onSubmit = async()=>{
                     <div class="flex flex-row  w-full items-center justify-between ">
                         <div class="flex flex-row items-center justify-start">
                             <User class="rounded-[50%] bg-white p-2 mr-4 w-16 h-16" />
-                            <h1 class="page-title text-left">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</h1>
+                            <h1  class="page-title text-left">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</h1>
                         </div>
                         <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
                             @click="() => router.push(`/clientes/edit/${currentCliente?.id}`)">
@@ -536,8 +538,8 @@ const onSubmit = async()=>{
                                 <div class="flex flex-row justify-start items-center">
                                     <Label class="w-[8rem] text-sm ">{{ formatDate(row.fecha) }}</Label>
                                     <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ tipoComprobanteDisplay(row.tipoComprobante)?.nombre.toLocaleUpperCase() }} {{ tipoComprobanteDisplay(row.tipoComprobante)?.letra }}</Label></Label>
-                                    <Label v-if="![1,6].includes(row.tipoComprobante)" class="w-[18rem] text-xs flex justify-start ">{{ row.motivo }}</Label>
-                                    <Label v-else class="w-[18rem] text-xs flex justify-start ">Venta</Label>
+                                    <Label v-if="![1,6].includes(row.tipoComprobante)" class="w-[15rem] text-xs flex justify-start ">{{ row.motivo }}</Label>
+                                    <Label v-else class="w-[15rem] text-xs flex justify-start ">Venta</Label>
                                     <Label class="w-[8rem] text-sm "> $ {{ row.importe.toFixed(2)}}</Label>
                                 </div>
                                 <div class="flex flex-row ">
@@ -559,7 +561,7 @@ const onSubmit = async()=>{
                                 <div class="flex flex-row justify-start items-center">
                                     <Label class="w-[8rem] text-sm ">{{ formatDate(row.fecha) }}</Label>
                                     <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{row.motivo}}</Label></Label>
-                                    <Label class="w-[18rem] text-xs flex justify-start ">Cuenta Corriente</Label>
+                                    <Label class="w-[15rem] text-xs flex justify-start ">Cuenta Corriente</Label>
                                     <Label class="w-[8rem] text-sm"><span class="font-bold" v-if="row.motivo==TipoMovimiento.VENTA">-</span> $ {{ row.importe.toFixed(2)}}</Label>
                                 </div>      
                             </div>
