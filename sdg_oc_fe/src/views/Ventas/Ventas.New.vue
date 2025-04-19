@@ -19,8 +19,12 @@ import {
 } from '@/components/ui/select';
 import {
   Dialog,
-  DialogContent
-} from '@/components/ui/dialog'
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -42,6 +46,11 @@ import router from '@/router';
 import { condicionIvaDisplay, isValidNumber } from '@/lib/utils';
 import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue';
 import { clientesApi } from '@/api/libs/clientes';
+import { useCajaStore } from '@/stores/CajaStore';
+import { cajaApi } from '@/api/libs/caja';
+
+const cajaStore = useCajaStore();
+const loadingForm = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -54,6 +63,11 @@ const openSelectOS = ref<boolean>(false);
 const openSelectOSIndex = ref<number>(0);
 const openNewClienteOS = ref<boolean>(false);
 const newOsIndex = ref<number>();
+
+const importeOpenCaja = ref<number>(0);
+const isValidImporteOpenCaja = ref<boolean>(true);
+const openDialogOpenCaja = ref<boolean>(false);
+const showErrorNotCaja = ref<boolean>(false);
 
 const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
 const mediosDePago = ref<{importe: number, tipoMedioDePago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
@@ -190,8 +204,13 @@ const onSubmit = (async()=>{
             title: 'Venta registrada con éxito',
         })
     }catch (err: any) {
-        errorMessage.value = err.message as string;
-        showError.value = true;
+        const message = err.message as string;
+        if (message=='No se puede crear una venta ya que no se hizo la apertura del día'){
+            showErrorNotCaja.value=true;
+        }else{
+            errorMessage.value = err.message as string;
+            showError.value = true;
+        }
     }
 })
 
@@ -227,6 +246,7 @@ const validateAndSubmit = async()=>{
 
 onMounted(async () => {
     addLineaVenta();
+    openDialogOpenCaja.value = !cajaStore.isCajaOpenedToday;
 });
 
 
@@ -361,6 +381,23 @@ const availableMedioDePago = computed(() => {
   }
   return entries;
 });
+
+
+const abrirCajaDiaria = async()=>{
+    try{
+        if(importeOpenCaja.value >= 0){
+            loadingForm.value=true;
+            await cajaApi.apertura(importeOpenCaja.value);
+            cajaStore.openCaja();
+            openDialogOpenCaja.value=false;
+            loadingForm.value=false;
+        }
+    }catch(e: any){
+        errorMessage.value = e.message as string;
+        loadingForm.value=false
+        showError.value = true;
+    }
+}
 
 </script>
 
@@ -884,12 +921,56 @@ const availableMedioDePago = computed(() => {
                 </div>
             </form>
         </div>
+        <Dialog v-model:open="openDialogOpenCaja" >
+            <DialogContent class="max-w-[35rem] min-h-[15rem] ">
+                <DialogHeader>
+                    <DialogTitle>Abrir Caja del Día</DialogTitle>
+                    <DialogDescription>
+                        Ingrese el importe en EFECTIVO con el que abre la caja de hoy
+                    </DialogDescription>
+                </DialogHeader>
+                <form @submit.prevent="abrirCajaDiaria()" v-if="!loadingForm" >
+                <div class="grid gap-4 py-4">
+                    <div class="grid grid-cols-3 items-center mb-4 gap-4">
+                        <Label class="text-right col-span-1">Importe Efectivo</Label>
+                        <div class=" ml-4 mr-12  col-span-2 flex flex-row items-center justify-between">
+                            <Label class="w-[7%] text-left">$</Label>
+                            <Input v-decimal type="number" class="w-[93%]" v-model="importeOpenCaja"   />
+                            <TooltipProvider  v-if="!isValidImporteOpenCaja" >
+                                <Tooltip>
+                                    <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                    <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                        <p>Ingresar Importe</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button type="submit">
+                    Abrir Caja
+                    </Button>
+                </DialogFooter>
+                </form>
+                <div v-else>
+                    <LoaderForm />
+                </div>
+            </DialogContent>
+        </Dialog>
         <AlertError
             v-model="showError"
             title="Error"
             :message="errorMessage"
             button="Aceptar"
             :action="()=>{showError=false}"
+        />
+        <AlertError
+            v-model="showErrorNotCaja"
+            title="Error"
+            message="No se puede crear una venta ya que no se hizo la apertura del día"
+            button="Abrir caja"
+            :action="()=>{showErrorNotCaja=false; openDialogOpenCaja=true; }"
         />
     </div>
 </template>
