@@ -48,6 +48,7 @@ import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue
 import { clientesApi } from '@/api/libs/clientes';
 import { useCajaStore } from '@/stores/CajaStore';
 import { cajaApi } from '@/api/libs/caja';
+import LoaderForm from '@/components/LoaderForm.vue';
 
 const cajaStore = useCajaStore();
 const loadingForm = ref<boolean>(false);
