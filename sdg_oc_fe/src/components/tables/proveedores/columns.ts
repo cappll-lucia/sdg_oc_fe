@@ -11,7 +11,7 @@ export const columns: ColumnDef<Proveedor>[] =[
     },
     {
         accessorKey: 'razonSocial',
-        header: () => h('div', 'Razon Social'),
+        header: () => h('div', 'Razón Social'),
         cell: info=> info.getValue(),
     },
     {

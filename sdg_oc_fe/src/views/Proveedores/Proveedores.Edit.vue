@@ -162,7 +162,7 @@ const validateAndSubmit = async () => {
                 <div class="h-[5rem] w-full flex justify-center">
                     <div class="flex w-[33rem] flex-row items-center justify-start ">
                         <Label class="w-[7rem] text-right pr-4">Teléfono</Label>
-                        <Input class="w-[24rem]" type="text" v-model="currentProv.telefono"  />
+                        <Input class="w-[24rem]" v-decimal type="text" v-model="currentProv.telefono"  />
                         <TooltipProvider  v-if="!isValidProveedor.telefono" >
                             <Tooltip>
                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>

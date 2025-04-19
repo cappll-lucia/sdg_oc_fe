@@ -439,7 +439,7 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
                             <Label  class="w-[7rem]  pr-[2rem] text-right ">Teléfono</Label>
                             <div class="flex flex-row justify-start items-center w-[25rem]">
-                                <Input type="number" class="w-[22rem]" v-model="newCliente.telefono" />
+                                <Input type="number" v-decimal class="w-[22rem]" v-model="newCliente.telefono" />
                                 <TooltipProvider  v-if="!isValidCliente.telefono" >
                                     <Tooltip>
                                         <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
