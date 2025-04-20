@@ -23,7 +23,7 @@ import { Audiometria, editAudiometriaCustomValidator } from '@/api/entities/audi
 import { audiometriasApi } from '@/api/libs/audiometrias';
 import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
-import {onMounted, ref } from 'vue'
+import {computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import AlertConfirm from '@/components/AlertConfirm.vue';
 import { uploadsApi } from '@/api/libs/uploads';
@@ -147,12 +147,13 @@ const handleFileUpload = () => {
     }
 };
 
+const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido +", "+ currentAudiometria.value?.cliente.nombre);
 
 </script>
 
 <template>
 <div class="page">
-        <Breadcrumb>
+         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
@@ -163,7 +164,23 @@ const handleFileUpload = () => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/audiometrias">
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="currentAudiometria?.cliente" >
+                    <BreadcrumbLink :href="`/clientes/dashboard/${currentAudiometria?.cliente?.id}`">
+                        {{nombreCliente}}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator  v-if="currentAudiometria?.cliente">
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="currentAudiometria?.cliente">
+                    <BreadcrumbLink :href="`/audiometrias/${currentAudiometria?.cliente?.id}`">
                         Audiometrias
                     </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -171,14 +188,14 @@ const handleFileUpload = () => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Editar</BreadcrumbPage>
+                    <BreadcrumbPage>Editar audiometría</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         <div class="pt-2 mb-4 " >
             <form @submit.prevent="validateAndSubmit" class="forms-wide h-[45rem] flex flex-col justify-start items-start bg-red-500 px-[5rem]">
                  <div class="w-full ">
-                    <h3 class="page-subtitle text-center" >Actualizar Audiometría</h3>
+                    <h3 class="page-subtitle text-center" >Editar Audiometría</h3>
                     <Separator class="my-6 w-full" />
                 </div>
                 <div class="flex flex-row w-[100%] h-[40rem] justify-center items-start">
@@ -254,7 +271,7 @@ const handleFileUpload = () => {
 
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="router.push('/audiometrias')"  >Cancelar</Button>
+                    <Button type="button" variant="outline" class="w-[15%] mr-5" @click="router.push(`/clientes/dashboard/${currentAudiometria?.cliente.id}`)"  >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
                 

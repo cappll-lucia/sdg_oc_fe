@@ -122,7 +122,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                 v-if="currentCliente && audiometriasCliente.length>0">
                 <div class="panel-index w-[23%] h-[100%] p-4">
                     <div class="flex justify-between items-center mr-2 h-10">
-                        <Button @click="()=>router.push('/audiometrias/create')" variant="outline" class="bg-transparent hover:bg-[#d7e5ec] w-full mr-2">
+                        <Button @click="()=>router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)" variant="outline" class="bg-transparent hover:bg-[#d7e5ec] w-full mr-2">
                                 Nueva Audiometria
                             <PlusIcon class="w-4 h-4" />
                         </Button>
