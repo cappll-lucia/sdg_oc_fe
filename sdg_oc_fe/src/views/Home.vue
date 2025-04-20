@@ -36,8 +36,9 @@ const errorMessage =ref<string>('');
 const openDialogOpenCaja = ref<boolean>(false);
 
 
-onMounted(()=>{
-    openDialogOpenCaja.value = !cajaStore.isCajaOpenedToday;
+onMounted(async ()=>{
+    const opened = await cajaStore.isCajaOpenedToday();
+    openDialogOpenCaja.value = !opened;
 })
 
 const abrirCajaDiaria = async()=>{
@@ -45,7 +46,6 @@ const abrirCajaDiaria = async()=>{
         if(importeOpenCaja.value >= 0){
             loadingForm.value=true;
             await cajaApi.apertura(importeOpenCaja.value);
-            cajaStore.openCaja();
             openDialogOpenCaja.value=false;
             loadingForm.value=false;
         }
