@@ -38,12 +38,14 @@ import {
 } from '@/components/ui/tooltip'
 import AlertError from '@/components/AlertError.vue';
 import { useRoute } from 'vue-router';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
-const route = useRoute()
+const route = useRoute();
+const loader = useLoaderStore();
+
 
 const selectedCliente = ref<Cliente | null>(null);
 const searchClienteOpen = ref<boolean>(false);
-const loading = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -182,15 +184,22 @@ const fechaReceta = ref({
 
 onMounted(async()=>{
     // TODO pagination
-    const query = route.query
-    if(query.cliente){
-        const foundCliente = await clientesApi.getOne(Number(query.cliente))
-        if(foundCliente) handleSelectCliente(foundCliente)
+    try{
+        const query = route.query
+        if(query.cliente){
+            const foundCliente = await clientesApi.getOne(Number(query.cliente))
+            if(foundCliente) handleSelectCliente(foundCliente)
+        }
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
     }
 })
 
 const onSubmit = async()=>{
     try {
+        loader.show();
         let newRecetaObj 
         switch(newReceta.value.tipoReceta){
             case TipoReceta.Lejos:
@@ -205,7 +214,7 @@ const onSubmit = async()=>{
         }
         newRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
         await recetasApi.createRecetaAereos(newRecetaObj)
-        loading.value=false;
+        loader.hide();
         toast({
             title: 'Receta registrada con éxito',
         })
@@ -213,7 +222,7 @@ const onSubmit = async()=>{
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loading.value=false;
+        loader.hide();
     };
 }
 
@@ -225,14 +234,14 @@ const handleSelectCliente = (cliente:Cliente)=>{
 }
 
 const validateAndSubmit = async()=>{
-    loading.value = true;
+    loader.show();
     const validDetalle = validateDetalles()
     const resultReceta = createRecetaAereosCustomValidator(newReceta.value, fechaReceta.value);
     isValidReceta.value = resultReceta.isValid
     if(validDetalle && resultReceta.success){
         await onSubmit();
     }
-    loading.value = false;
+    loader.hide();
 }
 
 const validateDetalles = ()=>{
@@ -763,7 +772,7 @@ const redirectCancel = ()=>{
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
                     <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel"  >Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                    <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
             </form>
         </div>

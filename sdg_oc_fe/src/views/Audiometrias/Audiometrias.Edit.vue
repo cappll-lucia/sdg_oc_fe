@@ -63,15 +63,23 @@ const isValidAudiometria = ref<{
 
 
 onMounted(async()=>{
-    currentAudiometria.value = await audiometriasApi.getOne(Number(route.params.id));
-    if(currentAudiometria.value){
-        currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme)
-        fechaInforme.value.day = currentAudiometria.value.fechaInforme.getDate().toString()
-        fechaInforme.value.month = (currentAudiometria.value.fechaInforme.getMonth()+1).toString()
-        fechaInforme.value.year = currentAudiometria.value.fechaInforme.getFullYear().toString() 
-        currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme);
-        audiometriaFile.value = await uploadsApi.getFile(`audiometrias/${currentAudiometria.value?.linkPDF}`)
-    }
+    try{
+        loader.show();
+        currentAudiometria.value = await audiometriasApi.getOne(Number(route.params.id));
+        if(currentAudiometria.value){
+            currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme)
+            fechaInforme.value.day = currentAudiometria.value.fechaInforme.getDate().toString()
+            fechaInforme.value.month = (currentAudiometria.value.fechaInforme.getMonth()+1).toString()
+            fechaInforme.value.year = currentAudiometria.value.fechaInforme.getFullYear().toString() 
+            currentAudiometria.value.fechaInforme = new Date(currentAudiometria.value.fechaInforme);
+            audiometriaFile.value = await uploadsApi.getFile(`audiometrias/${currentAudiometria.value?.linkPDF}`)
+        }
+        loader.hide();
+    } catch (err: any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    };
 })
 
 const onSubmit = async () => {

@@ -35,10 +35,11 @@ import {
 import AlertError from '@/components/AlertError.vue';
 import { useRoute } from 'vue-router';
 import { toast } from '@/components/ui/toast';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
-const route = useRoute()
+const route = useRoute();
+const loader = useLoaderStore();
 
-const loading = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -154,34 +155,41 @@ const fechaReceta = ref({
 
 
 onMounted(async()=>{
-    currentReceta.value = await recetasApi.getOneAereos(Number(route.params.id));
-    let detalleCerca, detalleLejos
-    switch(currentReceta.value.tipoReceta){
-        case TipoReceta.Cerca:
-            detalleCerca = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
-            if(detalleCerca) currentDetalleCerca.value = detalleCerca
-            break;
-        case TipoReceta.Lejos:
-            detalleLejos = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
-            if(detalleLejos) currentDetalleLejos.value = detalleLejos
-            
-            break;
-        case TipoReceta.Multifocal:
-            detalleCerca = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
-            if(detalleCerca) currentDetalleCerca.value = detalleCerca
-            detalleLejos = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
-            if(detalleLejos) currentDetalleLejos.value = detalleLejos
+    try{
+        currentReceta.value = await recetasApi.getOneAereos(Number(route.params.id));
+        let detalleCerca, detalleLejos
+        switch(currentReceta.value.tipoReceta){
+            case TipoReceta.Cerca:
+                detalleCerca = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
+                if(detalleCerca) currentDetalleCerca.value = detalleCerca
+                break;
+            case TipoReceta.Lejos:
+                detalleLejos = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
+                if(detalleLejos) currentDetalleLejos.value = detalleLejos
+                
+                break;
+            case TipoReceta.Multifocal:
+                detalleCerca = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Cerca)
+                if(detalleCerca) currentDetalleCerca.value = detalleCerca
+                detalleLejos = currentReceta.value.detallesRecetaLentesAereos.find(d=> d.tipo_detalle==TipoReceta.Lejos)
+                if(detalleLejos) currentDetalleLejos.value = detalleLejos
 
-        break;
+            break;
+        }
+        fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
+        fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
+        fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
     }
-    fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
-    fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
-    fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
 })
 
 const onSubmit = async()=>{
     if(!currentReceta.value) return
     try {
+        loader.show();
         let editedRecetaObj 
         switch(currentReceta.value.tipoReceta){
             case TipoReceta.Lejos:
@@ -196,7 +204,7 @@ const onSubmit = async()=>{
         }
         editedRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
         await recetasApi.editRecetaAereos(editedRecetaObj)
-        loading.value=false;
+        loader.hide();
         router.push(`/recetas/${currentReceta.value.cliente.id}`)
         toast({
             title: 'Receta actualizada con éxito',
@@ -204,20 +212,20 @@ const onSubmit = async()=>{
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loading.value=false;
+        loader.hide();
     };
 }
 
 
 const validateAndEdit = async()=>{
-    loading.value = true;
+    loader.show();
     const validDetalle = validateDetalles();
     const resultReceta = editRecetaAereosCustomValidator(currentReceta.value, fechaReceta.value);
     isValidReceta.value = resultReceta.isValid
     if(validDetalle && resultReceta.success){
         await onSubmit();
     }
-    loading.value = false;
+    loader.hide();
 }
 
 const validateDetalles = ()=>{
@@ -734,7 +742,7 @@ const redirectCancel = ()=>{
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
                     <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel"  >Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                    <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
             </form>
         </div>
