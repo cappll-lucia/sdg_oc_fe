@@ -219,7 +219,6 @@ const validateAndSubmit = async()=>{
     loading.value=true;
     const resultVenta = createVentaCustomValidator({
         cliente: {id: selectedCliente.value?.id},
-      //  fecha: fechaVenta.value,
         descuentoPorcentaje: porcDto.value,
         condicionIvaVenta: condicionIvaVenta.value
     })
@@ -242,6 +241,28 @@ const validateAndSubmit = async()=>{
         }
     }
     loading.value=true;
+}
+
+const middleValidate = async()=>{
+    const resultVenta = createVentaCustomValidator({
+        cliente: {id: selectedCliente.value?.id},
+        descuentoPorcentaje: porcDto.value,
+        condicionIvaVenta: condicionIvaVenta.value
+    })
+    isValidVenta.value =resultVenta.isValid;
+
+    const resultLineasVenta = createLineaVentaCustomValidator(lineasDeVenta.value);
+    isvalidLineasVenta.value= resultLineasVenta.isValid;
+
+    const resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
+    isvalidVentaObraSocial.value = resultVentasOS.isValid;
+
+    if(resultLineasVenta?.success && resultVentasOS?.success && resultVenta.success){
+        isValidImporteObrasSociales.value = !(totalVentaFinal.value < montoObrasSociales.value);
+        if(isValidImporteObrasSociales.value){
+            moveToMediosPago()
+        }
+    }
 }
 
 
@@ -277,6 +298,13 @@ const hanldeSelectProducto = (_producto: Producto)=>{
            producto: { id: _producto.id, descripcion: _producto.descripcion},
            cantidad:1,
            precioIndividual: _producto.precio
+       };
+       if(!isvalidLineasVenta.value[lineasDeVenta.value.length-1]?.producto){
+            isvalidLineasVenta.value[lineasDeVenta.value.length-1]={
+            producto: true,
+            cantidad:true,
+            precioIndividual: true
+        };
        }
     }
     searchProductoOpen.value =false;
@@ -779,10 +807,9 @@ const abrirCajaDiaria = async()=>{
                         />
                         
                     </div>
-
                     <div  v-if="!showMedioPago" class="w-full flex justify-end mt-4">
-                        <Button @click="()=>{moveToMediosPago()}">Continuar <ArrowRightIcon /></Button>
-                        <!-- <Button @click="()=>{showMedioPago=true; addPagoDefault()}">Continuar <ArrowRightIcon /></Button> -->
+                        <!-- <Button v-if="lineasDeVenta.length && lineasDeVenta[0]?.producto.descripcion" @click="()=>{middleValidate()}">Continuar <ArrowRightIcon /></Button> -->
+                        <Button  @click="()=>{middleValidate()}">Continuar <ArrowRightIcon /></Button>
                     </div>
 
 
