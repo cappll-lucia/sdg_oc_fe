@@ -13,11 +13,26 @@ import { SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/marcas/columns';
 import DataTable from '@/components/tables/marcas/data-table.vue';
+import AlertError from '@/components/AlertError.vue';
+import { useLoaderStore } from '@/stores/LoaderStore';
+
+const loader = useLoaderStore();
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 const data = ref<Marca[]>([]);
 
 const loadData = async()=>{
-    data.value = await marcasApi.getAll();
+    try{
+        loader.show();
+        data.value = await marcasApi.getAll();
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 }
 
 onMounted(async () => {
@@ -56,4 +71,6 @@ onMounted(async () => {
             <DataTable :columns="columns" :data="data" />
         </div>
     </div>
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
 </template>

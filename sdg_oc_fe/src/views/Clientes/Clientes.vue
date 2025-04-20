@@ -27,6 +27,7 @@ import { Localidad } from '@/api/entities/localidad';
 import { localidadesApi } from '@/api/libs/localidades';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
 const loader = useLoaderStore()
 const clientes = ref<Cliente[]>([]);
@@ -38,6 +39,9 @@ const currentLimit = ref<string>('10');
 const currentOffset = ref<number>(0);
 const nextPage=ref<number | null>();
 const previousPage=ref<number | null>(null);
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 const loadData = async()=>{
     await handleFilterClientes()
@@ -60,18 +64,25 @@ const clearFilters = async()=>{
 }
 
 const handleFilterClientes = async()=>{
-    loader.show();
-    const res= await clientesApi.getAll({
-        filtro: txtSearch.value,
-        sexo: selectedSexo.value,
-        localidadId: selectedLocalidadId.value,
-        offset: currentOffset.value,
-        limit: currentLimit.value
-    });
-    clientes.value = res.items.filter(c=> c.id!=0);
-    nextPage.value = res.nextPage;
-    previousPage.value =res.previousPage;
-    loader.hide()
+    try{
+
+        loader.show();
+        const res= await clientesApi.getAll({
+            filtro: txtSearch.value,
+            sexo: selectedSexo.value,
+            localidadId: selectedLocalidadId.value,
+            offset: currentOffset.value,
+            limit: currentLimit.value
+        });
+        clientes.value = res.items.filter(c=> c.id!=0);
+        nextPage.value = res.nextPage;
+        previousPage.value =res.previousPage;
+        loader.hide()
+     }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 };
 
 const handlePageChange = async(offset: number) => {
@@ -118,30 +129,6 @@ const handlePageChange = async(offset: number) => {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        <!-- <Select v-model="selectedLocalidadId" @update:model-value="handleFilterClientes" >
-                            <SelectTrigger class="w-[200px]">
-                                <SelectValue placeholder="Filtrar por localidad" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem 
-                                    v-for="localidad in localidades" 
-                                    :value="localidad.id.toString()"
-                                    >{{ localidad.localidad }}, {{ localidad.provincia.provincia }}</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select> -->
-                        <!-- <Select v-model="selectedSexo" @update:model-value="handleFilterClientes" >
-                            <SelectTrigger class="w-[200px]">
-                                <SelectValue placeholder="Filtrar por sexo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="Femenino">Femenino</SelectItem>
-                                    <SelectItem value="Masculino">Masculino</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select> -->
                         <Button variant="ghost" @click="clearFilters" class="text-gray-500 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline " > <ReloadIcon /> </Button>
                     </div>  
                 <Button class="text-xs"><a href="/clientes/create">Registrar Nuevo Cliente</a></Button>
@@ -168,5 +155,7 @@ const handlePageChange = async(offset: number) => {
                 <Button variant="outline" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)" > <ChevronRight /> </Button>
             </div>
         </div>
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
     </div>
 </template>

@@ -21,22 +21,41 @@ import { RecetaContacto } from '@/api/entities/recetasContacto';
 import Button from '@/components/ui/button/Button.vue';
 import router from '@/router';
 import { LayoutDashboard } from 'lucide-vue-next';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
 const route = useRoute();
+const loader = useLoaderStore();
+
 const currentCliente = ref<Cliente>();
 const recetasClienteAereos = ref<RecetasAereos[]>();
 const recetasClienteContacto = ref<RecetaContacto[]>();
 const historiaClinicaCliente = ref<HistoriaClinica>();
 
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
+
 onMounted(async()=>{
-    currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente))
-    if(currentCliente){
-        const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
-        recetasClienteAereos.value = res.recetasLentesAereos;
-        recetasClienteContacto.value = res.recetasLentesContacto;
-        historiaClinicaCliente.value = res.historiaClinicaContacto;
-    }
+    await loadData();
 })
+
+const loadData = async ()=>{
+    try{
+        loader.show()
+        currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente))
+        if(currentCliente){
+            const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
+            recetasClienteAereos.value = res.recetasLentesAereos;
+            recetasClienteContacto.value = res.recetasLentesContacto;
+            historiaClinicaCliente.value = res.historiaClinicaContacto;
+        }
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
+}
 
 const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+currentCliente.value?.nombre)
 
@@ -44,7 +63,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
 
 
 <template>
-    <div class="page">
+    <div class="page" v-if="currentCliente">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
@@ -110,7 +129,38 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
             </Tabs>
         </div>
     </div>
-
-
-
+    <div class="page" v-else>
+         <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                        Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Recetas</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        <div class="pt-2 mb-4 " >
+            <div  class="flex flex-col justify-between items-start px-[5rem] ">
+                <div class="w-full ">
+                    <h3 class="page-subtitle text-center">Cliente con id {{ route.params.idCliente }} no encontrado</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
 </template>

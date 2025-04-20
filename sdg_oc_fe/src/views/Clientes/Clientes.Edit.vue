@@ -13,7 +13,7 @@ import { toast } from '@/components/ui/toast';
 import EditClienteForm from '@/components/EditCliente.Form.vue';
 
 const handleEditCliente = async(id: number)=>{
-    router.push(`/clientes/dashboard/${id}`)
+    router.push(`/clientes/dashboard/${id}#dashboard`)
     toast({
         title: 'Cliente actualizado con éxito',
     })

@@ -13,12 +13,27 @@ import { onMounted, ref } from 'vue';
 import { columns } from '@/components/tables/proveedores/columns';
 import DataTable from '@/components/tables/proveedores/data-table.vue';
 import { proveedoresApi } from '@/api/libs/proveedores';
+import AlertError from '@/components/AlertError.vue';
+import { useLoaderStore } from '@/stores/LoaderStore';
+
+const loader = useLoaderStore();
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 
 const data = ref<Proveedor[]>([]);
 
 const loadData = async()=>{
-    data.value = await proveedoresApi.getAll();
+    try{
+        loader.show();
+        data.value = await proveedoresApi.getAll();
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 }
 
 onMounted(async () => {
@@ -57,4 +72,6 @@ onMounted(async () => {
             <DataTable :columns="columns" :data="data" />
         </div>
     </div>
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
 </template> 

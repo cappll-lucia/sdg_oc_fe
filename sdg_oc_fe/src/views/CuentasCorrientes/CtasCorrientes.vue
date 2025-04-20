@@ -24,6 +24,12 @@ import { CuentaCorriente } from '@/api/entities/cuentaCorriente';
 import { ReloadIcon } from '@radix-icons/vue';
 import DataTable from '@/components/tables/cuentasCorrientes/data-table.vue';
 import { columns } from '@/components/tables/cuentasCorrientes/columns';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
+
+
+const loader = useLoaderStore();
+
 const currentLimit = ref<string>('10');
 const currentOffset = ref<number>(0);
 const nextPage=ref<number | null>();
@@ -31,19 +37,30 @@ const previousPage=ref<number | null>(null);
 const txtSearch = ref<string>('');
 const selectedEstado = ref<string>('');
 
-const cuentasCorrientes = ref<CuentaCorriente[]>([])
+const cuentasCorrientes = ref<CuentaCorriente[]>([]);
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 const handleFilterCtasCorrientes = async()=>{
-    const res = await cuentaCorrienteApi.getAll({
-        filtro: txtSearch.value,
-        estado: selectedEstado.value,
-        offset: currentOffset.value,
-        limit: currentLimit.value
-    })
-    console.log(res)
-    cuentasCorrientes.value = res.items.filter(c=>c.cliente.id!=0);
-    nextPage.value = res.nextPage;
-    previousPage.value =res.previousPage;
+    try{
+        loader.show();
+        const res = await cuentaCorrienteApi.getAll({
+            filtro: txtSearch.value,
+            estado: selectedEstado.value,
+            offset: currentOffset.value,
+            limit: currentLimit.value
+        })
+        console.log(res)
+        cuentasCorrientes.value = res.items.filter(c=>c.cliente.id!=0);
+        nextPage.value = res.nextPage;
+        previousPage.value =res.previousPage;
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 };
 
 const handlePageChange = async(offset: number) => {
@@ -127,5 +144,7 @@ const clearFilters = async()=>{
                 <Button variant="outline" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)" > <ChevronRight /> </Button>
             </div>
         </div>
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
     </div>
 </template>
