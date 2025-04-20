@@ -265,7 +265,7 @@ const movimientosQty = computed( () =>
                                         
                                         <div class="flex flex-row justify-start items-center border-b h-16" v-for="mov in item.movimientos">
                                             <span class="w-[8rem]">{{ formatDate(mov.fecha) }}</span>
-                                            <span class="w-[15rem]">{{mov.apellidoCliente}} , {{ mov.nombreCliente }}</span>
+                                            <span class="w-[15rem]">{{mov.apellidoCliente}}, {{ mov.nombreCliente }}</span>
                                             <span class="w-[10rem]">$ {{ mov.importe.toFixed(2) }}</span>
                                             <Button variant="ghost" class="underline " @click="router.push(`/ventas/view/${mov.ventaId}`)" > Ver venta <Inspect :size="14"/> </Button>
                                         </div>

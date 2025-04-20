@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowDownUpIcon, BanknoteIcon, EarIcon, EyeIcon, Glasses, Receipt, Shield, ShoppingBag, Users2Icon } from 'lucide-vue-next';
+import { ArrowDownUpIcon, AsteriskIcon, BanknoteIcon, EarIcon, EyeIcon, Glasses, Receipt, Shield, ShoppingBag, Users2Icon } from 'lucide-vue-next';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -110,7 +110,7 @@ const abrirCajaDiaria = async()=>{
         </div>
     </div>
     <Dialog v-model:open="openDialogOpenCaja" >
-        <DialogContent class="max-w-[35rem] min-h-[15rem] ">
+        <DialogContent class="max-w-[530px] min-h-[15rem] pl-[50px] py-[50px] ">
             <DialogHeader>
                 <DialogTitle>Abrir Caja del Día</DialogTitle>
                 <DialogDescription>
@@ -118,12 +118,14 @@ const abrirCajaDiaria = async()=>{
                 </DialogDescription>
             </DialogHeader>
             <form @submit.prevent="abrirCajaDiaria()" v-if="!loadingForm" >
-            <div class="grid gap-4 py-4">
-                <div class="grid grid-cols-3 items-center mb-4 gap-4">
-                    <Label class="text-right col-span-1">Importe Efectivo</Label>
-                    <div class=" ml-4 mr-12  col-span-2 flex flex-row items-center justify-between">
-                        <Label class="w-[7%] text-left">$</Label>
-                        <Input v-decimal type="number" class="w-[93%]" v-model="importeOpenCaja"   />
+            <div class="flex flex-row">
+                <div class="flex flex-row items-center justify-start mb-4">
+                    <Label class="text-left w-[150px]">Importe Efectivo</Label>
+                    <div class=" w-[270px] flex flex-row items-center justify-start">
+                        <Label class="w-[30px]  text-center">$</Label>
+                        <Input v-decimal type="number" v-model="importeOpenCaja"   />
+                    </div>
+                    <div class="w-[20px]">
                         <TooltipProvider  v-if="!isValidImporteOpenCaja" >
                             <Tooltip>
                                 <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
@@ -136,7 +138,7 @@ const abrirCajaDiaria = async()=>{
                 </div>
             </div>
             <DialogFooter>
-                <Button type="submit">
+                <Button type="submit" class="mr-[30px]">
                 Abrir Caja
                 </Button>
             </DialogFooter>

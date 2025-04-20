@@ -43,7 +43,7 @@ import { cn } from '@/lib/utils';
 import Input from '@/components/ui/input/Input.vue';
 import { Caja, SaldoCaja } from '@/api/entities/caja';
 import { cajaApi } from '@/api/libs/caja';
-import { formatDate } from '@/lib/utils.recetas';
+import { formatDate, formatTime } from '@/lib/utils.recetas';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useLoaderStore } from '@/stores/LoaderStore';
@@ -395,7 +395,7 @@ const resetNewMovimiento = ()=>{
                                 Abrir Caja
                                 </Button>
                                 </DialogTrigger>
-                                <DialogContent class="max-w-[35rem] min-h-[15rem] ">
+                                <DialogContent class="max-w-[530px] min-h-[15rem] pl-[50px] py-[50px] ">
                                     <DialogHeader>
                                         <DialogTitle>Abrir Caja del Día</DialogTitle>
                                         <DialogDescription>
@@ -403,15 +403,17 @@ const resetNewMovimiento = ()=>{
                                         </DialogDescription>
                                     </DialogHeader>
                                     <form @submit.prevent="abrirCajaDiaria()" v-if="!loadingForm" >
-                                    <div class="grid gap-4 py-4">
-                                        <div class="grid grid-cols-3 items-center mb-4 gap-4">
-                                            <Label class="text-right col-span-1">Importe Efectivo</Label>
-                                            <div class=" ml-4 mr-12  col-span-2 flex flex-row items-center justify-between">
-                                                <Label class="w-[7%] text-left">$</Label>
-                                                <Input v-decimal type="number" class="w-[93%]" v-model="importeOpenCaja"   />
+                                    <div class=" flex flex-row ">
+                                        <div class="flex flex-row items-center justify-start mb-4 ">
+                                            <Label class="text-left w-[150px] ">Importe Efectivo</Label>
+                                            <div class=" w-[270px] flex flex-row items-center justify-start">
+                                                <Label class="w-[30px]  text-center">$</Label>
+                                                <Input v-decimal type="number" v-model="importeOpenCaja"   />
+                                            </div>
+                                            <div class="w-[20px]">
                                                 <TooltipProvider  v-if="!isValidImporteOpenCaja" >
                                                     <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4" > <AsteriskIcon :size="14" /> </TooltipTrigger>
                                                         <TooltipContent class="text-destructive border-destructive font-thin text-xs">
                                                             <p>Ingresar Importe</p>
                                                         </TooltipContent>
@@ -421,7 +423,7 @@ const resetNewMovimiento = ()=>{
                                         </div>
                                     </div>
                                     <DialogFooter>
-                                        <Button type="submit">
+                                        <Button type="submit" class="mr-[30px]">
                                         Abrir Caja
                                         </Button>
                                     </DialogFooter>
@@ -507,7 +509,7 @@ const resetNewMovimiento = ()=>{
                         </div>
                         <div v-else>
                             <div v-for="mov in dateMovements" class="flex flex-row justify-between w-ful h-[4rem]  mb-2 border-b items-center px-4 ">
-                                <Label class="w-[8rem] text-sm ">{{ formatDate(mov.fechaMovimiento) }}</Label>
+                                <Label class="w-[8rem] text-sm ">{{ formatTime(mov.fechaMovimiento) }} hs.</Label>
                                 <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
                                 <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle ?? "Cta. Cte. Cliente"}}</Label>
                                 <Label class="w-[18rem] text-xs flex justify-start "></Label>

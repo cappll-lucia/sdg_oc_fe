@@ -264,7 +264,7 @@ const hanldeCancel = ()=>{
                                         <Tooltip>
                                             <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Seleccionar tipo documento</p>
+                                                <p>Seleccionar categoría fiscal</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -360,7 +360,7 @@ const hanldeCancel = ()=>{
                                         <Tooltip>
                                             <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Ingresar fecha nacimeinto válida</p>
+                                                <p>Ingresar fecha nacimiento válida</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -390,7 +390,7 @@ const hanldeCancel = ()=>{
                                         <Tooltip>
                                             <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                             <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Seleccionar tipo documento</p>
+                                                <p>Seleccionar localidad</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>

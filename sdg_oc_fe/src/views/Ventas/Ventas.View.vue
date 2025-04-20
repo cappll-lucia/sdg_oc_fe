@@ -56,7 +56,7 @@ onMounted(async () => {
 const loadData = async(id: string)=>{
     try{
         const res = await ventasApi.getOne(id);
-        currentVenta.value = res.venta
+        currentVenta.value = res.venta;
         comprobantesVenta.value = res.comprobantesRelacionados;
         currentVenta.value.fecha = new Date(currentVenta.value.fecha);
         currentVenta.value.cliente = await clientesApi.getOne(currentVenta.value.cliente.id);
@@ -257,8 +257,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
 
 
                     <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
-                        <div class="w-[33rem] rounded-lg border p-4  flex flex-col justify-start  items-start">
-
+                        <div class="w-[68%] rounded-lg border p-4  flex flex-col justify-start  items-start">
                             <div class="rounded-lg w-[30rem] min-h-[4rem]">
                                 <h3 class="text-md font-bold ">Obras Sociales</h3>
                                 <span v-if="currentVenta.ventaObraSocial.length==0" class="text-sm">No aplica</span>
@@ -278,23 +277,23 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
 
                         </div>
                         <div v-if="currentVenta"
-                            class="w-[30%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-end justify-center">
+                            class="w-[30%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center">
                             <div v-if="currentVenta.ventaObraSocial.length>0 || currentVenta.descuentoPorcentaje"
-                                class=" flex  justify-center">
+                                class=" flex  justify-center my-2">
                                 <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
                                 <Label class=" w-[10rem]">$ {{ totalVentaBruto?.toFixed(2) }}</Label>
                             </div>
                             <div v-if="currentVenta.ventaObraSocial.length > 0"
-                                class=" flex  justify-center items-center mt-4">
+                                class=" flex  justify-center items-center my-2">
                                 <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
                                 <Label class=" w-[10rem]  ">- $ {{ montoObrasSociales?.toFixed(2) }}</Label>
                             </div>
                             <div v-if="currentVenta.descuentoPorcentaje"
-                                class=" flex  justify-center items-center mt-4">
+                                class=" flex  justify-center items-center my-2">
                                 <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
                                 <Label class=" w-[10rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
                             </div>
-                            <div class=" flex  justify-center mt-4">
+                            <div class=" flex justify-center my-2">
                                 <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
                                 <Label class="page-subtitle  w-[10rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
                             </div>
@@ -372,10 +371,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                             <Button variant="ghost" @click="emailComprobante(comprobante.id)">
                                 <MailIcon />
                             </Button>
-                            <Button variant="ghost" v-if="[1, 6].includes(comprobante.tipoComprobante)" @click="router.push(`/ventas/view/${comprobante.venta.id}`)">
-                                <InspectIcon />
-                            </Button>
-                            <Button variant="ghost" v-else @click="router.push(`/nota-credito-debito/view/${comprobante.id}`)">
+                            <Button variant="ghost" v-if="![1, 6].includes(comprobante.tipoComprobante)" @click="router.push(`/nota-credito-debito/view/${comprobante.id}`)">
                                 <InspectIcon />
                             </Button>
                         </div>

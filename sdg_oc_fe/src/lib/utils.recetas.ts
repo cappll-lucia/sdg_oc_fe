@@ -18,8 +18,21 @@ export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref
 }
 
 export const formatDate = (dateString: string | Date) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const date = new Date(dateString);
+  return date.toLocaleDateString('es-AR', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric' 
+  });
+};
+
+export const formatTime = (dateString: string | Date) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 };
 
 export function generateRecetasRecetadosPDF (recetas: RecetasAereos[], nombreCliente:string) {

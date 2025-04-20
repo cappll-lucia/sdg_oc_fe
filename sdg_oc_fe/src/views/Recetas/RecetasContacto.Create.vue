@@ -337,7 +337,7 @@ const redirectCancel = ()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Nueva</BreadcrumbPage>
+                    <BreadcrumbPage>Nueva receta lentes de contacto</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
