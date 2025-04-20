@@ -20,7 +20,6 @@ import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import Button from '@/components/ui/button/Button.vue';
 import router from '@/router';
-import { LayoutDashboard } from 'lucide-vue-next';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
 
@@ -41,8 +40,13 @@ onMounted(async()=>{
 
 const loadData = async ()=>{
     try{
-        loader.show()
-        currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente))
+        loader.show();
+        const id = Number(route.params.idCliente);
+        if(id==0){
+            loader.hide();
+            return;
+        }
+        currentCliente.value = await clientesApi.getOne(id)
         if(currentCliente){
             const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
             recetasClienteAereos.value = res.recetasLentesAereos;
@@ -96,7 +100,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
             </BreadcrumbList>
         </Breadcrumb>
         <div class=" flex flex-row justify-between w-full mb-4">
-            <h1 class="page-title ">Recetas: {{ nombreCliente }} <Button variant="ghost" @click="router.push(`/clientes/dashboard/${currentCliente?.id}`)" ><LayoutDashboard :size="24" /> </Button> </h1>
+            <h1 class="page-title ">Recetas: {{ nombreCliente }} </h1>
             <div>
                 <Button class="text-xs mr-2 " @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)" >Nueva Receta Anteojos Recetados </Button>
                 <Button class="text-xs" @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)" >Nueva Receta Lentes de Contacto </Button>
@@ -156,7 +160,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         <div class="pt-2 mb-4 " >
             <div  class="flex flex-col justify-between items-start px-[5rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Cliente con id {{ route.params.idCliente }} no encontrado</h3>
+                    <h3 class="page-subtitle text-center">Cliente con id={{ route.params.idCliente }} no encontrado</h3>
                 </div>
             </div>
         </div>

@@ -147,6 +147,7 @@ const submitNewObraSocial = async()=>{
                     <DialogContent class="max-w-[45rem]">
                         <CreateObrasSocialForm 
                             @handle-create-obra-social="handleCreateObraSocial"
+                            @handle-cancel="openNewOS=false"
                         />
                     </DialogContent>
                 </Dialog>

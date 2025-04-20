@@ -115,7 +115,7 @@ const preguntas = ref<{question: string, response: string}[]>([
             Preguntas frecuentes</h1>
         
         <div class=" flex flex-col justify-start items-start w-full">
-            <div v-for="(qts, index) in preguntas" class="flex flex-col justify-start items-start h-[5rem]">
+            <div v-for="(qts, index) in preguntas" class="flex flex-col justify-start items-start mb-[2rem]">
                 <h1 class="font-bold text-lg">{{ index+1 }}. {{ qts.question }}</h1>
                 <span class="text-md">{{ qts.response }}</span>
             </div>

@@ -42,12 +42,21 @@ onMounted(async () => {
 const loadData = async()=> {
     try{
         loader.show();
-        currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente));
-        if(currentCliente.value){
-            audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(Number(route.params.idCliente));
+        const id = Number(route.params.idCliente);
+        if(id==0){
+            loader.hide();
+            return;
         }
+        currentCliente.value = await clientesApi.getOne(id)
+        if(!currentCliente.value){
+            loader.hide();
+            return;
+        }
+        audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(Number(route.params.idCliente));
         selectedAudiom.value = audiometriasCliente.value[0];
-        filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`);
+        if(selectedAudiom.value){
+            filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value.linkPDF}`);
+        }
         loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
@@ -204,7 +213,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         <div class="pt-2 mb-4 " >
             <div  class="flex flex-col justify-between items-start px-[5rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Cliente con id {{ route.params.idCliente }} no encontrado</h3>
+                    <h3 class="page-subtitle text-center">Cliente con id={{ route.params.idCliente }} no encontrado</h3>
                 </div>
             </div>
         </div>

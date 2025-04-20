@@ -95,6 +95,7 @@ const handleCreateCliente = (cliente: Cliente)=>{
                 <ScrollArea class="h-[30rem] w-[80rem] pl-4 rounded-lg">
                     <CreateClienteForm
                         @handle-create-cliente="handleCreateCliente"
+                        @handle-cancel="showCreateForm=false"
                     />
                 </ScrollArea>
             </div>

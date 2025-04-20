@@ -113,32 +113,43 @@ onMounted( async()=>{
 
 const loadData = async()=>{
     // TODO pagination
-    currentCliente.value = await clientesApi.getOne(Number(route.params.id));
-    if(!currentCliente.value) return;
-    recetasCliente.value = await clientesApi.getRecetasSummaryByCliente(currentCliente.value.id);
-    audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(currentCliente.value.id);
-    ctaCorriente.value = await cuentaCorrienteApi.getOneByCliente(currentCliente.value.id);    
-    comprobantesCliente.value = await comprobantesApi.getAllByCliente(currentCliente.value.id)
-    const itemsComprobantes = comprobantesCliente.value.map((c=> ({
-        id: c.id,
-        fecha: new Date(c.fechaEmision),
-        importe: c.importeTotal,
-        motivo: c.motivo ?? '',
-        tipoComprobante: c.tipoComprobante,
-        venta:c.venta,
-        clase: 'comprobante',
-    })))
-    const itemsMovimientos = ctaCorriente.value.movimientos.map(mov=>({
-        id: mov.id.toString(),
-        fecha: new Date(mov.fechaMovimiento),
-        importe: mov.importe,
-        motivo: mov.tipoMovimiento.toString() ?? 'Movimiento cta cte',
-        tipoComprobante: undefined,
-        venta: undefined,
-        clase: 'movimiento',
-    }))
-    movimientosAndComprobantes.value = [...itemsMovimientos, ...itemsComprobantes];
-    movimientosAndComprobantes.value.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+    try{
+        const id = Number(route.params.id);
+        if(id==0){
+            loader.hide();
+            return;
+        }
+        currentCliente.value = await clientesApi.getOne(id);
+        if(!currentCliente.value) return;
+        recetasCliente.value = await clientesApi.getRecetasSummaryByCliente(currentCliente.value.id);
+        audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(currentCliente.value.id);
+        ctaCorriente.value = await cuentaCorrienteApi.getOneByCliente(currentCliente.value.id);    
+        comprobantesCliente.value = await comprobantesApi.getAllByCliente(currentCliente.value.id)
+        const itemsComprobantes = comprobantesCliente.value.map((c=> ({
+            id: c.id,
+            fecha: new Date(c.fechaEmision),
+            importe: c.importeTotal,
+            motivo: c.motivo ?? '',
+            tipoComprobante: c.tipoComprobante,
+            venta:c.venta,
+            clase: 'comprobante',
+        })))
+        const itemsMovimientos = ctaCorriente.value.movimientos.map(mov=>({
+            id: mov.id.toString(),
+            fecha: new Date(mov.fechaMovimiento),
+            importe: mov.importe,
+            motivo: mov.tipoMovimiento.toString() ?? 'Movimiento cta cte',
+            tipoComprobante: undefined,
+            venta: undefined,
+            clase: 'movimiento',
+        }))
+        movimientosAndComprobantes.value = [...itemsMovimientos, ...itemsComprobantes];
+        movimientosAndComprobantes.value.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 }
 
 const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=>{
@@ -212,7 +223,7 @@ const onSubmit = async()=>{
 </script>
 
 <template>
-    <div class="page"  id="dashboard">
+    <div class="page"  id="dashboard" v-if="currentCliente">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
@@ -232,7 +243,7 @@ const onSubmit = async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                    <BreadcrumbPage>{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
@@ -574,6 +585,39 @@ const onSubmit = async()=>{
                 </div>
             </div>
         </div>
+    </div>
+    <div class="page" v-else>
+        <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                        Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        <div class="pt-2 mb-4 " >
+            <div  class="flex flex-col justify-between items-start px-[5rem] ">
+                <div class="w-full ">
+                    <h3 class="page-subtitle text-center">Cliente con id={{ route.params.id }} no encontrado</h3>
+                </div>
+            </div>
+        </div>
+    </div>
         <AlertError
             v-model="showError"
             title="Error"
@@ -581,5 +625,4 @@ const onSubmit = async()=>{
             button="Aceptar"
             :action="()=>{showError=false}"
         />
-    </div>
 </template>

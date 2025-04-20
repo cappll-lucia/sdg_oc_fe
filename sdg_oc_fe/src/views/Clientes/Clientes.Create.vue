@@ -14,7 +14,7 @@ import { toast } from '@/components/ui/toast';
 import { Cliente } from '@/api/entities/clientes';
 
 const handleCreateCliente = async(newCliente: Cliente)=>{
-    router.push(`/clientes/dashboard/${newCliente.id}`)
+    router.push(`/clientes/dashboard/${newCliente.id}#dashboard`)
     toast({
         title: 'Cliente registrado con éxito',
     })
@@ -51,6 +51,7 @@ const handleCreateCliente = async(newCliente: Cliente)=>{
         <div class="pt-2 mb-4 " >
             <CreateClienteForm 
                 @handle-create-cliente="handleCreateCliente"
+                @handle-cancel="router.push('/clientes')"
             />
         </div>
 
