@@ -37,8 +37,11 @@ import { PruebaLentesContacto, pruebaLentesContactoCustomValidator } from '@/api
 import { toast } from '@/components/ui/toast';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { Cross2Icon, ValueNoneIcon } from '@radix-icons/vue';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
-const route = useRoute()
+const route = useRoute();
+const loader = useLoaderStore();
+
 
 const fechaReceta = ref({
     day:'',
@@ -46,7 +49,6 @@ const fechaReceta = ref({
     year:'',
 })
 
-const loading = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 
@@ -130,26 +132,33 @@ const isValidPrueba = ref<{
 }[]>([])
 
 onMounted(async()=>{
-    currentReceta.value = await recetasApi.getOneContacto(Number(route.params.id))
-    currentPruebas.value = currentReceta.value.pruebasLentesContacto.map((p: PruebaLentesContacto  )=>{
-        const { numeroPrueba: numero, ...prueba } = p;
-        return prueba
-    });
-    isValidPrueba.value.push({
-        od_cb: true,
-        od_esferico: true,
-        od_cilindrico: true,
-        od_eje: true,
-        od_diametro: true,
-        oi_cb: true,
-        oi_esferico: true,
-        oi_cilindrico: true,
-        oi_eje: true,
-        oi_diametro: true,
-    })
-    fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
-    fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
-    fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+    try{
+
+        currentReceta.value = await recetasApi.getOneContacto(Number(route.params.id))
+        currentPruebas.value = currentReceta.value.pruebasLentesContacto.map((p: PruebaLentesContacto  )=>{
+            const { numeroPrueba: numero, ...prueba } = p;
+            return prueba
+        });
+        isValidPrueba.value.push({
+            od_cb: true,
+            od_esferico: true,
+            od_cilindrico: true,
+            od_eje: true,
+            od_diametro: true,
+            oi_cb: true,
+            oi_esferico: true,
+            oi_cilindrico: true,
+            oi_eje: true,
+            oi_diametro: true,
+        })
+        fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
+        fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
+        fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 })
 
 const addPrueba = ()=>{
@@ -191,7 +200,7 @@ const addPrueba = ()=>{
 
 const validateAndSubmit = async()=>{
     if(currentReceta.value){   
-        loading.value=true;
+        loader.show();
         const resultReceta = recetaContactoCustomValidator(currentReceta.value, fechaReceta.value)
         isValidReceta.value = resultReceta.isValid;
         const resultPruebas = pruebaLentesContactoCustomValidator(currentPruebas.value)
@@ -199,7 +208,7 @@ const validateAndSubmit = async()=>{
         if(resultPruebas.success && resultReceta.success){
             await onSubmit();
         }
-        loading.value=false;
+        loader.hide();
     }
 }
 
@@ -210,7 +219,7 @@ const onSubmit = async()=>{
             const recetaObj = {...currentReceta.value, pruebasLentesContacto: currentPruebas.value}
             recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
             await recetasApi.editRecetaContacto(recetaObj)
-            loading.value=false;
+            loader.hide();
             toast({
                 title: 'Receta registrada con éxito',
             })
@@ -219,7 +228,7 @@ const onSubmit = async()=>{
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loading.value=false;
+        loader.hide();
     };
 }
 
@@ -874,7 +883,7 @@ const redirectCancel = ()=>{
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
                     <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel"  >Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                    <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
             </form>
         </div>

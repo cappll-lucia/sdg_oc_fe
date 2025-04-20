@@ -43,12 +43,13 @@ import { recetaContactoCustomValidator } from '@/api/entities/recetasContacto';
 import { pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
 import { recetasApi } from '@/api/libs/recetas';
 import { useRoute } from 'vue-router';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
 const route = useRoute();
+const loader = useLoaderStore();
 
 const selectedCliente = ref<Cliente| null>(null);
 const searchClienteOpen = ref<boolean>(false);
-const loading = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -208,10 +209,17 @@ const fechaReceta = ref({
 
 onMounted(async()=>{
     // TODO pagination
-    const query = route.query
-    if(query.cliente){
-        const foundCliente = await clientesApi.getOne(Number(query.cliente))
-        if(foundCliente) handleSelectCliente(foundCliente)
+    try{
+        loader.show()
+        const query = route.query
+        if(query.cliente){
+            const foundCliente = await clientesApi.getOne(Number(query.cliente))
+            if(foundCliente) handleSelectCliente(foundCliente)
+        }
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
     }
 })
 
@@ -261,7 +269,7 @@ const addPrueba = () => {
 };
 
 const validateAndSubmit = async()=>{
-    loading.value=true;
+    loader.show()
     const resultReceta = recetaContactoCustomValidator(newReceta.value, fechaReceta.value)
     isValidReceta.value = resultReceta.isValid;
     const resultPruebas = pruebaLentesContactoCustomValidator(newPruebas.value)
@@ -269,7 +277,7 @@ const validateAndSubmit = async()=>{
     if(resultPruebas.success && resultReceta.success){
         await onSubmit();
     }
-    loading.value=false;
+    loader.hide();
 }
 
 
@@ -278,7 +286,7 @@ const onSubmit = async()=>{
         const recetaObj = {...newReceta.value, pruebasLentesContacto: newPruebas.value}
         recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
         await recetasApi.createRecetaContacto(recetaObj)
-        loading.value=false;
+       loader.hide();
         toast({
             title: 'Receta registrada con éxito',
         })
@@ -286,7 +294,7 @@ const onSubmit = async()=>{
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loading.value=false;
+        loader.hide();
     };
 }
 const nombreCliente = computed(()=> selectedCliente.value?.apellido +", "+selectedCliente.value?.nombre)
@@ -969,7 +977,7 @@ const redirectCancel = ()=>{
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
                     <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel">Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                    <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
             </form>
         </div>
