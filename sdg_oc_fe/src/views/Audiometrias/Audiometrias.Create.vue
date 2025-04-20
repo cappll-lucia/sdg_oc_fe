@@ -77,11 +77,18 @@ const isValidAudiometria = ref<{
 
 onMounted(async()=>{
     // TODO pagination
-    const query = route.query
-    if(query.cliente){
-        const foundCliente = await clientesApi.getOne(Number(query.cliente))
-        if(foundCliente) handleSelectCliente(foundCliente)
-    }
+    try{
+
+        const query = route.query
+        if(query.cliente){
+            const foundCliente = await clientesApi.getOne(Number(query.cliente))
+            if(foundCliente) handleSelectCliente(foundCliente)
+        }
+    } catch (err: any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    };
 })
 
 const onSubmit = async () => {
