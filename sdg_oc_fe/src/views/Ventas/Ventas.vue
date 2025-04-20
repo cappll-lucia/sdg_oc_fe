@@ -33,12 +33,18 @@ import {
 import { CalendarIcon } from 'lucide-vue-next'
 import type { DateRange } from 'reka-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
+const loader = useLoaderStore();
 
 const selectedTipoFactura = ref<string>('');
 const txtSearch = ref<string>('');
 const currentLimit = ref<string>('10');
 const currentOffset = ref<number>(0);
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 const dateRange = ref<DateRange>({
   start: undefined,
@@ -53,17 +59,25 @@ const ventas = ref<Venta[]>([]);
 
 
 const handleFilterVentas = async()=>{
-    const resp = await ventasApi.getAll({
-        nombreCliente: txtSearch.value,
-        fechaDesde: dateRange.value.start ? formatDateValue(dateRange.value.start as CalendarDate | undefined) : '',
-        fechaHasta: dateRange.value.end ? formatDateValue(dateRange.value.end as CalendarDate | undefined) : '',
-        tipoComprobante:selectedTipoFactura.value,
-        offset: currentOffset.value,
-        limit: currentLimit.value,
-    });
-    ventas.value = resp.items;
-    nextPage.value = resp.nextPage;
-    previousPage.value =resp.previousPage;
+    try{
+        loader.show();
+        const resp = await ventasApi.getAll({
+            nombreCliente: txtSearch.value,
+            fechaDesde: dateRange.value.start ? formatDateValue(dateRange.value.start as CalendarDate | undefined) : '',
+            fechaHasta: dateRange.value.end ? formatDateValue(dateRange.value.end as CalendarDate | undefined) : '',
+            tipoComprobante:selectedTipoFactura.value,
+            offset: currentOffset.value,
+            limit: currentLimit.value,
+        });
+        ventas.value = resp.items;
+        nextPage.value = resp.nextPage;
+        previousPage.value =resp.previousPage;
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 }
 
 const formatDateValue = (dateValue: CalendarDate | undefined): string => {
@@ -206,5 +220,7 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                 </Button>
             </div>
         </div>
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
     </div>
 </template>

@@ -38,8 +38,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import router from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { JwtUser } from '@/api/entities/jwtUser';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
-const userStore = useUserStore()
+const userStore = useUserStore();
+const loader = useLoaderStore();
+
 
 const userData = ref<JwtUser | null>();
 const productos = ref<Producto[]>([]);
@@ -55,6 +59,9 @@ const currentOffset = ref<number>(0);
 const nextPage=ref<number | null>();
 const previousPage=ref<number | null>(null);
 
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
+
 const loadData = async()=>{
     await handleFilterProducts()
     marcas.value = await marcasApi.getAll();
@@ -68,17 +75,25 @@ onMounted(async () => {
 
 
 const handleFilterProducts = async () => {
-    const resp = await productosApi.getAll({
-        proveedorId: selectedProveedorId.value,
-        marcaId: selectedMarcaId.value,
-        categoria: selectedCategoria.value,
-        filtro: txtSearch.value,
-        offset: currentOffset.value,
-        limit: currentLimit.value
-    });
-    productos.value = resp.items;
-    nextPage.value = resp.nextPage;
-    previousPage.value =resp.previousPage;
+    try{
+        loader.show();
+        const resp = await productosApi.getAll({
+            proveedorId: selectedProveedorId.value,
+            marcaId: selectedMarcaId.value,
+            categoria: selectedCategoria.value,
+            filtro: txtSearch.value,
+            offset: currentOffset.value,
+            limit: currentLimit.value
+        });
+        productos.value = resp.items;
+        nextPage.value = resp.nextPage;
+        previousPage.value =resp.previousPage;
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 };
 
 const handlePageChange = async(offset: number) => {
@@ -206,6 +221,7 @@ const clearFilters = async()=>{
                 </Button>
             </div>
         </div>
-
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
     </div>
 </template>

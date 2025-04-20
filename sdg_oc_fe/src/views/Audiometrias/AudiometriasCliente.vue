@@ -11,7 +11,7 @@ import { Pencil1Icon, SlashIcon } from '@radix-icons/vue';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ChevronRightIcon } from '@radix-icons/vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { clientesApi } from '@/api/libs/clientes';
 import { Audiometria } from '@/api/entities/audiometrias';
@@ -20,38 +20,83 @@ import { formatDate } from '@/lib/utils.recetas';
 import { PlusIcon } from 'lucide-vue-next';
 import { uploadsApi } from '@/api/libs/uploads';
 import router from '@/router';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
 const route = useRoute();
+const loader = useLoaderStore();
+
 const selectedAudiom = ref<undefined | Audiometria>();
 const currentCliente = ref<Cliente>();
 const audiometriasCliente = ref<Audiometria[]>([]);
-const filePDF = ref()
+const filePDF = ref();
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 
 onMounted(async () => {
-    currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente));
-    if(currentCliente.value){
-        audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(Number(route.params.idCliente));
-    }
-    selectedAudiom.value = audiometriasCliente.value[0];
-    filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`)
+    await loadData();
 })
 
-const changeSelectedAudiom = async(audiometria: Audiometria) =>{
-    selectedAudiom.value=audiometria;
-    filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`)
+const loadData = async()=> {
+    try{
+        loader.show();
+        currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente));
+        if(currentCliente.value){
+            audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(Number(route.params.idCliente));
+        }
+        selectedAudiom.value = audiometriasCliente.value[0];
+        filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`);
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 }
+
+const changeSelectedAudiom = async(audiometria: Audiometria) =>{
+    try{
+        loader.show
+        selectedAudiom.value=audiometria;
+        filePDF.value = await uploadsApi.getFile(`audiometrias/${selectedAudiom.value?.linkPDF}`)
+        loader.hide()
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
+}
+
+const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+currentCliente.value?.nombre)
 
 
 </script>
 
 <template>
-    <div class="page">
+    <div class="page" v-if="currentCliente">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
                         Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink :href="`/clientes/dashboard/${currentCliente?.id}`">
+                        {{nombreCliente}}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
@@ -132,6 +177,40 @@ const changeSelectedAudiom = async(audiometria: Audiometria) =>{
             </div>
         </div>
     </div>
+    <div class="page" v-else>
+         <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                        Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Audiometrías</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        <div class="pt-2 mb-4 " >
+            <div  class="flex flex-col justify-between items-start px-[5rem] ">
+                <div class="w-full ">
+                    <h3 class="page-subtitle text-center">Cliente con id {{ route.params.idCliente }} no encontrado</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
 </template>
 
 

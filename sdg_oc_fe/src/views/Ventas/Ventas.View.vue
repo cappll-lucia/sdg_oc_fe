@@ -31,8 +31,13 @@ import router from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
 import AlertError from '@/components/AlertError.vue';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import LoaderInline from '@/components/LoaderInline.vue';
 
-const route = useRoute()
+const route = useRoute();
+const loader = useLoaderStore();
+const loadingForm=ref<boolean>(false);
+
 const currentVenta = ref<Venta>();
 const comprobantesVenta = ref<Comprobante[]>([]);
 
@@ -42,13 +47,24 @@ const errorMessage =ref<string>('');
 onMounted(async () => {
     const id = route.params.id?.toString();
     if(id){
+        loader.show()
+        await loadData(id)
+        loader.hide();
+    }
+});
+
+const loadData = async(id: string)=>{
+    try{
         const res = await ventasApi.getOne(id);
         currentVenta.value = res.venta
         comprobantesVenta.value = res.comprobantesRelacionados;
         currentVenta.value.fecha = new Date(currentVenta.value.fecha);
-        currentVenta.value.cliente = await clientesApi.getOne(currentVenta.value.cliente.id)
+        currentVenta.value.cliente = await clientesApi.getOne(currentVenta.value.cliente.id);
+    }catch(error: any){
+        errorMessage.value = error.message as string;
+        showError.value = true;
     }
-});
+}
 
 const totalVentaBruto = computed(()=>{
     if(currentVenta.value){
@@ -85,6 +101,7 @@ const caluclateImportePago = computed(()=>{
 
 const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=>{
     try {
+        loadingForm.value=true;
         const resp = await comprobantesApi.print(id);
         const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
@@ -97,24 +114,35 @@ const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+        toast({
+            title: 'Comprobante impreso con éxito'
+        })
+        loadingForm.value=false;
     } catch (error) {
-        console.error('Error al descargar el PDF:', error);
+        loadingForm.value=false;
+        errorMessage.value = 'Error al descargar el PDF';
+        showError.value = true;
     }
 }
 
 const emailComprobante = async(_id: string)=>{
     try {
+        loadingForm.value=true;
         await comprobantesApi.email(_id);
+        loadingForm.value=false;
         toast({
             title: 'Comprobante enviado por email'
         })
     } catch (error) {
-        console.error('Error al enviar el comprobante:', error);
+        errorMessage.value = 'Error al enviar el comprobante';
+        showError.value = true;
+        loadingForm.value=false;
     }
 }
 
 const emitirFactura = async()=>{
     try{
+        loader.show();
         if(currentVenta.value){
             const newFactura ={
                 importeTotal: currentVenta.value?.importe,
@@ -126,6 +154,7 @@ const emitirFactura = async()=>{
             const factura = await comprobantesApi.create(newFactura)  ;
             currentVenta.value.factura=factura;
             comprobantesVenta.value.push(factura);
+            loader.hide();
             toast({
                 title: 'Factura emitida',
             })
@@ -133,6 +162,7 @@ const emitirFactura = async()=>{
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
+        loader.hide();
     }
 }
 
@@ -166,7 +196,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Nueva Venta</BreadcrumbPage>
+                    <BreadcrumbPage>Detalles Venta</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
@@ -335,18 +365,23 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                         tipoComprobanteDisplay(comprobante.tipoComprobante)?.nombre }} {{
                             tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
                         <span class=" text-md font-thin w-[15rem]">{{ comprobante.numeroComprobante }}</span>
-                        <Button variant="ghost" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision)">
-                            <PrinterIcon />
-                        </Button>
-                        <Button variant="ghost" @click="emailComprobante(comprobante.id)">
-                            <MailIcon />
-                        </Button>
-                        <Button variant="ghost" v-if="[1, 6].includes(comprobante.tipoComprobante)" @click="router.push(`/ventas/view/${comprobante.venta.id}`)">
-                            <InspectIcon />
-                        </Button>
-                        <Button variant="ghost" v-else @click="router.push(`/nota-credito-debito/view/${comprobante.id}`)">
-                            <InspectIcon />
-                        </Button>
+                        <div v-if="!loadingForm" class="actions">
+                            <Button variant="ghost" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision)">
+                                <PrinterIcon />
+                            </Button>
+                            <Button variant="ghost" @click="emailComprobante(comprobante.id)">
+                                <MailIcon />
+                            </Button>
+                            <Button variant="ghost" v-if="[1, 6].includes(comprobante.tipoComprobante)" @click="router.push(`/ventas/view/${comprobante.venta.id}`)">
+                                <InspectIcon />
+                            </Button>
+                            <Button variant="ghost" v-else @click="router.push(`/nota-credito-debito/view/${comprobante.id}`)">
+                                <InspectIcon />
+                            </Button>
+                        </div>
+                        <div v-else>
+                            <LoaderInline />
+                        </div>
                     </div>
                 </div>
                 </div>

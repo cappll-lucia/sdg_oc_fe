@@ -139,15 +139,18 @@ const validateAndSubmit = async()=>{
 
 const onSubmit = async()=>{
     try{
+        loader.show();
         if(currentCliente.value){
             currentCliente.value.fechaNac = new Date(parseInt(fechaNac.value.year), parseInt(fechaNac.value.month)-1, parseInt(fechaNac.value.day))
             const { clienteObrasSociales, ...cliente} = currentCliente.value;
             await clientesApi.edit(currentCliente.value?.id, cliente, obrasSocialesCliente.value)
+            loader.hide();
             emit('handleEditCliente', currentCliente.value.id);
         }
     }catch (err: any) {
         errorMessage.value = err.message as string;
         showError.value = true;
+        loader.hide();
     }
 }
 
