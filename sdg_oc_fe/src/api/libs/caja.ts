@@ -15,8 +15,7 @@ const getMovimientos = async(_fecha: string)=>{
 const getApertura = async(_fecha: string)=>{
     try {
         const resp = await http.get(`/caja/apertura?fecha=${_fecha}`);
-        const apertura = resp.data.data as Caja;
-        return apertura.importe;
+        return resp.data.data as Caja;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }

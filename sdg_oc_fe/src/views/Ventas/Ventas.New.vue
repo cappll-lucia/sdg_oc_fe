@@ -247,7 +247,8 @@ const validateAndSubmit = async()=>{
 
 onMounted(async () => {
     addLineaVenta();
-    openDialogOpenCaja.value = !cajaStore.isCajaOpenedToday;
+    const cajaOpened = await cajaStore.isCajaOpenedToday();
+    openDialogOpenCaja.value = !cajaOpened
 });
 
 
@@ -389,7 +390,6 @@ const abrirCajaDiaria = async()=>{
         if(importeOpenCaja.value >= 0){
             loadingForm.value=true;
             await cajaApi.apertura(importeOpenCaja.value);
-            cajaStore.openCaja();
             openDialogOpenCaja.value=false;
             loadingForm.value=false;
         }
