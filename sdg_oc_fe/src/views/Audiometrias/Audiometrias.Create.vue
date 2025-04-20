@@ -25,7 +25,7 @@ import { audiometriaCustomValidator } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
 import AlertError from '@/components/AlertError.vue';
 import router from '@/router/index';
-import {onMounted, ref } from 'vue'
+import {computed, onMounted, ref } from 'vue'
 import { Cliente } from '@/api/entities/clientes';
 import { clientesApi } from '@/api/libs/clientes';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
@@ -152,6 +152,7 @@ const redirectCancel = ()=>{
     ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
     : router.push(`/`)
 }
+const nombreCliente = computed(()=>  selectedCliente.value?.apellido +", "+ selectedCliente.value?.nombre);
 
 
 </script>
@@ -169,7 +170,23 @@ const redirectCancel = ()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/audiometrias">
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="selectedCliente" >
+                    <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
+                        {{nombreCliente}}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator  v-if="selectedCliente">
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="selectedCliente">
+                    <BreadcrumbLink :href="`/audiometrias/${selectedCliente?.id}`">
                         Audiometrias
                     </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -177,7 +194,7 @@ const redirectCancel = ()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Nueva audiometría</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

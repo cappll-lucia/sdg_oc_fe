@@ -297,6 +297,8 @@ onMounted(async () => {
 
 
 const handleSelectCliente = async(cliente:Cliente)=>{
+    obrasSociales.value=false;
+    ventaObrasSociales.value=[]
     availableCondicionIva.value = [CondicionIva.CONSUMIDOR_FINAL]
     if(cliente.categoriaFiscal!= CondicionIva.CONSUMIDOR_FINAL){
         availableCondicionIva.value.push(cliente.categoriaFiscal as CondicionIva);
@@ -304,9 +306,18 @@ const handleSelectCliente = async(cliente:Cliente)=>{
     }
     selectedCliente.value=cliente; 
     searchClienteOpen.value=false;
+    if(cliente.id==0){
+        mediosDePago.value.forEach((mp)=> {
+            console.log(mp)
+         if (TipoMedioDePagoEnum[mp.tipoMedioDePago as keyof typeof TipoMedioDePagoEnum] === TipoMedioDePagoEnum.CUENTA_CORRIENTE) {
+                console.log('si')
+                mp.tipoMedioDePago=undefined
+            }
+        })
+    }
 }
 
-const hanldeSelectProducto = (_producto: Producto)=>{
+const handleSelectProducto = (_producto: Producto)=>{
     const existingLinea = lineasDeVenta.value.find(linea => linea.producto.id === _producto.id);
     if(existingLinea){
         existingLinea.cantidad+=1;
@@ -623,7 +634,7 @@ const abrirCajaDiaria = async()=>{
                             <SelectProductoDialog 
                                 v-model="searchProductoOpen"
                                 title="Seleccionar Producto"
-                                @select-producto="hanldeSelectProducto"
+                                @select-producto="handleSelectProducto"
                             />
                         </div>
 
@@ -799,20 +810,20 @@ const abrirCajaDiaria = async()=>{
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-centerr">
-                                <div v-if="(obrasSociales && montoObrasSociales > 0) || porcDto" class=" flex  justify-center mt-4">
+                            <div class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center">
+                                <div v-if="(obrasSociales && montoObrasSociales > 0) || porcDto" class=" flex  justify-center my-2">
                                     <Label class=" w-[9rem] text-right mr-4">Importe Total: </Label>
                                     <Label class=" w-[9rem]">$ {{ totalVentaBruto.toFixed(2) }}</Label>
                                 </div>
-                                <div v-if="obrasSociales && montoObrasSociales > 0" class=" flex  justify-center items-center mt-4">
+                                <div v-if="obrasSociales && montoObrasSociales > 0" class=" flex  justify-center items-center my-2">
                                     <Label class=" w-[9rem] text-right mr-4">Obras Sociales: </Label>
                                     <Label class=" w-[9rem]  ">- $ {{ montoObrasSociales.toFixed(2) }}</Label>
                                 </div>
-                                <div v-if="porcDto" class=" flex  justify-center items-center mt-4">
+                                <div v-if="porcDto" class=" flex  justify-center items-center my-2">
                                     <Label class=" w-[9rem] text-right mr-4">Descuento: </Label>
                                     <Label class=" w-[9rem] ">- $ {{ montoDto.toFixed(2) }}</Label>
                                 </div>
-                                <div class=" flex  justify-center mt-4">
+                                <div class=" flex  justify-center my-2">
                                     <Label class="page-subtitle w-[9rem] text-right mr-4">Importe Final: </Label>
                                     <Label class="page-subtitle  w-[9rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
                                 </div>
@@ -835,10 +846,10 @@ const abrirCajaDiaria = async()=>{
                         <Button type="button" v-if="lineasDeVenta.length && lineasDeVenta[0]?.producto.descripcion" @click="()=>{middleValidate()}">Continuar <ArrowRightIcon /></Button>
                     </div>
 
+                    <p>{{ mediosDePago }}</p>
 
                     <div v-if="showMedioPago && selectedCliente" class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
                         <h3 class="page-subtitle mb-4">Medios de Pago</h3>
-                        
                         <div v-for="(medio, index) in mediosDePago" class="medio-pago-item items-center flex flex-row w-full justify-start mb-4">
                             <Select 
                                 :modelValue="medio.tipoMedioDePago" 

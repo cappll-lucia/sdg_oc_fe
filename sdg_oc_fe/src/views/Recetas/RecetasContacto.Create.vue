@@ -328,12 +328,12 @@ const redirectCancel = ()=>{
                 <BreadcrumbSeparator  v-if="selectedCliente">
                     <SlashIcon />
                 </BreadcrumbSeparator>
-                <BreadcrumbItem>
+                <BreadcrumbItem v-if="selectedCliente">
                     <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">
                         Recetas
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator>
+                <BreadcrumbSeparator v-if="selectedCliente">
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
