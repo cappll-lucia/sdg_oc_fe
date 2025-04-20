@@ -49,8 +49,10 @@ import { clientesApi } from '@/api/libs/clientes';
 import { useCajaStore } from '@/stores/CajaStore';
 import { cajaApi } from '@/api/libs/caja';
 import LoaderForm from '@/components/LoaderForm.vue';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
 const cajaStore = useCajaStore();
+const loader = useLoaderStore()
 const loadingForm = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
@@ -59,7 +61,6 @@ const selectedCliente = ref<Cliente>();
 const searchClienteOpen =ref<boolean>(false);
 const searchProductoOpen =ref<boolean>(false);
 const showMedioPago = ref<boolean>(false);
-const loading = ref<boolean>(false);
 const openSelectOS = ref<boolean>(false);
 const openSelectOSIndex = ref<number>(0);
 const openNewClienteOS = ref<boolean>(false);
@@ -189,6 +190,7 @@ const addVentaObraSocial = ()=>{
 
 const onSubmit = (async()=>{
     try{
+        loader.show();
         const newVenta ={
             cliente: {id: selectedCliente.value?.id},
             condicionIva: condicionIvaVenta.value,
@@ -199,8 +201,8 @@ const onSubmit = (async()=>{
             observaciones: observaciones.value
         }
         const createdVenta = await ventasApi.create(newVenta)
-        loading.value=false;
         router.push(`/ventas/view/${createdVenta.venta.id}`)
+        loader.hide();
         toast({
             title: 'Venta registrada con éxito',
         })
@@ -212,14 +214,13 @@ const onSubmit = (async()=>{
             errorMessage.value = err.message as string;
             showError.value = true;
         }
+        loader.hide();
     }
 })
 
 const validateAndSubmit = async()=>{
-    loading.value=true;
     const resultVenta = createVentaCustomValidator({
         cliente: {id: selectedCliente.value?.id},
-      //  fecha: fechaVenta.value,
         descuentoPorcentaje: porcDto.value,
         condicionIvaVenta: condicionIvaVenta.value
     })
@@ -231,24 +232,67 @@ const validateAndSubmit = async()=>{
     const resultMedios= createMedioPagoCustomValidator(mediosDePago.value)
     isValidMediosPago.value = resultMedios.isValid;
 
-    const resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
-    isvalidVentaObraSocial.value = resultVentasOS.isValid;
+    let resultVentasOS
+    if(ventaObrasSociales.value.length){
+        resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
+        isvalidVentaObraSocial.value = resultVentasOS.isValid;
+        if(!resultVentasOS.success && ventaObrasSociales.value.length==1 && !ventaObrasSociales.value[1]?.obraSocial){
+            ventaObrasSociales.value=[];
+            resultVentasOS.success=true;
+            obrasSociales.value=false;
+        }
+    }else{
+        obrasSociales.value=false
+    }
 
-    if(resultLineasVenta?.success && resultMedios?.success && resultVentasOS?.success && resultVenta.success){
+    if(resultLineasVenta?.success && resultMedios?.success && (!ventaObrasSociales.value.length || resultVentasOS?.success) && resultVenta.success){
         isValidImporteMedios.value = caluclateImportePago.value == importeIngresado.value;
-        isValidImporteObrasSociales.value = !(totalVentaFinal.value < montoObrasSociales.value);
+        isValidImporteObrasSociales.value = !(totalVentaBruto.value < montoObrasSociales.value);
         if(isValidImporteMedios.value && isValidImporteObrasSociales.value){
             await onSubmit();
         }
     }
-    loading.value=true;
+}
+
+const middleValidate = async()=>{
+    const resultVenta = createVentaCustomValidator({
+        cliente: {id: selectedCliente.value?.id},
+        descuentoPorcentaje: porcDto.value,
+        condicionIvaVenta: condicionIvaVenta.value
+    })
+    isValidVenta.value =resultVenta.isValid;
+
+    const resultLineasVenta = createLineaVentaCustomValidator(lineasDeVenta.value);
+    isvalidLineasVenta.value= resultLineasVenta.isValid;
+    
+    let resultVentasOS
+    if(ventaObrasSociales.value.length){
+        resultVentasOS = ventaObrasSocialesCustomValidator(ventaObrasSociales.value)
+        isvalidVentaObraSocial.value = resultVentasOS.isValid;
+        if(!resultVentasOS.success && ventaObrasSociales.value.length==1 && !ventaObrasSociales.value[1]?.obraSocial){
+            ventaObrasSociales.value=[];
+            resultVentasOS.success=true;
+            obrasSociales.value=false;
+        }
+    }else{
+        obrasSociales.value=false
+    }
+
+    if(resultLineasVenta?.success && resultVenta.success && (!ventaObrasSociales.value.length || resultVentasOS?.success)){
+        isValidImporteObrasSociales.value = !(totalVentaBruto.value < montoObrasSociales.value);
+        if(isValidImporteObrasSociales.value){
+            moveToMediosPago()
+        }
+    }
 }
 
 
 onMounted(async () => {
+    loader.show();
     addLineaVenta();
     const cajaOpened = await cajaStore.isCajaOpenedToday();
     openDialogOpenCaja.value = !cajaOpened
+    loader.hide();
 });
 
 
@@ -277,6 +321,13 @@ const hanldeSelectProducto = (_producto: Producto)=>{
            producto: { id: _producto.id, descripcion: _producto.descripcion},
            cantidad:1,
            precioIndividual: _producto.precio
+       };
+       if(!isvalidLineasVenta.value[lineasDeVenta.value.length-1]?.producto){
+            isvalidLineasVenta.value[lineasDeVenta.value.length-1]={
+            producto: true,
+            cantidad:true,
+            precioIndividual: true
+        };
        }
     }
     searchProductoOpen.value =false;
@@ -353,6 +404,7 @@ const  handleShowNewObraSocialCliente= async(index: number)=>{
     openSelectOSIndex.value =index;
     newOsIndex.value=index;
     openNewClienteOS.value =true;
+    addVentaObraSocial();
 };
 
 const handleAddObraSocialCliente = async(obraSocialId: number)=>{
@@ -593,16 +645,16 @@ const abrirCajaDiaria = async()=>{
                                             <p class="text-xs" >No es posible asociar obras sociales al cliente Consumidor Final</p>
                                         </div>
                                         <Switch 
-                                            v-else
-                                            :model-value="obrasSociales" 
-                                            @update:model-value="()=>{
-                                                obrasSociales=!obrasSociales
-                                                if(obrasSociales){
-                                                    addVentaObraSocial()
-                                                }else{
-                                                    ventaObrasSociales=[]
-                                                }
-                                            }"
+                                        v-else
+                                        :model-value="obrasSociales" 
+                                        @update:model-value="()=>{
+                                            obrasSociales=!obrasSociales
+                                            if(obrasSociales && selectedCliente?.clienteObrasSociales.length){
+                                                addVentaObraSocial();
+                                            }else{
+                                                ventaObrasSociales=[];
+                                            }
+                                        }"
                                         ></Switch>
                                     </div>
                                     <div v-if="obrasSociales" class="flex flex-row items-center">
@@ -779,10 +831,8 @@ const abrirCajaDiaria = async()=>{
                         />
                         
                     </div>
-
                     <div  v-if="!showMedioPago" class="w-full flex justify-end mt-4">
-                        <Button @click="()=>{moveToMediosPago()}">Continuar <ArrowRightIcon /></Button>
-                        <!-- <Button @click="()=>{showMedioPago=true; addPagoDefault()}">Continuar <ArrowRightIcon /></Button> -->
+                        <Button type="button" v-if="lineasDeVenta.length && lineasDeVenta[0]?.producto.descripcion" @click="()=>{middleValidate()}">Continuar <ArrowRightIcon /></Button>
                     </div>
 
 
@@ -910,7 +960,8 @@ const abrirCajaDiaria = async()=>{
                         <Button size="icon" type="button"  variant="ghost" @click="removeMedioPago(index)"> <Cross2Icon /> </Button>
                         </div>        
                         <Button variant="outline"  type="button" class="mt-4"  @click="addMedioPago()">Agregar Medio de Pago <PlusIcon /></Button>
-                        <p v-if="!isValidImporteMedios && caluclateImportePago > importeIngresado" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago no cubren el importe final</p>               
+                        <p v-if="!isValidImporteMedios && caluclateImportePago > importeIngresado && !mediosDePago.length" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Seleccionar al menos un medio de pago</p>               
+                        <p v-if="!isValidImporteMedios && caluclateImportePago > importeIngresado && mediosDePago.length" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago no cubren el importe final</p>               
                         <p v-if="!isValidImporteMedios  && caluclateImportePago < importeIngresado" class="text-destructive py-6 flex flex-row"><AlertCircleIcon class="mr-2"/> Los medios de pago ingresados superan el importe final</p>               
 
                     </div>
