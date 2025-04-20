@@ -41,8 +41,13 @@ onMounted(async()=>{
 
 const loadData = async ()=>{
     try{
-        loader.show()
-        currentCliente.value = await clientesApi.getOne(Number(route.params.idCliente))
+        loader.show();
+        const id = Number(route.params.idCliente);
+        if(id==0){
+            loader.hide();
+            return;
+        }
+        currentCliente.value = await clientesApi.getOne(id)
         if(currentCliente){
             const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
             recetasClienteAereos.value = res.recetasLentesAereos;
@@ -156,7 +161,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         <div class="pt-2 mb-4 " >
             <div  class="flex flex-col justify-between items-start px-[5rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Cliente con id {{ route.params.idCliente }} no encontrado</h3>
+                    <h3 class="page-subtitle text-center">Cliente con id={{ route.params.idCliente }} no encontrado</h3>
                 </div>
             </div>
         </div>

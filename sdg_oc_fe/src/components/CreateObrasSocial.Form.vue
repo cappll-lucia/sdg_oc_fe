@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { AsteriskIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
 import { ref } from 'vue'
 import Label from '@/components/ui/label/Label.vue';
@@ -19,7 +18,7 @@ const loadingForm = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 
-const emit = defineEmits(['handleCreateObraSocial']);
+const emit = defineEmits(['handleCreateObraSocial', 'handleCancel']);
 
 
 const onSubmit = async () => {
@@ -49,6 +48,12 @@ const validateAndSubmit = async () => {
     }
 }
 
+
+const handleCancel = ()=>{
+    emit('handleCancel');
+}
+
+
 </script>
 
 <template>
@@ -72,8 +77,7 @@ const validateAndSubmit = async () => {
                     </div>
                 </div>
             <div class="w-full flex flex-row justify-end mt-8 mb-6 pr-14 ">
-                <Button variant="outline" class="w-[25%] mr-5"
-                    :onclick="() => { router.push('/obras-sociales'); }">Cancelar</Button>
+                <Button type="button" variant="outline" class="w-[25%] mr-5" @click="handleCancel" >Cancelar</Button>
                 <Button type="submit" class="w-[25%]">Guardar</Button>
             </div>
         </form>

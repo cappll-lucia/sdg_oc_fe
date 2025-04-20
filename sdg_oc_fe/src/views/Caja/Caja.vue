@@ -58,6 +58,7 @@ const df = new DateFormatter('es-AR', {
 
 const loader = useLoaderStore();
 const loadingForm = ref<boolean>(false);
+const loadingMovements = ref<boolean>(false);
 
 const saldoActual = ref<number>();
 const aperturaToday = ref<Caja>();
@@ -154,7 +155,7 @@ const abrirCajaDiaria = async()=>{
             await cajaApi.apertura(importeOpenCaja.value)
             await loadData();
             openDialogOpenCaja.value=false;
-            loadingForm.value=false
+            loadingForm.value=false;
         }
     }catch(e: any){
         errorMessage.value = e.message as string;
@@ -168,7 +169,8 @@ const cerrarCajaDiaria = async()=>{
     try{
         if(todayDate.value){
             loadingForm.value=true;
-            cierreToday.value = await cajaApi.cierre()
+            cierreToday.value = await cajaApi.cierre();
+            todayMovements.value.push(cierreToday.value)
             await informeCierre(todayDate.value);
         }
         openDialogCloseCaja.value=false;
@@ -243,9 +245,11 @@ const generateCierreCajaPDF = (cierreCaja:SaldoCaja, fecha:string) => {
 
 const handleDateRangeChange = async(newDate: DateValue | undefined) => {
     if (!newDate) return;
+    loadingMovements.value=true;
     selectedDate.value = newDate;
     const saldoCaja = await cajaApi.getMovimientos(formatDateValue.value);
     dateMovements.value = saldoCaja.cajaFinal;
+    loadingMovements.value=false;
 }
 
 const totalIngresosToday = computed(() => {
@@ -289,7 +293,7 @@ const resetNewMovimiento = ()=>{
         <div class="pt-2">
             <div class="flex flex-row justify-between items-center">
                 <h1 class="page-title ">Movimientos de Caja </h1>
-                <Dialog v-model:open="openDialog" @update:open="resetNewMovimiento()" >
+                <Dialog v-if="aperturaToday && !cierreToday" v-model:open="openDialog" @update:open="resetNewMovimiento()" >
                             <DialogTrigger as-child>
                             <Button>
                                Registrar Nuevo Movimiento
@@ -377,10 +381,13 @@ const resetNewMovimiento = ()=>{
                             </DialogContent>
                 </Dialog>
             </div>
-            <div class="w-full mt-10 flex flex-row justify-between h-[20rem]">
+            <div  class="w-full mt-10 flex flex-row justify-between h-[20rem]">
                 <div class="w-[40%] bg-secondary rounded-lg p-4 flex border flex-col justify-center items-center">
                     <div class="flex flex-row w-[90%] justify-between">
-                        <h2 class="page-subtitle">Caja Diaria</h2>
+                        <h2 class="page-subtitle">
+                            Caja Diaria -
+                            <span class="ml-1 font-normal">{{ todayDate ? formatDate(todayDate.toDate(getLocalTimeZone())) : '' }}</span>
+                        </h2>
                         <div class="flex flex-row  justify-end">
                             <Dialog v-if="!aperturaToday" v-model:open="openDialogOpenCaja" >
                                 <DialogTrigger as-child>
@@ -461,7 +468,7 @@ const resetNewMovimiento = ()=>{
                         </div>
                         <div class="flex flex-row mb-4 justify-between w-full">
                             <Label class="text-md w-[10rem] ">Saldo Inicial del Día: </Label>
-                            <Label class="text-md ">$ {{aperturaToday?.importe || aperturaToday?.importe==0 ? aperturaToday.importe : ' - '}} </Label>
+                            <Label class="text-md ">$ {{aperturaToday?.importe || aperturaToday?.importe==0 ? aperturaToday.importe : ' 0 '}} </Label>
                         </div>
                         <div class="flex flex-row mb-4 justify-between w-full">
                             <Label class="text-md w-[10rem] ">Total Ingresos: </Label>
@@ -475,7 +482,7 @@ const resetNewMovimiento = ()=>{
                 </div>
                 <div class="w-[57%] h-[40rem] border rounded-lg p-4 flex flex-col justify-start items-end">
                     <div class="flex flex-row justify-center items-center h-10">
-                        <Button variant="outline" v-if="selectedDate!=todayDate && dateMovements.length" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
+                        <Button variant="outline" v-if="selectedDate!=todayDate && dateMovements.length && !loadingMovements" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
                         <Popover>
                             <PopoverTrigger as-child>
                                 <Button
@@ -495,15 +502,24 @@ const resetNewMovimiento = ()=>{
                         </Popover>
                     </div>
                     <ScrollArea class=" mt-2 p-4 w-full h-full rounded-lg bg-white">
-                        <div v-for="mov in dateMovements" class="flex flex-row justify-between w-ful h-[4rem]  mb-2 border-b items-center px-4 ">
-                            <Label class="w-[8rem] text-sm ">{{ formatDate(mov.fechaMovimiento) }}</Label>
-                            <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
-                            <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle ?? "Cta. Cte. Cliente"}}</Label>
-                            <Label class="w-[18rem] text-xs flex justify-start "></Label>
-                            <Label class="w-[8rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
+                        <div v-if="loadingMovements" class="mt-[5rem]">
+                            <LoaderForm />
                         </div>
-                        <div v-if="!dateMovements.length" class="flex justify-center mt-10">
-                            <Lebel>No se encontraron movimientos de caja registrados para el día seleccionado</Lebel>
+                        <div v-else>
+                            <div v-for="mov in dateMovements" class="flex flex-row justify-between w-ful h-[4rem]  mb-2 border-b items-center px-4 ">
+                                <Label class="w-[8rem] text-sm ">{{ formatDate(mov.fechaMovimiento) }}</Label>
+                                <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
+                                <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle ?? "Cta. Cte. Cliente"}}</Label>
+                                <Label class="w-[18rem] text-xs flex justify-start "></Label>
+                                <Label class="w-[8rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
+                            </div>
+                            <div v-if="!dateMovements.length && selectedDate==todayDate" class="flex justify-center items-center flex-col mt-10">
+                                <Lebel v-if="selectedDate==todayDate">No se encontraron movimientos de caja registrados para hoy</Lebel>
+                                <Button class="w-[10rem] mt-4" @click="openDialogOpenCaja=true"> Abrir caja</Button>
+                            </div>
+                            <div v-else-if="!dateMovements.length" class="flex justify-center items-center flex-col mt-10">
+                                <Lebel>No se encontraron movimientos de caja registrados para el día seleccionado</Lebel>
+                            </div>
                         </div>
                     </ScrollArea>
                 </div>

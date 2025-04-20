@@ -60,6 +60,7 @@ const handleCreateObraSocial = async()=>{
 
         <CreateObrasSocialForm
             @handle-create-obra-social="handleCreateObraSocial"
+            @handle-cancel="router.push('/obras-sociales')"
         />
 
     </div>

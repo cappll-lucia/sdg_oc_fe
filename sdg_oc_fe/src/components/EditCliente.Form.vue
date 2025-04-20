@@ -32,14 +32,13 @@ import { condicionIvaDisplay } from '@/lib/utils';
 import { clientesApi } from '@/api/libs/clientes';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import { useRoute } from 'vue-router';
-import router from '@/router';
 
 const tipoDocumentoOptions = [
   { value: TipoDocumento.CUIT, label: "CUIT" },
   { value: TipoDocumento.DNI, label: "DNI" }
 ];
 
-const emit = defineEmits(['handleEditCliente']);
+const emit = defineEmits(['handleEditCliente', 'handleCancel']);
 
 const loader = useLoaderStore();
 const route = useRoute();
@@ -94,6 +93,11 @@ const isValidClienteObraSocial = ref<{obraSocial: boolean, numeroSocio: boolean}
 
 onMounted(async ()=>{
     loader.show();
+    const id = Number(route.params.id);
+    if(id==0){
+        loader.hide();
+        return;
+    }
     currentCliente.value= await clientesApi.getOne(Number(route.params.id))
     currentCliente.value.clienteObrasSociales.map(os=> {
         obrasSocialesCliente.value.push(os)
@@ -171,11 +175,15 @@ const availableObrasSociales = computed(() => {
     }));
 });
 
+const hanldeCancel = ()=>{
+    emit('handleCancel');
+
+}
 
 </script>
 
 <template>
-    <form @submit.prevent="validateAndSubmit" class="forms-wide flex flex-col justify-between items-start p2-[5rem] ">
+    <form @submit.prevent="validateAndSubmit" v-if="currentCliente" class="forms-wide flex flex-col justify-between items-start p2-[5rem] ">
                 <div class="w-full ">
                     <h3 class="page-subtitle text-center" >Editar Cliente</h3>
                     <Separator class="my-6 w-full" />
@@ -501,10 +509,17 @@ const availableObrasSociales = computed(() => {
                     </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-[6rem]">
-                    <Button @click="router.push(`/clientes/dashboard/${currentCliente?.id}#dashboard`)" variant="outline" type="button" class="w-[15%] mr-5">Cancelar</Button>
+                    <Button @click="hanldeCancel" variant="outline" type="button" class="w-[15%] mr-5">Cancelar</Button>
                     <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
                 </div>
-            </form>
+    </form>
+    <div class="pt-2 mb-4 " v-else >
+        <div  class="flex flex-col justify-between items-start px-[5rem] ">
+            <div class="w-full ">
+                <h3 class="page-subtitle text-center">Cliente con id={{ route.params.id }} no encontrado</h3>
+            </div>
+        </div>
+    </div>
         <AlertError 
             v-model="showError"
             title="Error"

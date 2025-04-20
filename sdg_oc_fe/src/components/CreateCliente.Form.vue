@@ -42,7 +42,7 @@ const tipoDocumentoOptions = [
   { value: TipoDocumento.DNI, label: "DNI" }
 ];
 
-const emit = defineEmits(['handleCreateCliente']);
+const emit = defineEmits(['handleCreateCliente', 'handleCancel']);
 
 const loader = useLoaderStore();
 
@@ -196,10 +196,14 @@ const handleCreateObraSocial = async(newObraSocial: ObraSocial)=>{
     }
 }
 
-function setObraSocialIdAtIndex(index: number, id: number) {
+const setObraSocialIdAtIndex = (index: number, id: number) => {
   if (clienteObrasSociales.value[index]) {
     clienteObrasSociales.value[index].obraSocial.id = id;
   }
+}
+
+const handleCancel = ()=>{
+    emit('handleCancel');
 }
 
 
@@ -507,6 +511,7 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                                     <DialogContent class="max-w-[45rem]">
                                         <CreateObrasSocialForm 
                                             @handle-create-obra-social="handleCreateObraSocial"
+                                            @handle-cancel="openNewOS=false"
                                         />
                                     </DialogContent>
                                 </Dialog>
@@ -543,7 +548,7 @@ function setObraSocialIdAtIndex(index: number, id: number) {
                     </div>
                 </div>
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-[6rem]">
-                    <Button variant="outline" class="w-[15%] mr-5">Cancelar</Button>
+                    <Button type='button' variant="outline" class="w-[15%] mr-5" @click="handleCancel" >Cancelar</Button>
                     <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
             </form>

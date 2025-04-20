@@ -19,6 +19,10 @@ const handleEditCliente = async(id: number)=>{
     })
 }
 
+const hanldeCancel = async(id: number)=>{
+    router.push(`/clientes/dashboard/${id}#dashboard`)
+}
+
 
 </script>
 
@@ -50,6 +54,7 @@ const handleEditCliente = async(id: number)=>{
         <div class="pt-2 mb-4 " >
             <EditClienteForm
                 @handle-edit-cliente="handleEditCliente"
+                @hanlde-cancel="hanldeCancel"
             />
         </div>
 
