@@ -19,7 +19,7 @@ import { Cliente } from '@/api/entities/clientes';
 import { formatDate } from '@/lib/utils.recetas';
 import { PlusIcon } from 'lucide-vue-next';
 import { uploadsApi } from '@/api/libs/uploads';
-import router from '@/router';
+import { router } from '@/router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
 

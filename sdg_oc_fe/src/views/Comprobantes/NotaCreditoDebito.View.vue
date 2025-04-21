@@ -16,8 +16,10 @@ import { condicionIvaDisplay, tipoComprobanteDisplay } from '@/lib/utils';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { useRoute } from 'vue-router';
 import { formatDate } from '@/lib/utils.recetas';
-import router from '@/router';
+import {router} from '@/router';
 import Button from '@/components/ui/button/Button.vue';
+import { InspectIcon } from 'lucide-vue-next';
+import { previousRoute } from '@/router';
 
 const route = useRoute()
 const currentComprobante = ref<Comprobante>();
@@ -27,6 +29,7 @@ const currentComprobante = ref<Comprobante>();
 onMounted(async()=>{
     if (typeof route.params.id === 'string') {
         currentComprobante.value = await comprobantesApi.getOne(route.params.id);
+        console.log(currentComprobante.value)
     }
 })
 
@@ -50,6 +53,14 @@ const printComprobante = async(_id: string)=>{
         console.error('Error al descargar el PDF:', error);
     }
 }
+
+const handleRedirect = () => {
+  if (previousRoute) {
+    router.push(previousRoute);
+  } else {
+    router.push('/ventas'); // ruta fallback
+  }
+};
 
 </script>
 
@@ -84,16 +95,17 @@ const printComprobante = async(_id: string)=>{
                         <div class="h-[10rem] w-full flex flex-row items-center justify-start ">
                             <div class=" w-[40rem]  flex flex-col items-center justify-start">
                                 <div class="flex h-14  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[12rem]  h-10  pt-2 text-lg">Cliente</Label>
-                                    <Label class="form-label w-[12rem]  h-10  pt-2 text-lg">{{currentComprobante.facturaRelacionada.venta.cliente.apellido}}, {{ currentComprobante.facturaRelacionada.venta.cliente.nombre }}</Label>
+                                    <Label class="form-label w-[14rem]  text-md">Cliente</Label>
+                                    <Label class="form-label w-[12rem] text-md">{{currentComprobante.facturaRelacionada.venta.cliente.apellido}}, {{ currentComprobante.facturaRelacionada.venta.cliente.nombre }}</Label>
                                 </div>
                                 <div class="flex h-14  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[12rem]  h-10 mt-6 text-md">Factura Relacionada</Label>
-                                    <Label class="form-label w-[12rem]  h-10 mt-6 text-md">{{currentComprobante.facturaRelacionada.numeroComprobante}}</Label>
+                                    <Label class="form-label w-[14rem]   text-md">Factura Relacionada</Label>
+                                    <Label class="form-label w-[10rem]   text-md">{{currentComprobante.facturaRelacionada.numeroComprobante}}</Label>
+                                    <Button variant="ghost" class="mt-2" type="button" @click="router.push(`/ventas/view/${currentComprobante.facturaRelacionada.venta.id}`)" ><InspectIcon /> </Button>
                                 </div>
                                 <div class="flex h-14 flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[12rem]  h-10 pt-3 text-md">Condición Fiscal</Label>
-                                    <Label class="form-label w-[15rem]  h-10 mt-6 text-md">{{condicionIvaDisplay(currentComprobante.venta.condicionIva)}}</Label>
+                                    <Label class="form-label w-[14rem]  text-md">Condición Fiscal</Label>
+                                    <Label class="form-label w-[15rem]   text-md">{{condicionIvaDisplay(currentComprobante.facturaRelacionada.venta.condicionIva)}}</Label>
                                 </div>
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
@@ -106,24 +118,23 @@ const printComprobante = async(_id: string)=>{
                         </div> 
                     </div>
                     <div class="flex flex-col justify-start items-start w-full mt-8 border rounded-lg p-8">
-                        <div class=" flex flex-row w-[30rem] p-4 bg-secondary rounded-lg justify-start items-center my-4">
-                            <Label class="w-[12rem] text-sm">Importe Factura Original</Label>
+                        <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
+                            <Label class="w-[14rem] text-md">Importe factura original</Label>
                             <Label class="text-md w-[1rem] mr-[1rem]">$</Label>
-                            <Label class="text-md w-[6rem]">{{currentComprobante.facturaRelacionada.importeTotal}}</Label>
-                           
+                            <Label class="text-md w-[6rem]">{{currentComprobante.facturaRelacionada?.importeTotal}}</Label>
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
-                            <Label class="w-[13rem] text-md">Concepto emisión</Label>
+                            <Label class="w-[14rem] text-md">Concepto emisión</Label>
                             <Label class="w-[20rem] text-md">{{currentComprobante.motivo}}</Label>
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
-                            <Label class="w-[13rem] text-md">Importe</Label>
+                            <Label class="w-[14rem] text-md">Importe</Label>
                             <Label class="text-md w-[1rem] mr-[1rem]">$</Label>
                             <Label class="text-md w-[15rem] mr-[1rem]">{{currentComprobante.importeTotal}}</Label>
                         </div>
                     </div>
                     <div class="w-full flex justify-end mt-4">
-                        <Button variant="outline" class="w-[10rem] mr-5" @click="router.push('/ventas')">Volver</Button>
+                        <Button variant="outline" class="w-[10rem] mr-5" @click="handleRedirect">Volver</Button>
                         <Button type="submit" class="w-[10rem]" @click="printComprobante(currentComprobante.id)" >Imprimir</Button>
                     </div>
                 </div>

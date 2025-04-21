@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
-import router from '@/router';
+import { router } from '@/router';
 import { toast } from '@/components/ui/toast';
 import EditClienteForm from '@/components/EditCliente.Form.vue';
 

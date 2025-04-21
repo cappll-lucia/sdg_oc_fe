@@ -22,7 +22,7 @@ import {
 import { Audiometria, editAudiometriaCustomValidator } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import {computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router';
 import AlertConfirm from '@/components/AlertConfirm.vue';

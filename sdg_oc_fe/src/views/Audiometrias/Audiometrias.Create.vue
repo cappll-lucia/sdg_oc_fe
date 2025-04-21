@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input'
 import { audiometriaCustomValidator } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import {computed, onMounted, ref } from 'vue'
 import { Cliente } from '@/api/entities/clientes';
 import { clientesApi } from '@/api/libs/clientes';

@@ -17,7 +17,9 @@ const router = createRouter({
 	}
 });
 
-router.beforeEach((to: RouteLocationNormalized, _ , next: NavigationGuardNext)=>{
+let previousRoute: string | null = null;
+
+router.beforeEach((to: RouteLocationNormalized, from , next: NavigationGuardNext)=>{
     const auth: boolean = to.meta.auth as boolean;
     const userStore = useUserStore();
 	const user = userStore.getMe
@@ -28,8 +30,9 @@ router.beforeEach((to: RouteLocationNormalized, _ , next: NavigationGuardNext)=>
 	} else if (to.meta.requireAdmin && user?.role !== 'admin') {
 		return next('/not-admin'); 
 	} else {
+		previousRoute = from.fullPath;
 		next();
 	}
 });
 
-export default router;
+export { router, previousRoute };

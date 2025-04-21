@@ -18,7 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate, generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
 import { PlusIcon } from 'lucide-vue-next';
-import router from '@/router';
+import { router } from '@/router';
 
 
 const props = defineProps<{

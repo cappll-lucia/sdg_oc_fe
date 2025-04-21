@@ -35,7 +35,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import router from '@/router';
+import { router } from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { JwtUser } from '@/api/entities/jwtUser';
 import { useLoaderStore } from '@/stores/LoaderStore';

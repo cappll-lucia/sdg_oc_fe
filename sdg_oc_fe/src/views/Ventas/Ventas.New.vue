@@ -42,7 +42,7 @@ import { AlertCircleIcon, AsteriskIcon, PlusCircleIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
 import { ventasApi } from '@/api/libs/ventas';
 import { Textarea } from '@/components/ui/textarea';
-import router from '@/router';
+import { router } from '@/router';
 import { condicionIvaDisplay, isValidNumber } from '@/lib/utils';
 import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue';
 import { clientesApi } from '@/api/libs/clientes';

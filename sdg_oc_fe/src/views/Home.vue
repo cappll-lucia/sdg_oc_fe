@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import router from '@/router';
+import { router } from '@/router';
 import { useCajaStore } from '@/stores/CajaStore';
 import { onMounted, ref } from 'vue';
 import {

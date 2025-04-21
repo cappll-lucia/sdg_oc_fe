@@ -16,7 +16,7 @@ import { createProveedorCustomValidator } from '@/api/entities/proveedor';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { AsteriskIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { proveedoresApi } from '@/api/libs/proveedores';
 import { ref } from 'vue'
 import { useLoaderStore } from '@/stores/LoaderStore';

@@ -2,7 +2,7 @@ import {h} from 'vue';
 import { ColumnDef } from "@tanstack/vue-table";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "@radix-icons/vue";
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { ClienteAudiometriasFecha } from "@/api/entities/audiometrias";
 import { formatDate } from '@/lib/utils.recetas';
 

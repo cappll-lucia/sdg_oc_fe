@@ -149,7 +149,7 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                         @keyup.enter="handleFilterVentas" />
                     <Select v-model="selectedTipoFactura" @update:model-value="handleFilterVentas">
                         <SelectTrigger class="w-[200px]">
-                            <SelectValue placeholder="Filtrar por Tipo Factura" />
+                            <SelectValue placeholder="Filtrar por tipo factura" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>

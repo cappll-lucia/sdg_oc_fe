@@ -19,7 +19,7 @@ import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
 import Input from './ui/input/Input.vue';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
-import router from '@/router';
+import { router } from '@/router';
 
 const printOpen = ref<boolean>(false);
 const props = defineProps<{

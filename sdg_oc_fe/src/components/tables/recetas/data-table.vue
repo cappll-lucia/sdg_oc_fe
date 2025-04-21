@@ -18,7 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button';
 import { valueUpdater } from '@/lib/utils.recetas'
-import router from '@/router';
+import { router } from '@/router';
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];

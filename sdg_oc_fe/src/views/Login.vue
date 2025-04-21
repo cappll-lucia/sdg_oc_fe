@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Label from '@/components/ui/label/Label.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { useUserStore } from '@/stores/UsersStore';
 import {
   Tooltip,

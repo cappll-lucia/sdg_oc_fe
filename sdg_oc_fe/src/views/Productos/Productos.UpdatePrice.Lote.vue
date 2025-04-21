@@ -19,7 +19,7 @@ import Button from '@/components/ui/button/Button.vue';
 import Input from '@/components/ui/input/Input.vue';
 import Label from '@/components/ui/label/Label.vue';
 import Separator from '@/components/ui/separator/Separator.vue';
-import router from '@/router';
+import { router } from '@/router';
 import { AsteriskIcon, SlashIcon } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { Marca } from '@/api/entities/marca';
