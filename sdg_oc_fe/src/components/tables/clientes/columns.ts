@@ -2,7 +2,7 @@ import { Cliente, TipoDocumento } from '@/api/entities/clientes';
 import { h } from 'vue'
 import { ColumnDef } from '@tanstack/vue-table';
 import Button from '@/components/ui/button/Button.vue';
-import router from '@/router';
+import { router } from '@/router';
 import { ChevronRightIcon } from 'lucide-vue-next';
 
 export const columns: ColumnDef<Cliente>[] = [

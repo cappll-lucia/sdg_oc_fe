@@ -27,7 +27,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
-import router from '@/router';
+import { router } from '@/router';
 import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
 import { computed, onMounted, ref} from 'vue';
 import {

@@ -27,7 +27,7 @@ import { clientesApi } from '@/api/libs/clientes';
 import { formatDate } from '@/lib/utils.recetas';
 import Button from '@/components/ui/button/Button.vue';
 import { InspectIcon, MailIcon, PrinterIcon } from 'lucide-vue-next';
-import router from '@/router';
+import { router } from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
 import AlertError from '@/components/AlertError.vue';
@@ -56,9 +56,8 @@ onMounted(async () => {
 const loadData = async(id: string)=>{
     try{
         const res = await ventasApi.getOne(id);
-        console.log('----> ', res.comprobantesRelacionados)
         currentVenta.value = res.venta;
-        comprobantesVenta.value = res.comprobantesRelacionados;
+        comprobantesVenta.value = [res.venta.factura, ...res.comprobantesRelacionados];
         currentVenta.value.fecha = new Date(currentVenta.value.fecha);
         currentVenta.value.cliente = await clientesApi.getOne(currentVenta.value.cliente.id);
     }catch(error: any){

@@ -28,7 +28,7 @@ import type { DateRange } from 'reka-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 import { UUID } from 'crypto';
-import router from '@/router';
+import { router } from '@/router';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -211,7 +211,7 @@ const movimientosQty = computed( () =>
             <div class=" flex flex-col justify-start items-end w-[35rem]">
             <div class="h-[15rem] flex flex-col justify-around  items-center w-[35rem] p-4 rounded-lg border mb-8 ">
                 <div class="flex flex-row justify-evenly gap-x-3 items-center">
-                    <Label>Seleccionar fecha reporte</Label>
+                    <Label>Seleccionar fechas reporte</Label>
                         <Popover>
                             <PopoverTrigger as-child>
                             <Button

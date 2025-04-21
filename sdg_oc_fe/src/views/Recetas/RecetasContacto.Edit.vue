@@ -31,7 +31,7 @@ import AccordionTrigger from '@/components/ui/accordion/AccordionTrigger.vue';
 import AccordionContent from '@/components/ui/accordion/AccordionContent.vue';
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue';
 import Button from '@/components/ui/button/Button.vue';
-import router from '@/router';
+import { router } from '@/router';
 import AlertError from '@/components/AlertError.vue';
 import { PruebaLentesContacto, pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
 import { toast } from '@/components/ui/toast';

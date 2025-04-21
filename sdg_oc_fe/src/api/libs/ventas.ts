@@ -48,7 +48,6 @@ const getAllByCliente = async (_idCliente: number) => {
 const getOne = async (_id: string) => {
     try {
         const resp = await http.get(`/venta/${_id}`);
-        console.log(resp.data.data)
         return resp.data.data as {venta: Venta, comprobantesRelacionados: Comprobante[]};
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');

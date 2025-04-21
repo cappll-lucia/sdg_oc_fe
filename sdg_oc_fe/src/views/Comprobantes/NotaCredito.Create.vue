@@ -27,7 +27,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/comp
 import { condicionIvaDisplay, tipoComprobanteDisplay } from '@/lib/utils';
 import SelectFacturaDialog from '@/components/SelectFacturaDialog.vue';
 import { AlertCircleIcon, AsteriskIcon } from 'lucide-vue-next';
-import router from '@/router';
+import { router } from '@/router';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
 import { Venta } from '@/api/entities/venta';

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-vue-next';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import AlertConfirm from '@/components/AlertConfirm.vue';
 import {ref} from 'vue'
 import { toast } from '@/components/ui/toast'

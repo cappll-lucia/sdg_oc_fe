@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import{Button} from '@/components/ui/button'
-import router from '@/router';
+import { router } from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { computed } from 'vue';
 import { ArrowDownUpIcon, BanknoteIcon, ChartColumnIcon, GlassesIcon, HomeIcon, LogOutIcon, Receipt, SettingsIcon, ShoppingBag, UserIcon, Wallet2Icon } from 'lucide-vue-next';

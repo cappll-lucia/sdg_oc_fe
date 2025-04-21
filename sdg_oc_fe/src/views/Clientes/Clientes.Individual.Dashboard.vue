@@ -40,7 +40,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatDate } from '@/lib/utils.recetas';
-import router from '@/router';
+import { router } from '@/router';
 import { cuentaCorrienteApi } from '@/api/libs/cuentaCorriente';
 import { CuentaCorriente } from '@/api/entities/cuentaCorriente';
 import Button from '@/components/ui/button/Button.vue';

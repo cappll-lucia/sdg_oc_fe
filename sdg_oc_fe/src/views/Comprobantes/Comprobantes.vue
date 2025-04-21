@@ -138,8 +138,8 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                     <Input class="max-w-sm " placeholder="Buscar cliente" v-model="txtSearch"
                         @keyup.enter="handleFilterComprobantes" />
                     <Select v-model="selectedTipoFactura" @update:model-value="handleFilterComprobantes">
-                        <SelectTrigger class="w-[200px]">
-                            <SelectValue placeholder="Filtrar por Tipo Factura" />
+                        <SelectTrigger class="w-[250px]">
+                            <SelectValue placeholder="Filtrar por tipo comprobante" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>

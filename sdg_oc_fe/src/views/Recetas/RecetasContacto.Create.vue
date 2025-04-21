@@ -21,7 +21,7 @@ import { computed, onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
-import router from '@/router';
+import { router } from '@/router';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 import { SlashIcon, AsteriskIcon, PlusIcon} from 'lucide-vue-next';
 import {

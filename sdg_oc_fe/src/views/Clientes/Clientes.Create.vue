@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import  CreateClienteForm  from '@/components/CreateCliente.Form.vue'
 import { SlashIcon } from '@radix-icons/vue';
-import router from '@/router';
+import { router } from '@/router';
 import { toast } from '@/components/ui/toast';
 import { Cliente } from '@/api/entities/clientes';
 

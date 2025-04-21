@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
 import { SlashIcon } from '@radix-icons/vue';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { proveedoresApi } from '@/api/libs/proveedores';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import router from '@/router';
+import { router } from '@/router';
 import { SlashIcon } from '@radix-icons/vue';
 import { onMounted,  } from 'vue';
 

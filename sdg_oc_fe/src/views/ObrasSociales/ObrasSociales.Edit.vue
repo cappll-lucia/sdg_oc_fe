@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { SlashIcon } from '@radix-icons/vue';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

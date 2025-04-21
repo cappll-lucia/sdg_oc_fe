@@ -15,7 +15,7 @@ import { SlashIcon } from '@radix-icons/vue';
 import { Marca } from '@/api/entities/marca';
 import AlertError from '@/components/AlertError.vue';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { marcasApi } from '@/api/libs/marcas';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

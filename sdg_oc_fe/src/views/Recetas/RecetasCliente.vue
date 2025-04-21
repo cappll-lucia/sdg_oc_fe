@@ -19,7 +19,7 @@ import { clientesApi } from '@/api/libs/clientes';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import Button from '@/components/ui/button/Button.vue';
-import router from '@/router';
+import { router } from '@/router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
 

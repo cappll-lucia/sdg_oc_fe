@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
 import { SlashIcon } from '@radix-icons/vue';
 import AlertError from '@/components/AlertError.vue';
-import router from '@/router/index';
+import { router } from '@/router/index';
 import { marcasApi } from '@/api/libs/marcas';
 import { ref } from 'vue'
 import Label from '@/components/ui/label/Label.vue';
