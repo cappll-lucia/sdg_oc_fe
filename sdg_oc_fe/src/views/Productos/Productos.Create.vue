@@ -48,7 +48,7 @@ const errorMessage =ref<string>('');
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Nuevo Producto</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

@@ -17,7 +17,7 @@ import Label from './ui/label/Label.vue';
 
 
 const searchProdDscTxt = ref <string>('');
-const searchProdIdTxt = ref <string>('');
+const searchProdCodTxt = ref <string>('');
 const foundProductos = ref<Producto[]>([]);
 
 
@@ -31,12 +31,12 @@ const emit = defineEmits(['update:modelValue', 'selectProducto']);
 const selectProducto = (producto: Producto) => {
     emit('selectProducto', producto);
     searchProdDscTxt.value='';
-    searchProdIdTxt.value='';
+    searchProdCodTxt.value='';
 };
 
 const searchProducto = async()=>{
     const resp = await productosApi.getAll({
-        filtro: searchProdIdTxt.value+' '+searchProdDscTxt.value,
+        filtro: searchProdCodTxt.value+' '+searchProdDscTxt.value,
     })
     foundProductos.value = resp.items;
 }
@@ -57,7 +57,7 @@ onMounted(async ()=>{
             </DialogHeader>
             <Separator class="my-2" />
             <div class="flex flex-row justify-between px-6 h-2 mb-4">
-                <Input type="text" v-model="searchProdIdTxt" class=" w-[12%] mr-4 text-center" placeholder="ID" @keyup.enter="searchProducto()" />
+                <Input type="text" v-model="searchProdCodTxt" class=" w-[12%] mr-4 text-center" placeholder="Código" @keyup.enter="searchProducto()" />
                 <Input type="text" v-model="searchProdDscTxt" class="mr-4" placeholder="Descripción" @keyup.enter="searchProducto()" />
                 <Button variant="default" size="icon" class="w-12 h-9" @click="searchProducto()">
                     <MagnifyingGlassIcon />
@@ -70,7 +70,7 @@ onMounted(async ()=>{
                     class="cursor-pointer search-area-item rounded-sm hover:bg-secondary px-4 py-2 w-[49rem] h-12 flex flex-row justify-between items-center"
                 >
                     <div class="w-[85%] flex flex-row justify-start items-center">
-                        <Label class=" w-[10%] text-sm text-center">{{ prod.id }}</Label>
+                        <Label class=" w-[10%] text-sm text-center">{{ prod.codProv }}</Label>
                         <Label class="text-sm text-center">-</Label>
                         <Label class="ml-6 text-sm font-bold">{{ prod.descripcion }}</Label>
                     </div>

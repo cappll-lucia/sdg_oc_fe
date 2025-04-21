@@ -34,6 +34,7 @@ import { Venta } from '@/api/entities/venta';
 import { useRoute } from 'vue-router';
 import { ventasApi } from '@/api/libs/ventas';
 import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
 const route = useRoute();
 const loader = useLoaderStore()
@@ -93,7 +94,7 @@ const isValidComprobante = ref<{
 
 const validateAndSubmit = async ()=>{
     isValidComprobante.value.cliente= Boolean(selectedCliente.value?.id);
-    isValidComprobante.value.importeTotal=  selectedFactura.value ? importeComprobante.value <= selectedFactura.value.importeTotal : false;
+    isValidComprobante.value.importeTotal=  selectedFactura.value ? (importeComprobante.value <= selectedFactura.value.importeTotal && importeComprobante.value>0) : false;
     isValidComprobante.value.motivo= Boolean(motivoComprobante.value);
     isValidComprobante.value.facturaRelacionada=Boolean(selectedFactura.value?.numeroComprobante);
     isValidComprobante.value.tipoComprobante = tipoComprobante.value ? [3, 8, 13, 53].includes(tipoComprobante.value) : false;
@@ -103,7 +104,7 @@ const validateAndSubmit = async ()=>{
 }
 
 const onSubmit = async()=>{
-       try{
+    try{
         loader.show()
         const newComprobante ={
             importeTotal: importeComprobante.value,
@@ -112,7 +113,7 @@ const onSubmit = async()=>{
             },
             tipoComprobante: tipoComprobante.value,
             motivo: motivoComprobante.value,
-            condicionIvaCliente: selectedFactura.value?.condicionIvaCliente
+            condicionIvaCliente: prevVenta.value?.condicionIva
         }
         const createdNC = await comprobantesApi.create(newComprobante)
         loader.hide();
@@ -175,14 +176,14 @@ const redirectCancel = ()=>{
         <h1 class="page-title">Nueva Nota de Crédito</h1>
         <div class="pt-2">
             <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4" >
-                <div class="rounded-[0.5rem] w-[55rem] h-auto flex flex-col justify-start items-start">
+                <div class="rounded-[0.5rem] w-[58rem] h-auto flex flex-col justify-start items-start">
                     <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8">
                         <div class="h-[10rem] w-full flex flex-row items-center justify-start ">
-                            <div class=" w-[40rem]  flex flex-col items-center justify-start">
+                            <div class=" w-[45rem]  flex flex-col items-center justify-start">
                                 <div class="flex h-14  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[12rem]  h-10  pt-2 text-lg">Cliente</Label>
+                                    <Label class="form-label w-[14rem]  text-md">Cliente</Label>
                                     <Input type="text" 
-                                        class="w-full sm:w-[20rem] h-10"
+                                        class="w-full sm:w-[17rem] h-10"
                                         readonly
                                         :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
                                         @click="searchClienteOpen = true"
@@ -202,9 +203,9 @@ const redirectCancel = ()=>{
                                     </TooltipProvider>
                                 </div>
                                 <div class="flex h-14  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[12rem]  h-10 mt-6 text-md">Factura Relacionada</Label>
+                                    <Label class="form-label w-[14rem] text-md">Factura relacionada</Label>
                                     <Input type="text" 
-                                        class="w-full sm:w-[20rem] h-10"
+                                        class="w-full sm:w-[17rem] h-10"
                                         readonly
                                         :value="selectedFactura ? `${selectedFactura.numeroComprobante}` : 'Buscar'"
                                         @click="()=>selectedCliente ? searchFacturaOpen = true : isValidComprobante.cliente=false"
@@ -227,8 +228,8 @@ const redirectCancel = ()=>{
                                         </div>
                                 </div>
                                 <div class="flex h-14 flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[12rem]  h-10 pt-3 text-md">Condición Fiscal</Label>
-                                    <Label class="form-label w-[15rem]  h-10 mt-6 text-md">{{ selectedFactura ? condicionIvaDisplay(selectedFactura?.condicionIvaCliente) : '--' }}</Label>
+                                    <Label class="form-label w-[14rem] text-md">Condición fiscal</Label>
+                                    <Label class="form-label w-[15rem] text-sm pt-1 ">{{ prevVenta ? condicionIvaDisplay(prevVenta?.condicionIva) : '--' }}</Label>
                                 </div>
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">
@@ -241,14 +242,13 @@ const redirectCancel = ()=>{
                         </div> 
                     </div>
                     <div class="flex flex-col justify-start items-start w-full mt-8 border rounded-lg p-8">
-                        <div class=" flex flex-row w-[30rem] p-4 bg-secondary rounded-lg justify-start items-center my-4">
-                            <Label class="w-[12rem] text-sm">Importe Factura Original</Label>
+                        <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
+                            <Label class="w-[14rem] text-md">Importe factura original</Label>
                             <Label class="text-md w-[1rem] mr-[1rem]">$</Label>
                             <Label class="text-md w-[6rem]">{{selectedFactura?.importeTotal}}</Label>
-                           
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
-                            <Label class="w-[13rem] text-md">Concepto emisión</Label>
+                            <Label class="w-[14rem] text-md">Concepto emisión</Label>
                             <Select v-model="motivoComprobante" >
                                 <SelectTrigger class="w-[17rem]">
                                     <SelectValue placeholder="Seleccionar" />
@@ -271,15 +271,17 @@ const redirectCancel = ()=>{
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
-                        <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
-                            <Label class="w-[13rem] text-md">Importe</Label>
-                            <Label class="text-md w-[1rem] mr-[1rem]">$</Label>
-                            <Input 
-                                class="w-[15rem]"
-                                v-decimal 
-                                :model-value="importeComprobante"
-                                @update:model-value="(value)=> importeComprobante=Number(value)"        
-                            />
+                        <div class=" flex flex-row justify-start items-center my-4">
+                            <Label class="w-[14rem] text-md">Importe</Label>
+                            <div class="w-[17rem]">
+                                <div class=" relative w-full max-w-sm items-center">
+                                    <Input 
+                                    class="pl-10" v-decimal 
+                                    :model-value="importeComprobante"
+                                    @update:model-value="(value)=> importeComprobante=Number(value)"         />
+                                    <span class="text-[#737373] absolute start-0 inset-y-0 flex items-center justify-center px-2">$</span>
+                                </div>
+                            </div>
                             <TooltipProvider  v-if="!isValidComprobante.importeTotal" >
                              <Tooltip>
                                  <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>

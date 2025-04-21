@@ -237,7 +237,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                     <h3 class="page-subtitle">Detalle</h3>
 
                     <div class="linea-venta-header bg-secondary mt-4 rounded-t-lg">
-                        <span>ID</span>
+                        <span>CÓDIGO</span>
                         <span class="text-left">DESCRIPCIÓN</span>
                         <span>IMPORTE UNITARIO</span>
                         <span>CANTIDAD</span>
@@ -247,7 +247,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
 
                     <div v-for="(linea, index) in currentVenta?.lineasDeVenta" :key="index"
                         class="linea-venta-item border-x border-b">
-                        <span class="text-center id-input">{{ linea.producto.id }}</span>
+                        <span class="text-center id-input">{{ linea.producto.codProv }}</span>
                         <span class="text-left descripcion-input">{{ linea.producto.descripcion }}</span>
                         <span class="text-center">$ {{ linea.precioIndividual.toFixed(2) }}</span>
                         <span class="text-center">{{ linea.cantidad }}</span>
@@ -353,8 +353,8 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                     <div class="border-x">
                     <div v-if="!currentVenta.factura"
                         class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
-                        <span class=" text-md mr-4">Factura no emitida</span>
-                        <Button variant="outline" @click="emitirFactura()">
+                        <span class=" text-sm w-[9rem]">Factura no emitida</span>
+                        <Button variant="outline" @click="emitirFactura()" class="ml-7">
                            Emitir
                         </Button>
                     </div>
@@ -402,7 +402,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
 
 .linea-venta-header {
     display: grid;
-    grid-template-columns: 0.5fr 2.5fr 1fr 1fr 1fr;
+    grid-template-columns: 0.6fr 2.5fr 1fr 1fr 1fr;
     font-weight: bold;
     text-align: center;
     padding: 0.75rem;
@@ -413,7 +413,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
 
 .linea-venta-item {
     display: grid;
-    grid-template-columns: 0.5fr 2.5fr 1fr 1fr 1fr;
+    grid-template-columns: 0.6fr 2.5fr 1fr 1fr 1fr;
     gap: 0.5rem;
     align-items: center;
     text-align: center;

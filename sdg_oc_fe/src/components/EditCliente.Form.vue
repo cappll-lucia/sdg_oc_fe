@@ -128,13 +128,14 @@ const condicionIvaOptions = Object.values(CondicionIva)
 
 const validateAndSubmit = async()=>{
     if(currentCliente.value){
-        console.log(currentCliente.value)
         const validCliente = editClienteCustomValidator(currentCliente.value, fechaNac.value);
-        console.log('+++ ', validCliente)
         isValidCliente.value = validCliente.isValid;
-        const validOS = createClienteObraSocialCustomValidator(obrasSocialesCliente.value)
-        isValidClienteObraSocial.value =validOS.isValid;
-        if(validCliente.success && validOS.success){
+        let validOS
+        if(obrasSocialesCliente.value.length){
+            validOS = createClienteObraSocialCustomValidator(obrasSocialesCliente.value)
+            isValidClienteObraSocial.value =validOS.isValid;
+        }
+        if(validCliente.success && (!obrasSocialesCliente.value.length || validOS?.success)){
             await onSubmit()
         }
     }
@@ -192,7 +193,7 @@ const hanldeCancel = ()=>{
                     <div class="flex flex-row w-full  justify-evenly items-start">
                         <div class="flex flex-col w-[45%] mt-4 mr-4 items-center">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Tipo Documento</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right leading-5 ">Tipo Documento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <Select 
                                     :modelValue="currentCliente.tipoDocumento?.toString()"
@@ -224,7 +225,7 @@ const hanldeCancel = ()=>{
                             </div>
 
                             <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Número Documento</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right  leading-5 ">Número Documento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <Input type="number" class="w-[22rem]" v-model="currentCliente.nroDocumento" />
                                     <TooltipProvider  v-if="!isValidCliente.nroDocumento" >
@@ -239,7 +240,7 @@ const hanldeCancel = ()=>{
                             </div>
                         
                             <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Categoría Fiscal</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right  leading-5 ">Categoría Fiscal</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <Select
                                         :modelValue="currentCliente.categoriaFiscal.toString()"
@@ -349,7 +350,7 @@ const hanldeCancel = ()=>{
                     
                     <div class="flex flex-col w-[45%] mt-4 ml-4 items-center">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Fecha Nacimiento</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right  leading-5 ">Fecha Nacimiento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <div class="flex gap-2 w-[60%]">
                                         <Input type="text" v-model="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
@@ -447,7 +448,7 @@ const hanldeCancel = ()=>{
                         <div v-for="(_, index) in obrasSocialesCliente" class="w-full flex flex-row justify-start items-center mb-6">
                             <div v-if="obrasSocialesCliente[index]" class="flex flex-row justify-start items-center w-[28rem]">
 
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Obra Social</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-left ">Obra Social</Label>
                                 <Select 
                                 :modelValue="obrasSocialesCliente[index].obraSocial.id?.toString() " 
                                 @update:model-value="(value)=>{
@@ -499,7 +500,7 @@ const hanldeCancel = ()=>{
                                     </Tooltip>
                                 </TooltipProvider>
                             </div>
-                            <Button variant="ghost" @click="removeObraSocial(index)">
+                            <Button type="button" variant="ghost" @click="removeObraSocial(index)">
                                 <Cross2Icon />
                             </Button>
                         </div>

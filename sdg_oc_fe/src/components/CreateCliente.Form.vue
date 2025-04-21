@@ -220,7 +220,7 @@ const handleCancel = ()=>{
                     <div class="flex flex-row w-full  justify-evenly items-start">
                     <div class="flex flex-col w-[45%] mt-4 items-center mr-4">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Tipo Documento</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right leading-5 ">Tipo Documento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <Select :v-model="newCliente.tipoDocumento " @update:model-value="(value) => newCliente.tipoDocumento= Number(value) as TipoDocumento"  >
                                         <SelectTrigger class="w-[22rem]">
@@ -250,7 +250,7 @@ const handleCancel = ()=>{
                             </div>
 
                             <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Número Documento</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right leading-5 ">Número Documento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <Input type="number" class="w-[22rem]" v-model="newCliente.nroDocumento" />
                                     <TooltipProvider  v-if="!isValidCliente.nroDocumento" >
@@ -265,7 +265,7 @@ const handleCancel = ()=>{
                             </div>
                         
                             <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Categoría Fiscal</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right leading-5 ">Categoría Fiscal</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <Select
                                         :v-model="newCliente.categoriaFiscal"
@@ -375,7 +375,7 @@ const handleCancel = ()=>{
                     
                     <div class="flex flex-col w-[45%] mt-4 items-center ml-4">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Fecha Nacimiento</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-right leading-5 ">Fecha Nacimiento</Label>
                                 <div class="flex flex-row justify-start items-center w-[25rem]">
                                     <div class="flex gap-2 w-[60%]">
                                         <Input type="text" v-model="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
@@ -472,7 +472,7 @@ const handleCancel = ()=>{
                         <h3 class="font-bold mb-4">Obras Sociales</h3>
                         <div v-for="(_, index) in clienteObrasSociales" class="w-full flex flex-row justify-start items-center mb-6">
                             <div v-if="clienteObrasSociales[index]" class="flex flex-row justify-start items-center w-[28rem]">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right ">Obra Social</Label>
+                                <Label  class="w-[7rem]  pr-[2rem] text-left ">Obra Social</Label>
                                 <Select
                                     :model-value="clienteObrasSociales[index].obraSocial.id?.toString()"
                                     v-model:open="openSelectOS"

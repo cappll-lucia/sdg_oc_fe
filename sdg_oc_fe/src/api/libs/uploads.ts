@@ -10,7 +10,8 @@ const getFile = async (_filePath: string) => {
         const file = URL.createObjectURL(resp.data);
         return file;
     } catch (error) {
-        throw error instanceof AxiosError ? new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+        console.log(error)
+        throw error instanceof AxiosError ? new Error(error?.message) : new Error('Algo salió mal');
     }
 };
 

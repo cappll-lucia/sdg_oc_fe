@@ -144,12 +144,13 @@ const clearFilters = async()=>{
                         <DropdownMenuLabel class="cursor-pointer" @click="router.push('/productos/create/single')" >Registrar producto único</DropdownMenuLabel>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <DropdownMenu>
+                <Button class="ml-4 w-[14rem]" v-if="userData?.role=='admin'" @click="router.push('/productos/update-price/lote')" >Actualizar Precios</Button>
+                <!-- <DropdownMenu>
                     <DropdownMenuTrigger><Button class="ml-4 w-[14rem]" v-if="userData?.role=='admin'" >Actualizar Precios</Button></DropdownMenuTrigger>
                     <DropdownMenuContent class="ml-4 w-[14rem]" >
                         <DropdownMenuLabel class="cursor-pointer" @click="router.push('/productos/update-price/lote')"  >Actualizar precio de lote de productos</DropdownMenuLabel>
                     </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> -->
             </div>
         </div>
         <div class="pt-2">

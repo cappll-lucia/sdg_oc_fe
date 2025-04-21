@@ -93,7 +93,7 @@ const printComprobante = async(_id: string)=>{
                                 </div>
                                 <div class="flex h-14 flex-row justify-start items-center w-full">
                                     <Label class="form-label w-[12rem]  h-10 pt-3 text-md">Condición Fiscal</Label>
-                                    <Label class="form-label w-[15rem]  h-10 mt-6 text-md">{{condicionIvaDisplay(currentComprobante.condicionIvaCliente)}}</Label>
+                                    <Label class="form-label w-[15rem]  h-10 mt-6 text-md">{{condicionIvaDisplay(currentComprobante.venta.condicionIva)}}</Label>
                                 </div>
                             </div>
                             <div class="date w-auto sm:w-[10rem] h-[8rem] text-center flex flex-col justify-between items-center">

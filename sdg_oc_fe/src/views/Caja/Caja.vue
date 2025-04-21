@@ -381,13 +381,13 @@ const resetNewMovimiento = ()=>{
                             </DialogContent>
                 </Dialog>
             </div>
-            <div  class="w-full mt-10 flex flex-row justify-between h-[20rem]">
+            <div  class="w-full mt-10 flex flex-row justify-between h-[21rem]">
                 <div class="w-[40%] bg-secondary rounded-lg p-4 flex border flex-col justify-center items-center">
                     <div class="flex flex-row w-[90%] justify-between">
-                        <h2 class="page-subtitle">
-                            Caja Diaria -
-                            <span class="ml-1 font-normal">{{ todayDate ? formatDate(todayDate.toDate(getLocalTimeZone())) : '' }}</span>
-                        </h2>
+                        <div class="flex flex-row justify-start items-center">
+                            <h2 class="page-subtitle">Caja Diaria</h2>
+                                <span class="ml-4 font-normal font-xs">( {{ todayDate ? formatDate(todayDate.toDate(getLocalTimeZone())) : '' }} )</span>
+                            </div>
                         <div class="flex flex-row  justify-end">
                             <Dialog v-if="!aperturaToday" v-model:open="openDialogOpenCaja" >
                                 <DialogTrigger as-child>
@@ -457,29 +457,28 @@ const resetNewMovimiento = ()=>{
                                     </DialogContent>
                             </Dialog>
                             <div v-if="cierreToday">
-                                <span class=" font-bold mr-4 text-red-800">Caja del día cerrada</span>
                                 <Button @click="informeCierre(todayDate)" > Imprimir Cierre</Button>
                             </div>
                         </div>
                     </div>
-                    
                     <div  class=" mt-4 w-[90%] rounded-lg p-4 items-center flex flex-col border bg-white">
                         <div class="flex flex-row mb-4 justify-between w-full">
-                            <Label class="text-md w-[13rem] ">Saldo Actual Efectivo: </Label>
+                            <Label class="text-md w-[13rem] ">Saldo actual efectivo: </Label>
                             <Label class="text-md ">$ {{ saldoActual }} </Label>
                         </div>
                         <div class="flex flex-row mb-4 justify-between w-full">
-                            <Label class="text-md w-[10rem] ">Saldo Inicial del Día: </Label>
+                            <Label class="text-md w-[10rem] ">Saldo inicial del día: </Label>
                             <Label class="text-md ">$ {{aperturaToday?.importe || aperturaToday?.importe==0 ? aperturaToday.importe : ' 0 '}} </Label>
                         </div>
                         <div class="flex flex-row mb-4 justify-between w-full">
-                            <Label class="text-md w-[10rem] ">Total Ingresos: </Label>
+                            <Label class="text-md w-[10rem] ">Total ingresos: </Label>
                             <Label class="text-md ">$ {{totalIngresosToday}}</Label>
                         </div>
-                        <div class="flex flex-row mb-4 justify-between w-full">
-                            <Label class="text-md w-[10rem] ">Total Egresos: </Label>
+                        <div class="flex flex-row justify-between w-full">
+                            <Label class="text-md w-[10rem] ">Total egresos: </Label>
                             <Label class="text-md ">$ {{ Math.abs(totalEgresosToday) }} </Label>
                         </div>
+                        <span v-if="cierreToday" class=" mt-4 font-bold  text-lg text-red-800">Caja del día cerrada</span>
                     </div>
                 </div>
                 <div class="w-[57%] h-[40rem] border rounded-lg p-4 flex flex-col justify-start items-end">
@@ -512,15 +511,14 @@ const resetNewMovimiento = ()=>{
                                 <Label class="w-[8rem] text-sm ">{{ formatTime(mov.fechaMovimiento) }} hs.</Label>
                                 <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
                                 <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle ?? "Cta. Cte. Cliente"}}</Label>
-                                <Label class="w-[18rem] text-xs flex justify-start "></Label>
-                                <Label class="w-[8rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
+                                <Label class="w-[11rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
                             </div>
                             <div v-if="!dateMovements.length && selectedDate==todayDate" class="flex justify-center items-center flex-col mt-10">
-                                <Lebel v-if="selectedDate==todayDate">No se encontraron movimientos de caja registrados para hoy</Lebel>
+                                <Lebel v-if="selectedDate==todayDate">No se encontraron movimientos de caja registrados para hoy.</Lebel>
                                 <Button class="w-[10rem] mt-4" @click="openDialogOpenCaja=true"> Abrir caja</Button>
                             </div>
                             <div v-else-if="!dateMovements.length" class="flex justify-center items-center flex-col mt-10">
-                                <Lebel>No se encontraron movimientos de caja registrados para el día seleccionado</Lebel>
+                                <Lebel>No se encontraron movimientos de caja registrados para el día seleccionado.</Lebel>
                             </div>
                         </div>
                     </ScrollArea>

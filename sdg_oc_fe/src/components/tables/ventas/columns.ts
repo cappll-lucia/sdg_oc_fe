@@ -36,13 +36,20 @@ export const columns: ColumnDef<Venta>[]=[
         accessorKey: 'tipoFactura',
         header: () => h('div', 'Tipo Factura'),
         cell: ({row})=>  row.original.factura 
-                        ? `${tipoComprobanteDisplay(row.original.factura.tipoComprobante)?.nombre} ${tipoComprobanteDisplay(row.original.factura.tipoComprobante)?.letra}`
-                        : ' Pendiente '
+        ? `${tipoComprobanteDisplay(row.original.factura.tipoComprobante)?.nombre} ${tipoComprobanteDisplay(row.original.factura.tipoComprobante)?.letra}`
+        : h('span', { class: 'block text-center w-full pr-10' }, '-' )
     },
     {
         accessorKey: 'numeroFactura',
         header: () => h('div', 'Número Factura'),
-        cell: ({row})=>  row.original.factura ? row.original.factura.numeroComprobante : ' Pendiente '
+        cell: ({ row }) => {
+            const numero = row.original.factura?.numeroComprobante;
+            return h(
+            'div',
+            { class: numero ? '' : 'text-red-700 ' },
+            numero || 'Pendiente'
+            );
+        }
     },
     {
         id: 'actions',
