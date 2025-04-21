@@ -1,5 +1,5 @@
 import { BaseTransactionalEntity } from "./entities";
-import { CondicionIva, Venta } from "./venta";
+import { Venta } from "./venta";
 
 export interface Comprobante extends BaseTransactionalEntity{
     numeroComprobante: string;
@@ -10,7 +10,6 @@ export interface Comprobante extends BaseTransactionalEntity{
     facturaRelacionada: Comprobante;
     importeTotal: number;
     motivo: string | undefined;
-    condicionIvaCliente: CondicionIva;
 }
 
 export enum TipoComprobante {

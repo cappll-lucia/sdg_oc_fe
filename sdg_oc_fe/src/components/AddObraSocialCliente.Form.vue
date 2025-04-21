@@ -107,7 +107,7 @@ const submitNewObraSocial = async()=>{
     <form @submit.prevent="submitNewObraSocial" class="w-[30rem] flex flex-col justify-start items-start " v-if="!loadingForm">
         <div class="px-4">
             <h3 class=" font-bold text-lg text-center">Asociar nueva obra social al cliente</h3>
-            <Label>Cliente:{{ cliente.apellido }}, {{ cliente.nombre }} </Label>
+            <Label>Cliente: {{ cliente.apellido }}, {{ cliente.nombre }} </Label>
         </div>    
         <Separator class="my-6" />
         <div class="flex flex-row justify-start items-center w-[28rem] mb-4">

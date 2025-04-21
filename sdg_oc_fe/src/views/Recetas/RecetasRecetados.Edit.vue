@@ -703,8 +703,8 @@ const redirectCancel = ()=>{
                                 </div>
                         </div>
                         <div  class="flex flex-col mt-6  w-[60%] justify-start items-start">
-                                <div class="flex flex-row justify-between items-center w-full">
-                                    <div class="flex flex-row justify-between items-center w-full mt-5">
+                                <div class="flex flex-row justify-between items-start w-full h-[5rem]">
+                                    <div class="flex flex-row justify-between items-center w-full  ">
                                         <Label class="form-label text-right mr-4 w-[8rem]">Armazón</Label>    
                                         <Input
                                             class="resize-none w-[60%]"
@@ -712,7 +712,7 @@ const redirectCancel = ()=>{
                                             v-model="currentReceta.armazon"
                                         />                            
                                     </div>
-                                    <div class="flex flex-row justify-between items-center w-full mt-5">
+                                    <div class="flex flex-row justify-between items-center w-full ">
                                         <Label class="form-label text-right mr-4 w-[8rem]">Oftalmólogo</Label>    
                                         <Input
                                             class="resize-none w-[60%] "
@@ -729,8 +729,8 @@ const redirectCancel = ()=>{
                                         </TooltipProvider>                          
                                     </div>
                                 </div>
-                                <div class="flex flex-row justify-between w-full mt-5">
-                                    <Label class="form-label text-right mr-4 w-[8rem]">Observaciones</Label>    
+                                <div class="flex flex-row justify-between w-full">
+                                    <Label class="form-label text-right mr-4 w-[8rem] mt-3">Observaciones</Label>   
                                     <Textarea
                                         class="resize-none w-[80%] h-[7.5rem]"
                                         v-if="currentReceta"

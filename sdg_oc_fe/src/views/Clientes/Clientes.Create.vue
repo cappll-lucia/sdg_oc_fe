@@ -44,7 +44,7 @@ const handleCreateCliente = async(newCliente: Cliente)=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Nuevo Cliente</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

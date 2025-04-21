@@ -89,7 +89,7 @@ const validateAndSubmit = async () => {
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Crear</BreadcrumbPage>
+                    <BreadcrumbPage>Nueva Marca</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

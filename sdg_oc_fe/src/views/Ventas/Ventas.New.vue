@@ -71,7 +71,7 @@ const isValidImporteOpenCaja = ref<boolean>(true);
 const openDialogOpenCaja = ref<boolean>(false);
 const showErrorNotCaja = ref<boolean>(false);
 
-const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string}, cantidad: number, precioIndividual: number}[] >([]);
+const lineasDeVenta = ref<{producto: {id:number|undefined, descripcion: string, codProv: string }, cantidad: number, precioIndividual: number}[] >([]);
 const mediosDePago = ref<{importe: number, tipoMedioDePago: TipoMedioDePagoEnum|undefined, redDePago:RedDePago|undefined, entidadBancaria:string|undefined}[]>([]);
 const ventaObrasSociales = ref<{obraSocial: {id: number| undefined}, importe: number, condicionIva: CondicionIva | undefined}[]>([]);
 const porcDto = ref<number>(0);
@@ -118,7 +118,7 @@ const isValidImporteObrasSociales = ref<boolean>(true);
 
 const addLineaVenta = () => {
     lineasDeVenta.value.push({
-        producto: {id: undefined, descripcion:''},
+        producto: {id: undefined, descripcion:'', codProv:''},
         cantidad: 1,
         precioIndividual: 0
     });
@@ -127,6 +127,7 @@ const addLineaVenta = () => {
         cantidad: true,
         precioIndividual: true,
     })
+    
 };
 
 const addMedioPago=async()=>{
@@ -329,7 +330,7 @@ const handleSelectProducto = (_producto: Producto)=>{
         })
     }else{
         lineasDeVenta.value[lineasDeVenta.value.length-1]={
-           producto: { id: _producto.id, descripcion: _producto.descripcion},
+           producto: { id: _producto.id, descripcion: _producto.descripcion, codProv: _producto.codProv},
            cantidad:1,
            precioIndividual: _producto.precio
        };
@@ -493,10 +494,10 @@ const abrirCajaDiaria = async()=>{
             <form @submit.prevent="validateAndSubmit" class="flex flex-row justify-between items-center py-4 ">
                 <div class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start">
                     <div class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8">
-                        <div class="h-[8rem] w-[60%] flex flex-row items-center justify-start">
-                            <div class=" w-full flex flex-col items-center justify-start">
+                        <div class="h-[8rem] w-[60%] flex flex-row items-between justify-start">
+                            <div class=" w-full flex flex-col items-start justify-evenly">
                                 <div class="flex  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[8rem]  h-10 mt-4 text-lg">Cliente</Label>
+                                    <Label class="form-label w-[12rem] text-lg">Cliente</Label>
                                     <Input type="text" 
                                         class="w-full sm:w-[20rem] h-10"
                                         readonly
@@ -518,7 +519,7 @@ const abrirCajaDiaria = async()=>{
                                     </TooltipProvider>
                                 </div>
                                 <div class="flex  flex-row justify-start items-center w-full">
-                                    <Label class="form-label w-[8rem]  h-10 mt-6 text-sm">Condición Fiscal</Label>
+                                    <Label class="form-label w-[12rem] text-lg">Condición Fiscal</Label>
                                     <Select 
                                         :model-value="condicionIvaVenta.toString()" 
                                         @update:model-value="(value) => condicionIvaVenta = value as unknown as CondicionIva"
@@ -563,7 +564,7 @@ const abrirCajaDiaria = async()=>{
                         <h3 class="page-subtitle">Detalle</h3>
 
                         <div class="linea-venta-header bg-secondary mt-4 rounded-lg">
-                            <span>ID</span>
+                            <span>CÓDIGO</span>
                             <span class="text-left">DESCRIPCIÓN</span>
                             <span>IMPORTE UNITARIO</span>
                             <span>CANTIDAD</span>
@@ -574,7 +575,7 @@ const abrirCajaDiaria = async()=>{
                         <div v-for="(linea, index) in lineasDeVenta" :key="index" class="linea-venta-item">
                             <Input
                                 @click="searchProductoOpen = true" 
-                                :model-value="linea.producto.id" 
+                                :model-value="linea.producto.codProv" 
                                 readonly 
                                 :class="{'rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input': (isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto),
                                         'rounded-lg cursor-default focus:outline-none focus:border-none text-center id-input border-destructive' : !(isvalidLineasVenta[index]?.cantidad && isvalidLineasVenta[index]?.precioIndividual && isvalidLineasVenta[index]?.producto)
@@ -638,9 +639,7 @@ const abrirCajaDiaria = async()=>{
                             />
                         </div>
 
-                        <Button variant="outline" type="button" class="mt-4" :disabled="isLastLineaEmpty"  @click="addLineaVenta">Agregar <PlusIcon /></Button>
-
-                
+                        <Button variant="outline" type="button" class="mt-4" :disabled="isLastLineaEmpty"  @click="()=>{addLineaVenta(); searchProductoOpen = true;}">Agregar <PlusIcon /></Button>
 
                         
                         <div class="w-full min-h-[9rem] flex flex-row justify-between items-start mt-10">
@@ -686,7 +685,7 @@ const abrirCajaDiaria = async()=>{
                                                                     }}"
                                                                 >
                                                                     <SelectTrigger class="text-black w-[12rem] text-xs ">
-                                                                        <SelectValue   />
+                                                                        <SelectValue placeholder="Obra Social"  />
                                                                     </SelectTrigger>
                                                                     <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
                                                                     <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
@@ -739,7 +738,7 @@ const abrirCajaDiaria = async()=>{
                                                                     @update:model-value="(value) => os.condicionIva = Number(value)"
                                                                 >
                                                                         <SelectTrigger class="text-black w-[13rem] text-xs ">
-                                                                            <SelectValue   />
+                                                                            <SelectValue placeholder="Condicion IVA"  />
                                                                         </SelectTrigger>
                                                                         <SelectContent>
                                                                             <SelectGroup>
@@ -769,7 +768,7 @@ const abrirCajaDiaria = async()=>{
                                                     <Button variant="outline"  type="button" class="mt-8"  @click="addVentaObraSocial()">Agregar Obra Social <PlusIcon /></Button>
                                             </div>
                                             <div v-else>
-                                                <p>No hay obras sociales registradas para el cliente</p>
+                                                <p class="py-4">No hay obras sociales registradas para el cliente</p>
                                                 <Button @click="()=>{ handleShowNewObraSocialCliente(0)}">Registrar Obra Social</Button>
                                             </div>
                                             <Dialog  v-model:open="openNewClienteOS" >
@@ -809,6 +808,15 @@ const abrirCajaDiaria = async()=>{
                                         </TooltipProvider>
                                     </div>
                                 </div>
+                                <div class="border min-h-[3rem] p-4 w-full rounded-lg  mt-4">
+                                    <div class="w-full flex flex-row justify-between  items-center">
+                                        <h3 class="page-subtitle">Observaciones</h3>
+                                    </div>    
+                                    <Textarea
+                                        v-model="observaciones"
+                                        class="resize-none"
+                                    />
+                                </div>
                             </div>
                             <div class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center">
                                 <div v-if="(obrasSociales && montoObrasSociales > 0) || porcDto" class=" flex  justify-center my-2">
@@ -828,25 +836,11 @@ const abrirCajaDiaria = async()=>{
                                     <Label class="page-subtitle  w-[9rem] ">$ {{ caluclateImportePago.toFixed(2) }}</Label>
                                 </div>
                             </div>
-                            
-
                         </div>
-                    </div>
-
-                    <div class="rounded-lg border mt-10 w-full p-8">
-
-                        <h3 class="page-subtitle">Observaciones</h3>
-                        <Textarea
-                        v-model="observaciones"
-                        class="resize-none"
-                        />
-                        
                     </div>
                     <div  v-if="!showMedioPago" class="w-full flex justify-end mt-4">
                         <Button type="button" v-if="lineasDeVenta.length && lineasDeVenta[0]?.producto.descripcion" @click="()=>{middleValidate()}">Continuar <ArrowRightIcon /></Button>
                     </div>
-
-                    <p>{{ mediosDePago }}</p>
 
                     <div v-if="showMedioPago && selectedCliente" class="flex flex-col w-full justify-start items-start border rounded-lg p-8 mt-10">
                         <h3 class="page-subtitle mb-4">Medios de Pago</h3>
@@ -1048,7 +1042,7 @@ const abrirCajaDiaria = async()=>{
 
 .linea-venta-header {
     display: grid;
-    grid-template-columns: 0.4fr 3fr 1fr 0.5fr 1fr 0.1fr 0.1fr;
+    grid-template-columns: 0.6fr 2.8fr 1fr 0.5fr 1fr 0.1fr 0.1fr;
     gap: 0.5rem;
     font-weight: bold;
     text-align: center;
@@ -1062,7 +1056,7 @@ const abrirCajaDiaria = async()=>{
 
 .linea-venta-item {
     display: grid;
-    grid-template-columns: 0.5fr 3fr 1fr 0.5fr 1fr 0.1fr 0.1fr;
+    grid-template-columns: 0.7fr 3fr 1fr 0.5fr 1fr 0.1fr 0.1fr;
     gap: 0.5rem;
     align-items: center;
     padding: 0.5rem 0;

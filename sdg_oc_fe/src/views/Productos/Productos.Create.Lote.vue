@@ -69,6 +69,7 @@ const steps: Array<{ step: number; title: string; description: string; descripti
         step: 3,
         title: 'Completar la información de los productos',
         description: 'Ingresar todos los datos requeridos en la plantilla, verificando que sean correctos y estén bien estructurados.',
+        description2: 'Recordá que si no completas la columna código proveedor, el sistema lo generará automáticamente.',
     },
     {
         step: 4,
@@ -162,7 +163,7 @@ const loading = ref<boolean>(false);
         </Breadcrumb>
         <div class="pt-2 flex w-full justify-center items-center">
             <form @submit.prevent="validateAndSubmit"
-                class="forms-wide h-[45rem] w-full flex flex-col justify-start items-start  px-[5rem]">
+                class="forms-wide h-[50rem] w-full flex flex-col justify-start items-start  px-[5rem]">
                 <div class="w-full ">
                     <h3 class="page-subtitle text-center">Registrar Lote de Productos</h3>
                     <Separator class="my-6 w-full" />

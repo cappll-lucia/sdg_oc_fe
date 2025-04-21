@@ -326,7 +326,7 @@ const redirectCancel = ()=>{
                          <div class="flex flex-col w-full">
                          <div class="flex flex-row w-full justify-between">
                             <!-- Cliente -->
-                            <div class="h-[5rem] mt-8  w-[25%]">
+                            <div class="h-[5rem] mt-8  w-[35%]">
                                     <div class="form-item-wide justify-start">
                                         <Label class="form-label w-[3rem] text-left">Cliente</Label>
                                         <div class="flex flex-row justify-start items-center">
@@ -355,9 +355,9 @@ const redirectCancel = ()=>{
 
                                 <!-- Fecha -->
                                  <div class="h-[5rem] w-[30%] flex flex-col justify-start items-end mt-8">
-                                    <div class="flex items-center justify-end w-full">
-                                        <Label class="w-[25%]">Fecha Receta</Label>
-                                        <div class="flex gap-2 w-[60%]">
+                                    <div class="flex items-center justify-center w-full">
+                                        <Label class="w-[3rem] text-wrap text-right mr-3 leading-5">Fecha Receta</Label>
+                                        <div class="flex gap-2  mr-3">
                                             <Input type="text" v-model="fechaReceta.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
                                             <Input type="text" v-model="fechaReceta.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
                                             <Input type="text" v-model="fechaReceta.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
@@ -376,7 +376,7 @@ const redirectCancel = ()=>{
                                 <!-- TipoReceta -->
                                 <div class="h-[5rem] w-[30%] mt-8">
                                     <div class="form-item-wide mb-2">
-                                        <Label class="w-[8rem]">Tipo Receta</Label>
+                                        <Label class="w-[3rem] text-wrap text-right mr-3 leading-5">Tipo Receta</Label>
                                         <Select v-model="newReceta.tipoReceta" @update:model-value="(value) => newReceta.tipoReceta=value as TipoReceta"  >
                                             <SelectTrigger>
                                                 <SelectValue class="text-black w-[15rem] "  />
@@ -635,9 +635,9 @@ const redirectCancel = ()=>{
                 
                         <div class="flex flew-row mt-6   w-full justify-between items-start">
 
-                        <div class="flex flex-row mt-6 w-[40%]  justify-start items-start">
+                        <div class="flex flex-row mt-6 w-[40%] justify-start items-start">
                                 <span class="form-label font-bold text-xl w-[8rem]">Cristales</span>                                
-                                <div class="flex flex-col justify-start w-[85%]">
+                                <div class="flex flex-col justify-start w-[85%] ">
                                     
                                     <!-- TipoCristal -->
                                     <div class="h-[5rem] w-[20rem] mr-16">
@@ -735,16 +735,16 @@ const redirectCancel = ()=>{
 
                                 </div>
                         </div>
-                        <div class="flex flex-col mt-6  w-[60%] justify-start items-start">
-                                <div class="flex flex-row justify-between items-center w-full">
-                                    <div class="flex flex-row justify-between items-center w-full mt-5">
+                        <div class="flex flex-col mt-6  w-[60%] justify-start items-start ">
+                                <div class="flex flex-row justify-between items-start w-full  h-[5rem]">
+                                    <div class="flex flex-row justify-between  items-center w-full ">
                                         <Label class="form-label text-right mr-4 w-[8rem]">Armazón</Label>    
                                         <Input
                                             class="resize-none w-[60%]"
                                             v-model="newReceta.armazon"
                                         />                            
                                     </div>
-                                    <div class="flex flex-row justify-between items-center w-full mt-5">
+                                    <div class="flex flex-row justify-between items-center w-full ">
                                         <Label class="form-label text-right mr-4 w-[8rem]">Oftalmólogo</Label>    
                                         <Input
                                             class="resize-none w-[60%] "
@@ -760,8 +760,8 @@ const redirectCancel = ()=>{
                                         </TooltipProvider>                          
                                     </div>
                                 </div>
-                                <div class="flex flex-row justify-between w-full mt-5">
-                                    <Label class="form-label text-right mr-4 w-[8rem]">Observaciones</Label>    
+                                <div class="flex flex-row justify-between w-full">
+                                    <Label class="form-label text-right mr-4 w-[8rem] mt-3">Observaciones</Label>    
                                     <Textarea
                                         class="resize-none w-[80%] h-[7.5rem]"
                                         v-model="newReceta.observaciones"

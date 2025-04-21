@@ -17,6 +17,8 @@ export interface Venta extends BaseTransactionalEntity{
     factura: Comprobante,
     observaciones: string;
     ventaObraSocial: VentaObraSocial[];
+    condicionIva: CondicionIva;
+
 }
 
 export interface VentaObraSocial extends BaseTransactionalEntity{

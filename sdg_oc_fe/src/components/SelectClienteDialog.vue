@@ -65,7 +65,7 @@ const handleCreateCliente = (cliente: Cliente)=>{
             <Separator class="my-2" />
             <div class="flex flex-row justify-end w-full px-4 h-2 mb-4 ">
                 <div class="flex justify-center w-[60rem]">
-                    <Input type="text" v-model="searchClientesTxt" class="w-[30rem] ml-[10rem]" @keyup.enter="searchClientes()" />
+                    <Input type="text" v-model="searchClientesTxt" class="w-[30rem] ml-[6rem]" @keyup.enter="searchClientes()" />
                     <Button variant="default" size="icon" class="w-12 h-9 mx-4" @click="searchClientes()">
                         <MagnifyingGlassIcon />
                     </Button>
@@ -75,7 +75,7 @@ const handleCreateCliente = (cliente: Cliente)=>{
                 </Button>
             </div>
             <div v-if="!showCreateForm" class="flex justify-center">
-                <ScrollArea class="h-[30rem] w-[30rem] pl-4 mt-4">
+                <ScrollArea class="h-[30rem] w-[30rem] mt-4">
                     <div v-for="cliente in foundClientes" 
                         :key="cliente.id" 
                         @click="selectCliente(cliente)"

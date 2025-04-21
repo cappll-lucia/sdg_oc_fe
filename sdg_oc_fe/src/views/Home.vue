@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowDownUpIcon, AsteriskIcon, BanknoteIcon, EarIcon, EyeIcon, Glasses, Receipt, Shield, ShoppingBag, Users2Icon } from 'lucide-vue-next';
+import { ArrowDownUpIcon, AsteriskIcon, BanknoteIcon, EarIcon, EyeIcon, Glasses, Receipt, SettingsIcon, ShoppingBag, Users2Icon } from 'lucide-vue-next';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -67,7 +67,7 @@ const abrirCajaDiaria = async()=>{
                 </div>
                 <span>Caja</span>
             </div>
-            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/logo_no_bg.png" class="w-[300px]" /> </div>
+            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/image.png" class="w-[300px]" /> </div>
 
             <div @click="router.push(`/ventas/new`)" class="box menu-venta">
                 <ShoppingBag class="mb-2" :size="25" />
@@ -102,9 +102,9 @@ const abrirCajaDiaria = async()=>{
                 <EarIcon class="mb-2" :size="25" />
                 <span>Nueva Audiometría</span>
             </div>
-            <div @click="router.push(`/obras-sociales`)" class="box productos">
-                <Shield class="mb-2" :size="25" />
-                <span>Obras Sociales</span>
+            <div @click="router.push(`/parametros`)" class="box productos">
+                <SettingsIcon class="mb-2" :size="25" />
+                <span>Parámetros</span>
             </div>
 
         </div>
