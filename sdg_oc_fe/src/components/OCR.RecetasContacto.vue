@@ -10,13 +10,12 @@ import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
 import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
 import AlertError from '@/components/AlertError.vue';
-import { useLoaderStore } from '@/stores/LoaderStore';
 import LoaderForm from './LoaderForm.vue';
+import { ocrApi } from '@/api/libs/ocr';
 
-const loader = useLoaderStore();
 const loadingForm =ref<boolean>(false);
 
-const emit = defineEmits(['hanldeSubmit', 'handleCancel']);
+const emit = defineEmits(['handleSubmit', 'handleCancel']);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -34,17 +33,20 @@ const isValidForm = ref<{image1: boolean, image2: boolean}>({
 
 
 const validateAndSubmit = async () => {
-    loadingForm.value=true;
-    console.log('aaa')
+    //todo Validate    loadingForm.value=false;
+    await onSubmitImage1()
 };
 
-const onSubmit = async()=>{
+const onSubmitImage1 = async()=>{
     try{
-        emit('hanldeSubmit', 'holaaaa')
+        loadingForm.value=true;
+        const dataImage1 = await ocrApi.processRecetaImg1(imageFile1.value)
+        loadingForm.value=false;
+        emit('handleSubmit', dataImage1)
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loader.hide();
+        loadingForm.value=false;
     };
 }
 

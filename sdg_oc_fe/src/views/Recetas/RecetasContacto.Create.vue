@@ -314,15 +314,20 @@ const redirectCancel = ()=>{
     : router.push(`/`)
 }
 
-const loadImages = async(text: string)=>{
-    console.log(text)
+const loadImages = async(dataImage:  { oftalmometria: {OD: string[], OI: string[]}, observaciones: string})=>{
+    console.log(dataImage)
+    newReceta.value.quet_m1_od= dataImage.oftalmometria.OD[0] ? Number(dataImage.oftalmometria.OD[0]) : undefined
+    newReceta.value.quet_m2_od= dataImage.oftalmometria.OD[1] ? Number(dataImage.oftalmometria.OD[1]) : undefined
+    newReceta.value.quet_m1_oi= dataImage.oftalmometria.OI[0] ? Number(dataImage.oftalmometria.OI[0]) : undefined
+    newReceta.value.quet_m2_oi= dataImage.oftalmometria.OI[1] ? Number(dataImage.oftalmometria.OI[1]) : undefined
+    newReceta.value.observaciones = dataImage.observaciones;
+    openOCR.value=false;
 }
 
 
 </script>
 
 <template>
-
     <div class="page">
             <Breadcrumb>
             <BreadcrumbList>
