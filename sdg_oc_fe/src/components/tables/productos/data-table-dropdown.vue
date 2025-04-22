@@ -21,7 +21,7 @@ defineProps<{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="() => {router.push(`/productos/edit/${producto.id}`)}">Actualizar</DropdownMenuItem>
+            <DropdownMenuItem @click="() => {router.push(`/productos/edit/${producto.id}`)}">Editar</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

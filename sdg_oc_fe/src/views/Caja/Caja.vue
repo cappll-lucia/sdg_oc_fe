@@ -170,7 +170,7 @@ const cerrarCajaDiaria = async()=>{
         if(todayDate.value){
             loadingForm.value=true;
             cierreToday.value = await cajaApi.cierre();
-            todayMovements.value.push(cierreToday.value)
+            await loadData();
             await informeCierre(todayDate.value);
         }
         openDialogCloseCaja.value=false;
@@ -509,8 +509,9 @@ const resetNewMovimiento = ()=>{
                         <div v-else>
                             <div v-for="mov in dateMovements" class="flex flex-row justify-between w-ful h-[4rem]  mb-2 border-b items-center px-4 ">
                                 <Label class="w-[8rem] text-sm ">{{ formatTime(mov.fechaMovimiento) }} hs.</Label>
-                                <Label class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
-                                <Label class="w-[13rem] text-sm flex justify-start ">{{mov.detalle ?? "Cta. Cte. Cliente"}}</Label>
+                                <Label v-if="mov.detalle && ['APERTURA', 'CIERRE'].includes(mov.detalle)" class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.detalle }}</Label></Label>
+                                <Label v-else class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
+                                <Label class="w-[13rem] text-sm flex justify-start ">{{ (mov.detalle && !['APERTURA', 'CIERRE'].includes(mov.detalle)) ? (mov.detalle ?? "CTA. CTE. CLIENTE") : ''}}</Label>
                                 <Label class="w-[11rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
                             </div>
                             <div v-if="!dateMovements.length && selectedDate==todayDate" class="flex justify-center items-center flex-col mt-10">
@@ -527,7 +528,7 @@ const resetNewMovimiento = ()=>{
             <AlertError
             v-model="showError"
             title="Error"
-            :message="errorMessage"
+            :message="errorMessage || ''"
             button="Aceptar"
             :action="()=>{showError=false}"
         />

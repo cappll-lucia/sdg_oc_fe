@@ -34,6 +34,9 @@ import { CalendarIcon } from 'lucide-vue-next'
 import type { DateRange } from 'reka-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useLoaderStore } from '@/stores/LoaderStore';
+import { ventasApi } from '@/api/libs/ventas';
+import AlertError from '@/components/AlertError.vue';
+import AlertAcept from '@/components/AlertAcept.vue';
 
 
 const loader=useLoaderStore()
@@ -41,6 +44,12 @@ const selectedTipoFactura = ref<string>('');
 const txtSearch = ref<string>('');
 const currentLimit = ref<string>('10');
 const currentOffset = ref<number>(0);
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
+const showPendientesAlert= ref<boolean>(false);
+const messagePendientes=ref<string>('');
+
 
 const dateRange = ref<DateRange>({
   start: undefined,
@@ -118,6 +127,32 @@ const handleDateRangeChange = async(newRange: DateRange) => {
   await handleFilterComprobantes()
 }
 
+const handleFacturarPendientes = async()=>{
+    try{
+        loader.show();
+        const pending = await ventasApi.getAll({
+            tipoComprobante: "pendiente",
+            limit: 10000,
+        });
+        if(pending.items.length){
+            await comprobantesApi.facturarPendientes();
+            messagePendientes.value='Las facturas pendientes se han emitido exitosamente.'
+            showPendientesAlert.value=true;
+            const comprobantesRes = await comprobantesApi.getAll({});
+            comprobantes.value=comprobantesRes.items;
+        }else{
+            messagePendientes.value='No se encontraron ventas pendientes de facturar.'
+            showPendientesAlert.value=true;
+        }
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
+}
+
+
 
 </script>
 
@@ -193,6 +228,8 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                     </Popover>
                     <Button variant="ghost" @click="clearFilters" class="text-gray-500 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline"> <ReloadIcon /> </Button>
                 </div>
+            <Button variant="ghost" @click="handleFacturarPendientes" class="text-gray-500 text-sm font-light hover:bg-transparent hover:cursor-pointer hover:underline"> Emitir facturas pendientes</Button>
+
             </div>
             <DataTable :columns="columns" :data="comprobantes" />
         </div>
@@ -203,7 +240,7 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                 </Button>
                 <Select v-model="currentLimit" @update:model-value="handleLimitChange">
                     <SelectTrigger class="w-[80px] h-8">
-                        <SelectValue placeholder="Select a fruit" />
+                        <SelectValue  />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
@@ -220,5 +257,15 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                 </Button>
             </div>
         </div>
+        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
+            :action="()=>{showError=false}" />
+
+        <AlertAcept
+            v-model="showPendientesAlert"
+            title="Facturar ventas pendientes"
+            :message="messagePendientes"
+            primary-btn="Aceptar"
+            :primary-action="()=>showPendientesAlert=false"
+        />
     </div>
 </template>

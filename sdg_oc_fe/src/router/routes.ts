@@ -211,6 +211,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/recetas/contacto/ocr',
+            name: 'recetas_ocr',
+            component: () => import('../views/Recetas/RecetasContacto.OCR.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/recetas/contacto/new',
             name: 'new_receta_contacto',
             component: () => import('../views/Recetas/RecetasContacto.Create.vue'),

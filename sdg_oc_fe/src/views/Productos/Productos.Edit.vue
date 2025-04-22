@@ -136,7 +136,7 @@ const onSubmit= async()=>{
                     <SlashIcon/>
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/prodcutos">
+                    <BreadcrumbLink href="/productos">
                         Productos
                     </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -144,13 +144,13 @@ const onSubmit= async()=>{
                     <SlashIcon />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Actualizar Producto</BreadcrumbPage>
+                    <BreadcrumbPage>Editar Producto</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         <div v-if="currentProducto" class="pt-2 flex w-full justify-center items-center" >
             <form @submit.prevent="validateAndSubmit" class="forms w-[45rem]">
-                <h3 class="page-subtitle text-center" >Actualizar Producto</h3>
+                <h3 class="page-subtitle text-center" >Editar Producto</h3>
                 <Separator class="my-6" />
                 
                 <div class="h-[5rem] w-full flex justify-center">

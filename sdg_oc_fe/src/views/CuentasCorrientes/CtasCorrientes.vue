@@ -130,7 +130,7 @@ const clearFilters = async()=>{
                 <Button variant="outline" :class="{'w-8 h-8': previousPage, 'w-8 h-8 pointer-events-none opacity-50': !previousPage}" @click="handlePageChange(-1)" > <ChevronLeft/> </Button>
                 <Select v-model="currentLimit" @update:model-value="handleFilterCtasCorrientes" >
                     <SelectTrigger class="w-[80px] h-8">
-                    <SelectValue placeholder="Select a fruit" />
+                    <SelectValue  />
                     </SelectTrigger>
                     <SelectContent>
                     <SelectGroup>

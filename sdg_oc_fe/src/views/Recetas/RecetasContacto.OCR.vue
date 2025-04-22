@@ -117,10 +117,10 @@ const onSubmit = async()=>{
             <form @submit.prevent="validateAndSubmit"
                 class="forms-wide h-[30rem] w-full flex flex-col justify-start items-start  px-[5rem]">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Actualizar Precio Lote de Productos</h3>
+                    <h3 class="page-subtitle text-center">Carga de receta de lentes de contacto mediante imágenes</h3>
                     <Separator class="my-6 w-full" />
                 </div>
-                <div class="flex flex-row w-[100%] h-[20rem] px-4 justify-between items-start">
+                <div class="flex flex-col w-[100%] h-[20rem] px-4 justify-between items-start">
 
                     <div class=" flex flex-col w-[35%] h-full justify-start items-start text-gray-800 ">
                         <h5 class="text-[1.2rem] text-center mt-8 ml-4">Completá los campos para modificar los precios de todos los productos que coincidan con la marca y el proveedor elegidos.</h5>

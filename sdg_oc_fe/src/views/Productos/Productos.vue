@@ -94,7 +94,6 @@ const handleFilterProducts = async () => {
             limit: currentLimit.value
         });
         productos.value = resp.items;
-        console.log(resp)
         nextPage.value = resp.nextPage;
         previousPage.value =resp.previousPage;
         loader.hide();
@@ -220,7 +219,7 @@ const clearFilters = async()=>{
                 </Button>
                 <Select v-model="currentLimit" @update:model-value="handleLimitChange">
                     <SelectTrigger class="w-[80px] h-8">
-                        <SelectValue placeholder="Select a fruit" />
+                        <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
