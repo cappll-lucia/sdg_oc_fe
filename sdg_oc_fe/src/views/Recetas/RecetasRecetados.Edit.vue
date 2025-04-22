@@ -156,6 +156,7 @@ const fechaReceta = ref({
 
 onMounted(async()=>{
     try{
+        loader.show();
         currentReceta.value = await recetasApi.getOneAereos(Number(route.params.id));
         let detalleCerca, detalleLejos
         switch(currentReceta.value.tipoReceta){
@@ -179,6 +180,7 @@ onMounted(async()=>{
         fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
         fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
         fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+        loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
         showError.value = true;
