@@ -16,10 +16,21 @@ export enum CategoriaEnum {
 export interface Producto extends BaseEntity{
     descripcion: string,
     codProv: string,
+    precioLista: number,
     precio: number,
-    precioSugerido: number,
     stock: number,
     categoria: CategoriaEnum,
     marca: Marca,
     proveedor: Proveedor
+}
+
+
+export type NewProductoType = {
+    codProv: string,
+    descripcion: string|undefined,
+    precio: number,
+    precioLista: number,
+    categoria: CategoriaEnum|undefined,
+    marca: {id: number|undefined},
+    proveedor: {id: number|undefined},
 }

@@ -63,14 +63,22 @@ const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 
 const loadData = async()=>{
-    await handleFilterProducts()
-    marcas.value = await marcasApi.getAll();
-    proveedores.value =await proveedoresApi.getAll();
+    try{
+        await handleFilterProducts()
+        marcas.value = await marcasApi.getAll();
+        proveedores.value =await proveedoresApi.getAll();
+     }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
 }
 
 onMounted(async () => {
+    loader.show();
     userData.value = userStore?.getMe
     await loadData()
+    loader.hide();
 });
 
 
@@ -86,6 +94,7 @@ const handleFilterProducts = async () => {
             limit: currentLimit.value
         });
         productos.value = resp.items;
+        console.log(resp)
         nextPage.value = resp.nextPage;
         previousPage.value =resp.previousPage;
         loader.hide();

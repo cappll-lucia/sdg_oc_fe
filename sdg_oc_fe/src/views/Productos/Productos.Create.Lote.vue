@@ -33,9 +33,12 @@ import { proveedoresApi } from '@/api/libs/proveedores';
 import { toast } from '@/components/ui/toast';
 import AlertError from '@/components/AlertError.vue';
 import { productosApi } from '@/api/libs/productos';
+import { useLoaderStore } from '@/stores/LoaderStore';
 
 const marcas = ref<Marca[]>([]);
 const proveedores = ref<Proveedor[]>([]);
+
+const loader = useLoaderStore();
 
 
 const selectedMarcaId = ref<string|undefined>();
@@ -104,18 +107,19 @@ const handleFileUpload = (event: Event) => {
 };
 
 const validateAndSubmit = async () => {
-    loading.value=true;
+    loader.show()
     isValidLote.value.marca = !!selectedMarcaId.value && !isNaN(Number(selectedMarcaId.value));
     isValidLote.value.proveedor = !!selectedProveedorId.value && !isNaN(Number(selectedProveedorId.value));
     isValidLote.value.file = !!uploadedFile.value && uploadedFile.value?.name.endsWith('.xlsm') ;
     if(isValidLote.value.file && isValidLote.value.marca && isValidLote.value.proveedor){
         await onSubmit()
     }
-    loading.value=false;
+    loader.hide()
 };
 
 const onSubmit = async()=>{
     try{
+        loader.show();
         if(selectedMarcaId.value && selectedProveedorId.value && uploadedFile.value){
             await productosApi.createLote(selectedMarcaId.value, selectedProveedorId.value, uploadedFile.value)
             toast({
@@ -123,16 +127,13 @@ const onSubmit = async()=>{
             })
             router.push('/productos')
         }
+        loader.hide();
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
-        loading.value=false;
+        loader.hide()
     };
 }
-
-
-
-const loading = ref<boolean>(false);
 
 </script>
 
@@ -261,7 +262,7 @@ const loading = ref<boolean>(false);
                 <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
                     <Button variant="outline" class="w-[15%] mr-5"
                         @click="router.push('/productos')">Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">{{ loading ? 'Cargando...' : 'Guardar' }}</Button>
+                    <Button type="submit" class="w-[15%]">Guardar</Button>
                 </div>
 
             </form>

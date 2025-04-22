@@ -171,7 +171,7 @@ const validateAndSubmit = async () => {
 
                 <div class="w-full flex flex-row justify-end mt-8 mb-6 pr-14 ">
                     <Button variant="outline" class="w-[25%] mr-5"
-                        :onclick="() => { router.push('/proveedores'); }">Cancelar</Button>
+                        type="button" @click="() => { router.push('/proveedores'); }">Cancelar</Button>
                     <Button type="submit" class="w-[25%]">Guardar</Button>
                 </div>
             </form>
