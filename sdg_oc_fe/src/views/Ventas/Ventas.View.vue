@@ -103,10 +103,10 @@ const caluclateImportePago = computed(()=>{
 
 
 
-const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=>{
+const printComprobante = async(id: string, tipoComprobante: number, fecha:Date, duplicado: number)=>{
     try {
         loadingForm.value=true;
-        const resp = await comprobantesApi.print(id);
+        const resp = await comprobantesApi.print(id, duplicado);
         const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
         const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
@@ -372,9 +372,14 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                                 tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
                         <span class=" text-md font-thin w-[15rem]">{{ comprobante.numeroComprobante }}</span>
                         <div v-if="!loadingForm" class="actions">
-                            <Button variant="ghost" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision)">
-                                <PrinterIcon />
-                            </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger> <Button variant="ghost"> <PrinterIcon /></Button>  </DropdownMenuTrigger>
+                                        <DropdownMenuContent class="w-[10rem] font-normal" >
+                                            <DropdownMenuLabel class="cursor-pointer font-normal" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision, 0)"  >Imprimir original</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel class="cursor-pointer font-normal" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision, 1)" >Imprimir duplicado</DropdownMenuLabel>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                             <Button variant="ghost" @click="emailComprobante(comprobante.id)">
                                 <MailIcon />
                             </Button>

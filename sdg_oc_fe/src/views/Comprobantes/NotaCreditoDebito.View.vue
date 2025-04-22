@@ -9,7 +9,13 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
 import {  onMounted, ref } from 'vue';
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Comprobante } from '@/api/entities/comprobante';
 import Label from '@/components/ui/label/Label.vue';
 import { condicionIvaDisplay, tipoComprobanteDisplay } from '@/lib/utils';
@@ -44,10 +50,10 @@ onMounted(async()=>{
     }
 })
 
-const printComprobante = async(_id: string)=>{
+const printComprobante = async(_id: string, _duplicado: number)=>{
     try {
         loader.show();
-        const resp = await comprobantesApi.print(_id);
+        const resp = await comprobantesApi.print(_id, _duplicado);
         const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
         const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
@@ -150,7 +156,15 @@ const handleRedirect = () => {
                     </div>
                     <div class="w-full flex justify-end mt-4">
                         <Button variant="outline" type="button" class="w-[10rem] mr-5" @click="handleRedirect">Volver</Button>
-                        <Button type="submit" class="w-[10rem]" @click="printComprobante(currentComprobante.id)" >Imprimir</Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger> <Button type="button" class="w-[10rem]">Imprimir</Button>  </DropdownMenuTrigger>
+                            <DropdownMenuContent class="w-[10rem] font-normal" >
+                                <DropdownMenuLabel class="cursor-pointer font-normal" @click="printComprobante(currentComprobante.id, 0)"  >Imprimir original</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel class="cursor-pointer font-normal" @click="printComprobante(currentComprobante.id, 1)" >Imprimir duplicado</DropdownMenuLabel>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        
                     </div>
                 </div>
             </div>

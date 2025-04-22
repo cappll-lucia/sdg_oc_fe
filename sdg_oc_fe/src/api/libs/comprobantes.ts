@@ -72,10 +72,10 @@ const getOne = async(_id: string)=>{
     }
 }
 
-const print = async(_id: string)=>{
+const print = async(_id: string, _duplicado=0)=>{
     try {
         const resp = await http.post(
-            `/comprobante/imprimir`, 
+            `/comprobante/imprimir?duplicado=${_duplicado}`, 
             { id: _id},
             {responseType: 'arraybuffer'}
         ); 
@@ -114,11 +114,7 @@ const create = async(_comprobante: any ) =>{
 
 const facturarPendientes = async() =>{
     try {
-        const resp = await http.post('/comprobante/facturarPendientes');
-        console.log(resp)
-        // const comprobante = resp.data.data as Comprobante;
-        // comprobante.fechaEmision = new Date(comprobante.fechaEmision)
-        //return comprobante
+        await http.post('/comprobante/facturarPendientes');
     } catch (error: any) {
         console.log(error)
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la obra social')
@@ -130,7 +126,7 @@ export const comprobantesApi = {
     getAll: (filters: ComprobanteFilters)=> getAll(filters),
     getAllByCliente: (_id: number)=> getAllByCliente(_id),
     getOne: (_id: string)=> getOne(_id),
-    print: (_id: string)=> print(_id),
+    print: (_id: string, _duplicado: number)=> print(_id, _duplicado),
     email: (_id: string)=> email(_id),
     getFacturasByCliente: (_nroDoc: number)=> getFacturasByCliente(_nroDoc),
     getComprobantesByVenta: (_ventaId: string)=> getComprobantesByVenta(_ventaId),
