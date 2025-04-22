@@ -17,13 +17,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { computed, onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { router } from '@/router';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
-import { SlashIcon, AsteriskIcon, PlusIcon} from 'lucide-vue-next';
+import { SlashIcon, AsteriskIcon, PlusIcon, ImageUpIcon} from 'lucide-vue-next';
 import {
   Tooltip,
   TooltipContent,
@@ -45,6 +50,7 @@ import { recetasApi } from '@/api/libs/recetas';
 import { useRoute } from 'vue-router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
+import OCRRecetasContacto from '@/components/OCR.RecetasContacto.vue';
 
 const route = useRoute();
 const loader = useLoaderStore();
@@ -54,6 +60,8 @@ const searchClienteOpen = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
+
+const openOCR = ref<boolean>(false);
 
 
 const newReceta = ref<{
@@ -306,10 +314,20 @@ const redirectCancel = ()=>{
     : router.push(`/`)
 }
 
+const loadImages = async(dataImage:  { oftalmometria: {OD: string[], OI: string[]}, observaciones: string})=>{
+    console.log(dataImage)
+    newReceta.value.quet_m1_od= dataImage.oftalmometria.OD[0] ? Number(dataImage.oftalmometria.OD[0]) : undefined
+    newReceta.value.quet_m2_od= dataImage.oftalmometria.OD[1] ? Number(dataImage.oftalmometria.OD[1]) : undefined
+    newReceta.value.quet_m1_oi= dataImage.oftalmometria.OI[0] ? Number(dataImage.oftalmometria.OI[0]) : undefined
+    newReceta.value.quet_m2_oi= dataImage.oftalmometria.OI[1] ? Number(dataImage.oftalmometria.OI[1]) : undefined
+    newReceta.value.observaciones = dataImage.observaciones;
+    openOCR.value=false;
+}
+
+
 </script>
 
 <template>
-
     <div class="page">
             <Breadcrumb>
             <BreadcrumbList>
@@ -353,7 +371,22 @@ const redirectCancel = ()=>{
         <div class="pt-2 mb-4 " >
             <form @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Nueva Receta - Lentes de contacto</h3>
+                    <div class="flex w-full justify-center">
+                        <h3 class="page-subtitle text-center">Nueva Receta - Lentes de contacto</h3>
+                        <Dialog v-model:open="openOCR" >
+                            <DialogTrigger >
+                                <Button type="button" class="absolute right-[10rem]" >
+                                    <ImageUpIcon /> Carga con imágenes
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent class="max-w-[100rem] min-h-[40rem] ">
+                                <OCRRecetasContacto 
+                                    @handle-submit="loadImages"
+                                    @handle-cancel="openOCR=false"
+                                />
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                     <Separator class="my-10 w-full" />
                 </div>
                 <div class="flex flex-col w-full justify-between items-start">

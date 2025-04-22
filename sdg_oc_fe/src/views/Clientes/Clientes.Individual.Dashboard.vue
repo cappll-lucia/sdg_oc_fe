@@ -152,9 +152,9 @@ const loadData = async()=>{
     }
 }
 
-const printComprobante = async(id: string, tipoComprobante: number, fecha:Date)=>{
+const printComprobante = async(id: string, tipoComprobante: number, fecha:Date, duplicado:number)=>{
     try {
-        const resp = await comprobantesApi.print(id);
+        const resp = await comprobantesApi.print(id, duplicado);
         const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
         const pdfBlob = new Blob([uint8Array], { type: 'application/pdf' });
@@ -554,9 +554,14 @@ const onSubmit = async()=>{
                                     <Label class="w-[8rem] text-sm "> $ {{ row.importe.toFixed(2)}}</Label>
                                 </div>
                                 <div class="flex flex-row ">
-                                    <Button variant="ghost" @click="printComprobante(row.id, row.tipoComprobante, row.fecha)">
-                                        <PrinterIcon />
-                                    </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger> <Button variant="ghost"> <PrinterIcon /></Button>  </DropdownMenuTrigger>
+                                        <DropdownMenuContent class="w-[10rem] font-normal" >
+                                            <DropdownMenuLabel class="cursor-pointer font-normal" @click="printComprobante(row.id, row.tipoComprobante, row.fecha, 0)"  >Imprimir original</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel class="cursor-pointer font-normal" @click="printComprobante(row.id, row.tipoComprobante, row.fecha, 1)" >Imprimir duplicado</DropdownMenuLabel>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                     <Button variant="ghost" @click="emailComprobante(row.id)">
                                         <Mail />
                                     </Button>
