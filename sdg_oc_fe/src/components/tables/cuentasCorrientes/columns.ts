@@ -20,12 +20,20 @@ export const columns: ColumnDef<CuentaCorriente>[] = [
     {
         accessorKey: 'estado',
         header: ()=> h('div', 'Estado'),
-        cell: ({row})=> row.original.saldo >= 0 ? 'Saldo a favor' : 'Deuda'  
+        cell: ({row})=> {
+            const state = getState(row.original.saldo)
+            return h('div', {class: getColor(state)}, state)
+        }
     },
     {
         accessorKey: 'saldo',
         header: ()=> h('div', 'Saldo'),
-        cell: ({row})=> `$ ${row.original.saldo}`
+        cell: ({row})=> {
+            const state = getState(row.original.saldo)
+            return h(
+                'div', {class: getColor(state)} ,`$ ${row.original.saldo}`
+            )
+        }
     },
     {
         accessorKey: 'actions',
@@ -40,3 +48,22 @@ export const columns: ColumnDef<CuentaCorriente>[] = [
         }, h(ChevronRightIcon, { class: 'w-4 h-4' }))
   }
 ]
+
+
+function getColor(value:string){
+    if(value=='Saldo negativo')
+        return 'text-red-700';
+    if(value=='Saldo a favor')
+        return 'text-green-700';
+    return ''
+}
+
+function getState(saldo: number){
+    const value = saldo >= 0 
+    ? ( saldo == 0
+        ? '-'
+        : 'Saldo a favor'
+    ) 
+    : 'Saldo negativo'; 
+    return value
+}

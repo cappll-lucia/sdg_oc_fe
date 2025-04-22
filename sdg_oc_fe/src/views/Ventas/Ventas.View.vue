@@ -57,12 +57,16 @@ const loadData = async(id: string)=>{
     try{
         const res = await ventasApi.getOne(id);
         currentVenta.value = res.venta;
-        comprobantesVenta.value = [res.venta.factura, ...res.comprobantesRelacionados];
+        comprobantesVenta.value = [...res.comprobantesRelacionados];
+        if(res.venta.factura){
+            comprobantesVenta.value.push(res.venta.factura)
+        }
         currentVenta.value.fecha = new Date(currentVenta.value.fecha);
         currentVenta.value.cliente = await clientesApi.getOne(currentVenta.value.cliente.id);
-    }catch(error: any){
-        errorMessage.value = error.message as string;
+    }catch (err: any) {
+        errorMessage.value = err.message as string;
         showError.value = true;
+        loader.hide();
     }
 }
 
@@ -151,9 +155,11 @@ const emitirFactura = async()=>{
                 condicionIvaCliente: Number(currentVenta.value?.cliente.categoriaFiscal),
                 transaccionRelacionadaId: {id: currentVenta.value.id}
             }
-            const factura = await comprobantesApi.create(newFactura)  ;
+            const factura = await comprobantesApi.create(newFactura);
             currentVenta.value.factura=factura;
-            comprobantesVenta.value.push(factura);
+            if(currentVenta.value.factura){
+                comprobantesVenta.value.push(factura);
+            }
             loader.hide();
             toast({
                 title: 'Factura emitida',
@@ -357,12 +363,13 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                            Emitir
                         </Button>
                     </div>
-                    <div v-for="comprobante in comprobantesVenta"
-                    class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
-                    <span class=" text-md w-[8rem] ">{{ formatDate(comprobante.fechaEmision) }}</span>
-                    <span class=" text-md mx-4 w-[11rem]">{{
-                        tipoComprobanteDisplay(comprobante.tipoComprobante)?.nombre }} {{
-                            tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
+                    <div v-if="comprobantesVenta.length">
+                        <div v-for="comprobante in comprobantesVenta"
+                        class="h-[4rem] flex justify-start items-center py-2 px-8 border-b">
+                        <span class=" text-md w-[8rem] ">{{ formatDate(comprobante.fechaEmision) }}</span>
+                        <span class=" text-md mx-4 w-[11rem]">{{
+                            tipoComprobanteDisplay(comprobante.tipoComprobante)?.nombre }} {{
+                                tipoComprobanteDisplay(comprobante.tipoComprobante)?.letra }}</span>
                         <span class=" text-md font-thin w-[15rem]">{{ comprobante.numeroComprobante }}</span>
                         <div v-if="!loadingForm" class="actions">
                             <Button variant="ghost" @click="printComprobante(comprobante.id, comprobante.tipoComprobante, comprobante.fechaEmision)">
@@ -379,6 +386,7 @@ const tipoFactura = ((condicionIva: CondicionIva)=>{
                             <LoaderInline />
                         </div>
                     </div>
+                </div>
                 </div>
                 </div>
             </div>

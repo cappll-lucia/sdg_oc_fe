@@ -155,6 +155,7 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                             <SelectGroup>
                                 <SelectItem value="1">Factura A</SelectItem>
                                 <SelectItem value="6">Factura B</SelectItem>
+                                <SelectItem value="pendiente">Pendientes de facturar</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

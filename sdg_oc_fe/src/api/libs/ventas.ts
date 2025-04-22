@@ -23,13 +23,21 @@ const getAll = async (filter: VentaFilters) => {
         if(filter.nroDocumento) params.append("nroDocumento", filter.nroDocumento);
         if(filter.fechaDesde) params.append("fechaDesde", filter.fechaDesde);
         if(filter.fechaHasta) params.append("fechaHasta", filter.fechaHasta);
-        if(filter.tipoComprobante) params.append("tipoComprobante", filter.tipoComprobante);
+        if(filter.tipoComprobante){
+            if(filter.tipoComprobante=='pendiente'){
+                params.append("pendientes", "1")
+            }else{
+                params.append("tipoComprobante", filter.tipoComprobante)
+            };
+        }
 
         params.append("limit", filter.limit?.toString() || "10");
         params.append("offset", filter.offset?.toString() || "0");
 
         const url = `/venta?${params.toString()}`;
+        console.log(url)
         const resp = await http.get(url);
+        console.log(resp)
         return resp.data.data as {items: Venta[],  nextPage: number|null, previousPage: number|null};
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
