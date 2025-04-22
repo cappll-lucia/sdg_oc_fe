@@ -309,9 +309,7 @@ const handleSelectCliente = async(cliente:Cliente)=>{
     searchClienteOpen.value=false;
     if(cliente.id==0){
         mediosDePago.value.forEach((mp)=> {
-            console.log(mp)
          if (TipoMedioDePagoEnum[mp.tipoMedioDePago as keyof typeof TipoMedioDePagoEnum] === TipoMedioDePagoEnum.CUENTA_CORRIENTE) {
-                console.log('si')
                 mp.tipoMedioDePago=undefined
             }
         })
@@ -394,9 +392,6 @@ const moveToMediosPago =()=>{
     }
 }
 
-
-
-
 const autocompleteMedioPagoImporte=(index: number)=>{
     if(mediosDePago.value[index]){    
         mediosDePago.value[index].importe = caluclateImportePago.value - importeIngresado.value
@@ -412,7 +407,7 @@ const tipoFactura = computed(()=>{
 });
 
 const  handleShowNewObraSocialCliente= async(index: number)=>{
-    openSelectOS.value =false;
+    if(openSelectOS.value) openSelectOS.value =false;
     openSelectOSIndex.value =index;
     newOsIndex.value=index;
     openNewClienteOS.value =true;
@@ -669,7 +664,7 @@ const abrirCajaDiaria = async()=>{
                                     </div>
                                     <div v-if="obrasSociales" class="flex flex-row items-center">
                                         <div v-if=" selectedCliente">
-                                            <div v-if="selectedCliente?.clienteObrasSociales.length > 0">
+                                            <div v-if="(selectedCliente?.clienteObrasSociales.length > 0) || ventaObrasSociales.length ">
                                                     <div v-for="(os, index) in ventaObrasSociales" class="w-full flex flex-row justify-between mt-4 items-center">
                                                         <div class="flex flex-row w-[15rem] ">
                                                         <Select 
