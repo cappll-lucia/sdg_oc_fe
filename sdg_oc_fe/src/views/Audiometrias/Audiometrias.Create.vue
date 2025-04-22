@@ -308,11 +308,11 @@ const nombreCliente = computed(()=>  selectedCliente.value?.apellido +", "+ sele
         </div>
 
         <AlertError 
-        v-model="showError"
-        title="Error"
-        :message="errorMessage"
-        button="Aceptar"
-        :action="()=>{showError=false}"
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
         />
     
     

@@ -147,7 +147,7 @@ const handleLimitChange = async (newLimit: string) => {
                 <Button variant="outline" class="h-8" :disabled="previousPage === null" @click="handlePageChange(previousPage)" > <ChevronLeft/> </Button>
                 <Select v-model="currentLimit" @update:model-value="handleLimitChange" >
                     <SelectTrigger class="w-[80px] h-8">
-                    <SelectValue placeholder="Select a fruit" />
+                    <SelectValue  />
                     </SelectTrigger>
                     <SelectContent>
                     <SelectGroup>

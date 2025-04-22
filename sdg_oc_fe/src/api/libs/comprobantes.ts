@@ -112,6 +112,19 @@ const create = async(_comprobante: any ) =>{
     }
 }
 
+const facturarPendientes = async() =>{
+    try {
+        const resp = await http.post('/comprobante/facturarPendientes');
+        console.log(resp)
+        // const comprobante = resp.data.data as Comprobante;
+        // comprobante.fechaEmision = new Date(comprobante.fechaEmision)
+        //return comprobante
+    } catch (error: any) {
+        console.log(error)
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la obra social')
+    }
+}
+
 
 export const comprobantesApi = {
     getAll: (filters: ComprobanteFilters)=> getAll(filters),
@@ -122,4 +135,5 @@ export const comprobantesApi = {
     getFacturasByCliente: (_nroDoc: number)=> getFacturasByCliente(_nroDoc),
     getComprobantesByVenta: (_ventaId: string)=> getComprobantesByVenta(_ventaId),
     create: (_comprobante: any)=> create(_comprobante),
+    facturarPendientes: ()=> facturarPendientes()
 }

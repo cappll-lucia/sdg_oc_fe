@@ -20,21 +20,33 @@ import {router} from '@/router';
 import Button from '@/components/ui/button/Button.vue';
 import { InspectIcon } from 'lucide-vue-next';
 import { previousRoute } from '@/router';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
-const route = useRoute()
+const route = useRoute();
+const loader = useLoaderStore();
 const currentComprobante = ref<Comprobante>();
 
-
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 onMounted(async()=>{
-    if (typeof route.params.id === 'string') {
-        currentComprobante.value = await comprobantesApi.getOne(route.params.id);
-        console.log(currentComprobante.value)
+    loader.show()
+    try{
+        if (typeof route.params.id === 'string') {
+            currentComprobante.value = await comprobantesApi.getOne(route.params.id);
+        }
+        loader.hide();
+    } catch (err:any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
     }
 })
 
 const printComprobante = async(_id: string)=>{
     try {
+        loader.show();
         const resp = await comprobantesApi.print(_id);
         const bufferData = resp.data;
         const uint8Array = new Uint8Array(bufferData);
@@ -49,8 +61,11 @@ const printComprobante = async(_id: string)=>{
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-    } catch (error) {
-        console.error('Error al descargar el PDF:', error);
+        loader.hide();
+    } catch (err:any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
     }
 }
 
@@ -58,7 +73,7 @@ const handleRedirect = () => {
   if (previousRoute) {
     router.push(previousRoute);
   } else {
-    router.push('/ventas'); // ruta fallback
+    router.push('/ventas'); 
   }
 };
 
@@ -125,7 +140,7 @@ const handleRedirect = () => {
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
                             <Label class="w-[14rem] text-md">Concepto emisión</Label>
-                            <Label class="w-[20rem] text-md">{{currentComprobante.motivo}}</Label>
+                            <Label class="w-[20rem] text-md">{{currentComprobante.motivo ?? 'Sin detalle'}}</Label>
                         </div>
                         <div class=" flex flex-row w-[40rem] justify-start items-center my-4">
                             <Label class="w-[14rem] text-md">Importe</Label>
@@ -134,7 +149,7 @@ const handleRedirect = () => {
                         </div>
                     </div>
                     <div class="w-full flex justify-end mt-4">
-                        <Button variant="outline" class="w-[10rem] mr-5" @click="handleRedirect">Volver</Button>
+                        <Button variant="outline" type="button" class="w-[10rem] mr-5" @click="handleRedirect">Volver</Button>
                         <Button type="submit" class="w-[10rem]" @click="printComprobante(currentComprobante.id)" >Imprimir</Button>
                     </div>
                 </div>
@@ -143,5 +158,12 @@ const handleRedirect = () => {
                 <span>Error al cargar el comprobante</span>
             </div>
         </div>
+        <AlertError
+            v-model="showError"
+            title="Error"
+            :message="errorMessage"
+            button="Aceptar"
+            :action="()=>{showError=false}"
+        />
     </div>
 </template>

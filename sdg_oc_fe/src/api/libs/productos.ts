@@ -9,6 +9,8 @@ interface ProductoFilters {
     marcaId?: string | null;
     categoria?: string | null;
     filtro?: string | null;
+    codigo?: string | null;
+    descripcion?: string | null;
     limit?: number | string;
     offset?: number | string;
 }
@@ -21,12 +23,15 @@ const getAll = async (filters: ProductoFilters = {}) => {
         if (filters.proveedorId) params.append("proveedorId", filters.proveedorId);
         if (filters.marcaId) params.append("marcaId", filters.marcaId);
         if (filters.categoria) params.append("categoria", filters.categoria);
-        if (filters.filtro) params.append("descripcion", filters.filtro);
+        if (filters.filtro) params.append("filtro", filters.filtro);
+        if (filters.codigo) params.append("codigo", filters.codigo);
+        if (filters.descripcion) params.append("descripcion", filters.descripcion);
         
         params.append("limit", filters.limit?.toString() || "10");
         params.append("offset", filters.offset?.toString() || "0");
 
         const url = `/producto?${params.toString()}`;
+        console.log(url)
         const resp = await http.get(url);
         return resp.data.data as {items: Producto[],  nextPage: number|null, previousPage: number|null};
     } catch (error) {
