@@ -133,7 +133,7 @@ const isValidPrueba = ref<{
 
 onMounted(async()=>{
     try{
-
+        loader.show();
         currentReceta.value = await recetasApi.getOneContacto(Number(route.params.id))
         currentPruebas.value = currentReceta.value.pruebasLentesContacto.map((p: PruebaLentesContacto  )=>{
             const { numeroPrueba: numero, ...prueba } = p;
@@ -154,6 +154,7 @@ onMounted(async()=>{
         fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
         fechaReceta.value.month = (currentReceta.value.fecha.getMonth()+1).toString()
         fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+        loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
         showError.value = true;

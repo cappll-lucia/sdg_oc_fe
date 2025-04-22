@@ -76,14 +76,14 @@ const isValidAudiometria = ref<{
 
 
 onMounted(async()=>{
-    // TODO pagination
     try{
-
+        loader.show();
         const query = route.query
         if(query.cliente){
             const foundCliente = await clientesApi.getOne(Number(query.cliente))
             if(foundCliente) handleSelectCliente(foundCliente)
         }
+        loader.hide();
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;

@@ -44,6 +44,7 @@ import { pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLente
 import { recetasApi } from '@/api/libs/recetas';
 import { useRoute } from 'vue-router';
 import { useLoaderStore } from '@/stores/LoaderStore';
+import AlertError from '@/components/AlertError.vue';
 
 const route = useRoute();
 const loader = useLoaderStore();
@@ -208,14 +209,14 @@ const fechaReceta = ref({
 
 
 onMounted(async()=>{
-    // TODO pagination
     try{
-        loader.show()
+        loader.show();
         const query = route.query
         if(query.cliente){
             const foundCliente = await clientesApi.getOne(Number(query.cliente))
             if(foundCliente) handleSelectCliente(foundCliente)
         }
+        loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
         showError.value = true;
