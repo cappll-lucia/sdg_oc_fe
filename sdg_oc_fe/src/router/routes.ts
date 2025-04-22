@@ -138,6 +138,14 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/productos/create/single',
+            name: 'productos_create',
+            component: () => import('../views/Productos/Productos.Create.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/productos/update-price/lote',
             name: 'productos_lote_update',
             component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),

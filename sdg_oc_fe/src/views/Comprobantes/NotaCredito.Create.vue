@@ -279,7 +279,7 @@ const redirectCancel = ()=>{
                                     class="pl-10" v-decimal 
                                     :model-value="importeComprobante"
                                     @update:model-value="(value)=> importeComprobante=Number(value)"         />
-                                    <span class="text-[#737373] absolute start-0 inset-y-0 flex items-center justify-center px-2">$</span>
+                                    <span class="text-sm text-[#757575] absolute start-0 inset-y-0 flex items-center justify-center px-2">$</span>
                                 </div>
                             </div>
                             <TooltipProvider  v-if="!isValidComprobante.importeTotal" >

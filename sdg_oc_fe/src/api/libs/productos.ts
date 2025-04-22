@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import {http} from '../http';
-import { Producto } from '../entities/producto';
+import { NewProductoType, Producto } from '../entities/producto';
 import { http_files } from '../http.files';
 
 interface ProductoFilters {
@@ -36,6 +36,15 @@ const getAll = async (filters: ProductoFilters = {}) => {
     }
 };
 
+const create = async(_newProducto: NewProductoType)=>{
+    try{
+        const resp = await http.post('/producto', _newProducto)
+        return resp.data.data as Producto;
+    }catch(error){
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+}
+
 const createLote = async(_marcaId: string, _provId: string, _file: File)=>{
     try{
         const formData = new FormData();
@@ -69,6 +78,7 @@ const updateLote = async(_marcaId: string, _provId: string, _porcentaje: number)
 
 export const productosApi ={
     getAll: (_filters: ProductoFilters)=> getAll(_filters),
+    create: (_newProducto:NewProductoType)=> create (_newProducto),
     createLote: (_marcaId: string, _provId: string, _file: File)=> createLote (_marcaId, _provId, _file),
     updateLote: (_marcaId: string, _provId: string, _porcentaje: number)=> updateLote (_marcaId, _provId, _porcentaje)
 }
