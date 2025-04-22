@@ -48,7 +48,7 @@ const dateRange = ref<DateRange>({
 })
 
 
-const nextPage=ref<number | null>();
+const nextPage=ref<number | null>(null);
 const previousPage=ref<number | null>(null);
 
 const comprobantes = ref<Comprobante[]>([]);
@@ -93,10 +93,17 @@ onMounted(async () => {
     await handleFilterComprobantes();
 });
 
-const handlePageChange = async(offset: number) => {
-    if(currentOffset.value==0 && offset<0) return
-    currentOffset.value = currentOffset.value + offset
-    await handleFilterComprobantes()
+
+const handlePageChange = async(targetOffset: number | null) => {
+    if (targetOffset == null) return;
+    currentOffset.value = targetOffset;
+    await handleFilterComprobantes();
+};
+
+const handleLimitChange = async (newLimit: string) => {
+    currentLimit.value = newLimit;
+    currentOffset.value = 0;
+    await handleFilterComprobantes();
 };
 
 const df = new DateFormatter('es-AR', {
@@ -191,10 +198,10 @@ const handleDateRangeChange = async(newRange: DateRange) => {
         </div>
         <div class="mt-4 flex w-full justify-center">
             <div class="flex items-center gap-1 text-gray-500 ">
-                <Button variant="outline" :class="{'w-8 h-8': previousPage, 'w-8 h-8 pointer-events-none opacity-50': !previousPage}" @click="handlePageChange(-1)">
+                <Button variant="outline" class="h-8" :disabled="previousPage === null" @click="handlePageChange(previousPage)"  >
                     <ChevronLeft />
                 </Button>
-                <Select v-model="currentLimit" @update:model-value="handleFilterComprobantes">
+                <Select v-model="currentLimit" @update:model-value="handleLimitChange">
                     <SelectTrigger class="w-[80px] h-8">
                         <SelectValue placeholder="Select a fruit" />
                     </SelectTrigger>
@@ -208,7 +215,7 @@ const handleDateRangeChange = async(newRange: DateRange) => {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                <Button variant="outline" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)">
+                <Button variant="outline" class="h-8" :disabled="nextPage === null" @click="handlePageChange(nextPage)" >
                     <ChevronRight />
                 </Button>
             </div>

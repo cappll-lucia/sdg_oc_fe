@@ -350,23 +350,23 @@ const hanldeCancel = ()=>{
                     
                     <div class="flex flex-col w-[45%] mt-4 ml-4 items-center">
                         <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
-                                <Label  class="w-[7rem]  pr-[2rem] text-right  leading-5 ">Fecha Nacimiento</Label>
-                                <div class="flex flex-row justify-start items-center w-[25rem]">
-                                    <div class="flex gap-2 w-[60%]">
-                                        <Input type="text" v-model="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaNac.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaNac.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
-                                    </div>
-                                    <TooltipProvider  v-if="!isValidCliente.fechaNac" >
-                                        <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Ingresar fecha nacimiento válida</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                            <Label  class="w-[7rem]  pr-[2rem] text-right  leading-5 ">Fecha Nacimiento</Label>
+                            <div class="flex flex-row justify-start items-center w-[25rem]">
+                                <div class="flex gap-2 w-[60%]">
+                                    <Input type="text" v-model="fechaNac.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
+                                    <Input type="text" v-model="fechaNac.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
+                                    <Input type="text" v-model="fechaNac.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
                                 </div>
+                                <TooltipProvider  v-if="!isValidCliente.fechaNac" >
+                                    <Tooltip>
+                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                            <p>Ingresar fecha nacimiento válida</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
+                        </div>
 
                             <div class="h-[5rem] w-[33rem] mt-2 flex flex-row justify-start items-center">
                                 <Label  class="w-[7rem]  pr-[2rem] text-right ">Localidad</Label>

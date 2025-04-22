@@ -37,6 +37,8 @@ const previousPage=ref<number | null>(null);
 const txtSearch = ref<string>('');
 const selectedEstado = ref<string>('');
 
+
+
 const cuentasCorrientes = ref<CuentaCorriente[]>([]);
 
 const showError = ref<boolean>(false);
@@ -51,7 +53,6 @@ const handleFilterCtasCorrientes = async()=>{
             offset: currentOffset.value,
             limit: currentLimit.value
         })
-        console.log(res)
         cuentasCorrientes.value = res.items.filter(c=>c.cliente.id!=0);
         nextPage.value = res.nextPage;
         previousPage.value =res.previousPage;
@@ -108,13 +109,13 @@ const clearFilters = async()=>{
                         v-model="txtSearch" @keyup.enter="handleFilterCtasCorrientes"
                     />
                     <Select v-model="selectedEstado" @update:model-value="handleFilterCtasCorrientes" >
-                        <SelectTrigger class="w-[200px]">
-                            <SelectValue placeholder="Filtrar por Estado" />
+                        <SelectTrigger class="w-[250px]">
+                            <SelectValue  placeholder="Filtrar por Estado" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="1">Con Deuda</SelectItem>
-                                <SelectItem value="0">Con Saldo a Favor</SelectItem>
+                                <SelectItem  class="text-red-700" value="1">Con saldo negativo</SelectItem>
+                                <SelectItem class="text-green-700"  value="0">Con saldo a favor</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

@@ -56,7 +56,7 @@ const txtSearch = ref<string>('');
 const currentLimit = ref<string>('10');
 const currentOffset = ref<number>(0);
 
-const nextPage=ref<number | null>();
+const nextPage=ref<number | null>(null);
 const previousPage=ref<number | null>(null);
 
 const showError = ref<boolean>(false);
@@ -105,10 +105,16 @@ const handleFilterProducts = async () => {
     }
 };
 
-const handlePageChange = async(offset: number) => {
-    if(currentOffset.value==0 && offset<0) return
-    currentOffset.value = currentOffset.value + offset
-    await handleFilterProducts()
+const handlePageChange = async(targetOffset: number | null) => {
+    if (targetOffset == null) return;
+    currentOffset.value = targetOffset;
+    await handleFilterProducts();
+};
+
+const handleLimitChange = async (newLimit: string) => {
+    currentLimit.value = newLimit;
+    currentOffset.value = 0;
+    await handleFilterProducts();
 };
 
 
@@ -209,10 +215,10 @@ const clearFilters = async()=>{
 
         <div class="mt-4 flex w-full justify-center">
             <div class="flex items-center gap-1 text-gray-500 ">
-                <Button variant="outline" :class="{'w-8 h-8': previousPage, 'w-8 h-8 pointer-events-none opacity-50': !previousPage}" @click="handlePageChange(-1)">
+                <Button variant="outline"  class="h-8" :disabled="previousPage === null" @click="handlePageChange(previousPage)" >
                     <ChevronLeft />
                 </Button>
-                <Select v-model="currentLimit" @update:model-value="handleFilterProducts">
+                <Select v-model="currentLimit" @update:model-value="handleLimitChange">
                     <SelectTrigger class="w-[80px] h-8">
                         <SelectValue placeholder="Select a fruit" />
                     </SelectTrigger>
@@ -226,7 +232,7 @@ const clearFilters = async()=>{
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                <Button variant="outline" :class="{'w-8 h-8': nextPage, 'w-8 h-8 pointer-events-none opacity-50': !nextPage}" @click="handlePageChange(1)">
+                <Button variant="outline" class="h-8" :disabled="nextPage === null" @click="handlePageChange(nextPage)" >
                     <ChevronRight />
                 </Button>
             </div>
