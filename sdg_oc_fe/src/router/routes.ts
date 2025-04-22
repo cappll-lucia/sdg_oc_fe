@@ -139,8 +139,16 @@ export const routerRoutes = [
         },
         {
             path: '/productos/create/single',
-            name: 'productos_create',
+            name: 'producto_create',
             component: () => import('../views/Productos/Productos.Create.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/productos/edit/:id',
+            name: 'producto_edit',
+            component: () => import('../views/Productos/Productos.Edit.vue'),
             meta: {
 			    auth: true,
 		    },

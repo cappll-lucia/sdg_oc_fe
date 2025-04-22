@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { router } from '@/router';
 import { MoreHorizontal } from 'lucide-vue-next';
 
 defineProps<{
@@ -20,7 +21,7 @@ defineProps<{
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @click="() => {}">Editar</DropdownMenuItem>
+            <DropdownMenuItem @click="() => {router.push(`/productos/edit/${producto.id}`)}">Actualizar</DropdownMenuItem>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

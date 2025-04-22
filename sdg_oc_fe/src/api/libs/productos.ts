@@ -36,6 +36,17 @@ const getAll = async (filters: ProductoFilters = {}) => {
     }
 };
 
+const getOne = async (_id: number) => {
+    try {
+        const resp = await http.get(`/producto/${_id}`);
+        return resp.data.data as Producto;
+    } catch (error) {
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+};
+
 const create = async(_newProducto: NewProductoType)=>{
     try{
         const resp = await http.post('/producto', _newProducto)
@@ -53,6 +64,15 @@ const createLote = async(_marcaId: string, _provId: string, _file: File)=>{
         formData.append('file', _file);
         const resp = await http_files.post('/producto/upload', formData)
         return resp.data.data as Producto[];
+    }catch(error){
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+}
+
+const edit = async(_id: number, _producto: Producto)=>{
+    try{
+        const resp = await http.patch(`/producto/${_id}`, _producto)
+        return resp.data.data as Producto;
     }catch(error){
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -78,7 +98,9 @@ const updateLote = async(_marcaId: string, _provId: string, _porcentaje: number)
 
 export const productosApi ={
     getAll: (_filters: ProductoFilters)=> getAll(_filters),
+    getOne: (_id: number)=> getOne(_id),
     create: (_newProducto:NewProductoType)=> create (_newProducto),
+    edit: (_id: number, _producto:Producto)=> edit (_id, _producto),
     createLote: (_marcaId: string, _provId: string, _file: File)=> createLote (_marcaId, _provId, _file),
     updateLote: (_marcaId: string, _provId: string, _porcentaje: number)=> updateLote (_marcaId, _provId, _porcentaje)
 }
