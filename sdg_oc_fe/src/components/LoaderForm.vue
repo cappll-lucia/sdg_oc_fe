@@ -6,7 +6,7 @@
 
 
 <template>
-  <div class="flex flex-col items-center justify-center bg-white  ">
+  <div class="flex flex-col items-center justify-center  ">
     <div class="dots-loader">
       <span v-for="n in 5" :key="n" :style="{ animationDelay: `${(n - 1) * 0.1}s` }" />
     </div>
