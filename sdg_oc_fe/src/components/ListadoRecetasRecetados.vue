@@ -25,7 +25,7 @@ const props = defineProps<{
     recetas: RecetasAereos[],
     nombreCliente: string,
     idCliente: number,
-    selectedId: number|undefined
+    selectedId: string|undefined
 }>();
 const currentRec = ref<RecetasAereos|undefined>();
 const detalleCerca = ref<DetalleRecetaAereos|undefined>();
@@ -35,7 +35,7 @@ const printOpen = ref<boolean>(false);
 
 onMounted(()=>{
     if(props.selectedId){
-        currentRec.value=props.recetas.find(r=>r.id==props.selectedId)
+        currentRec.value=props.recetas.find(r=>r.id==Number(props.selectedId))
     }else{
         currentRec.value=props.recetas[0]
     }

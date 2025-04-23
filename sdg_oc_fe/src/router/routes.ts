@@ -219,6 +219,22 @@ export const routerRoutes = [
 		    },
         },
         {
+            path: '/recetas/contacto/historia-clinica/new',
+            name: 'new_historia_clinica',
+            component: () => import('../views/Recetas/RecetasContacto.CreateHistoriaClinica.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
+            path: '/recetas/contacto/historia-clinica/edit/:id',
+            name: 'edit_historia_clinica',
+            component: () => import('../views/Recetas/RecetasContacto.EditHistoriaClinica.vue'),
+            meta: {
+			    auth: true,
+		    },
+        },
+        {
             path: '/recetas/contacto/edit/:id',
             name: 'edit_receta_contado',
             component: () => import('../views/Recetas/RecetasContacto.Edit.vue'),

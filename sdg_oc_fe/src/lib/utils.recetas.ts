@@ -155,7 +155,7 @@ export function generateRecetasContactoPDF (recetas: RecetaContacto[], nombreCli
 
     autoTable(doc, {
       startY: y,
-      head: [["Queterometría", "", "", ""]],
+      head: [["Queratometría", "", "", ""]],
       body: queteBody,
       styles: { fontSize: 10 },
       margin: { left: 20, right: 20 },
@@ -165,7 +165,7 @@ export function generateRecetasContactoPDF (recetas: RecetaContacto[], nombreCli
 
     doc.setFontSize(10);
     y += 7;
-    doc.text(`Observaciones Queterometría: ${receta.observaciones_queterometria}`, 20, y);
+    doc.text(`Observaciones Queratometría: ${receta.observaciones_queterometria}`, 20, y);
     y += 7;
 
     const booleanos = [

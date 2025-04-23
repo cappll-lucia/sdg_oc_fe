@@ -1,9 +1,36 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import Checkbox from './ui/checkbox/Checkbox.vue';
-import Label from './ui/label/Label.vue';
-import Separator from './ui/separator/Separator.vue';
+import { Cliente } from '@/api/entities/clientes';
+import { clientesApi } from '@/api/libs/clientes';
+import { recetasApi } from '@/api/libs/recetas';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import Button from '@/components/ui/button/Button.vue';
+import Checkbox from '@/components/ui/checkbox/Checkbox.vue';
+import Label from '@/components/ui/label/Label.vue';
+import Separator from '@/components/ui/separator/Separator.vue';
+import Textarea from '@/components/ui/textarea/Textarea.vue';
+import { toast } from '@/components/ui/toast';
+import { router } from '@/router';
+import { useLoaderStore } from '@/stores/LoaderStore';
+import { SlashIcon } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
+
+const route = useRoute();
+const loader = useLoaderStore();
+
+const selectedCliente = ref<Cliente| null>(null);
+
+
+const showError = ref<boolean>(false);
+const errorMessage =ref<string>('');
 
 const newHistoriaClinica = ref<{
     patologicas: boolean;
@@ -39,7 +66,6 @@ const newHistoriaClinica = ref<{
     tranquilizantes: boolean;
     corticoides: boolean;
     parasimpaticoliticos: boolean;
-    observacionesTratamiento: string;
 }>({
     patologicas: false,
     traumaticas: false,
@@ -74,85 +100,177 @@ const newHistoriaClinica = ref<{
     tranquilizantes: false,
     corticoides: false,
     parasimpaticoliticos: false,
-    observacionesTratamiento: '',
 })
+
+
+
+onMounted(async()=>{
+    try{
+        loader.show();
+        const query = route.query
+        if(query.cliente){
+            const foundCliente = await clientesApi.getOne(Number(query.cliente))
+            if(foundCliente){
+                selectedCliente.value=foundCliente
+            }
+        }
+        loader.hide();
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
+})
+const nombreCliente = computed(()=> selectedCliente.value?.apellido +", "+selectedCliente.value?.nombre)
+
+
+const onSubmit = async()=>{
+    try{
+        if(!selectedCliente.value) return
+        loader.show();
+        const hc = {
+            ...newHistoriaClinica.value,
+            cliente: {id: selectedCliente.value.id}
+        }
+        await recetasApi.createHistoriaClinica(hc)
+        loader.hide();
+        router.push(`/recetas/${selectedCliente.value.id}?tab=contacto&recetaId=hc`)
+        toast({
+            title: 'Historia clínica registrada con éxito',
+        })
+    }catch(err: any){
+        errorMessage.value=err.message as string
+        showError.value = true;
+        loader.hide();
+    }
+}
+
 
 </script>
 
 
 <template>
-    <form action="" class="w-full">
-        <div class="flex flex-col justify-between">
-            <span class="text-ls font-bold">Antecedentes Oculares </span>
-            <div class="flex flex-row mt-3 justify-between ">
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox  v-model:checked="newHistoriaClinica.patologicas" />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Patológicos
-                        </Label>
+    <div class="page">
+            <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                        Inicio
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbLink href="/clientes">
+                        Clientes
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="selectedCliente" >
+                    <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
+                        {{nombreCliente}}
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator  v-if="selectedCliente">
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem v-if="selectedCliente">
+                    <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">
+                        Recetas
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator v-if="selectedCliente">
+                    <SlashIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Historia Clínica Lentes de Contacto</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        <div class="pt-2 mb-4 flex justify-center " >
+            <form @submit.prevent="onSubmit" class=" rounded-lg bg-secondary w-[65rem] flex flex-col justify-start items-center px-[5rem] py-[2rem] min-h-[60rem] ">
+                <div class="w-full flex flex-col justify-center">
+                    <h3 class="page-subtitle text-center">Registrar historia clínica - Lentes de contacto</h3>
+                    <Label class="text-center mt-4 text-lg">Cliente:  <span>{{ nombreCliente }}</span></Label>
+                    <Separator class="my-10 w-full" />
+                </div>
+                <div class="flex w-full flex-col justify-between">
+                <span class="text-ls font-bold">Antecedentes Oculares </span>
+                <div class="flex w-full flex-row mt-3 justify-between ">
+                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox  v-model:checked="newHistoriaClinica.patologicas" />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Patológicos
+                            </Label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="newHistoriaClinica.traumaticas"  />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Traumáticos
+                            </Label>
+                        </div>
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="newHistoriaClinica.traumaticas"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Traumáticos
-                        </Label>
+                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="newHistoriaClinica.sensLuzNatural"  />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Sensibilidad Luz Natural
+                            </Label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="newHistoriaClinica.sensLuzArtificial"
+                                />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Sensibilidad Luz Artificial
+                            </Label>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="newHistoriaClinica.sensPolvo"  />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Sensibilidad Polvo
+                            </Label>
+                        </div>
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="newHistoriaClinica.sensFrio"  />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Sensibilidad Frio
+                            </Label>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
+                        <div class="items-center flex gap-x-2">
+                            <Checkbox v-model:checked="newHistoriaClinica.sensHumo"  />
+                            <Label for="terms1"
+                                class="text-sm font-light leading-none ">
+                                Sensibilidad Humo
+                            </Label>
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="newHistoriaClinica.sensLuzNatural"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sensibilidad Luz Natural
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="newHistoriaClinica.sensLuzArtificial"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sensibilidad Luz Artificial
-                        </Label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="newHistoriaClinica.sensPolvo"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sensibilidad Polvo
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="newHistoriaClinica.sensFrio"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sensibilidad Frio
-                        </Label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="newHistoriaClinica.sensHumo"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sensibilidad Humo
-                        </Label>
-                    </div>
-                </div>
+                <span class="text-sm font-bold mt-6">Observaciones: </span>
+                <Textarea
+                    v-model="newHistoriaClinica.observacionesSens"
+                    class="resize-none h-[3rem]" 
+                />
             </div>
-            <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light ">{{ newHistoriaClinica.observacionesSens || ' - ' }} </span>
-        </div>
 
         <Separator class="my-6" />
 
-        <div class="flex flex-col justify-between">
+        <div class="flex w-full flex-col justify-between">
             <span class="text-ls font-bold">Antecedentes Generales </span>
-            <div class="flex flex-row mt-3 justify-between ">
+            <div class="flex w-full flex-row mt-3 justify-between ">
                 <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
                     <div class="items-center flex gap-x-2">
                         <Checkbox 
@@ -270,15 +388,17 @@ const newHistoriaClinica = ref<{
                 </div>
             </div>
             <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light">{{ newHistoriaClinica.observacionesAntecedentes || ' - ' }}
-            </span>
+            <Textarea
+                v-model="newHistoriaClinica.observacionesAntecedentes"
+                class="resize-none h-[3rem]" 
+            />
         </div>
 
         <Separator class="my-6" />
 
-        <div class="flex flex-col justify-between">
+        <div class="flex w-full flex-col justify-between">
             <span class="text-ls font-bold">Tratamientos Recientes o En Curso </span>
-            <div class="flex flex-row mt-3 justify-between ">
+            <div class="flex w-full  flex-row mt-3 justify-between ">
                 <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
                     <div class="items-center flex gap-x-2">
                         <Checkbox  v-model:checked="newHistoriaClinica.antibioticos" />
@@ -361,9 +481,13 @@ const newHistoriaClinica = ref<{
                     </div>
                 </div>
             </div>
-            <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light ">{{ newHistoriaClinica.observacionesTratamiento || ' - ' }} </span>
+        </div>
+            <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
+                <Button type="button" variant="outline" class="w-[15%] mr-5" @click="router.push(`/recetas/${selectedCliente?.id}?tab=contacto&recetaId=hc`)">Cancelar</Button>
+                <Button type="submit" class="w-[15%]">Guardar</Button>
+            </div>
+            </form>
         </div>
 
-    </form>
+    </div>
 </template>

@@ -28,8 +28,8 @@ const loader = useLoaderStore();
 
 const openTab=ref<string>('recetados')
 
-const selectedRecetaId=ref<number>();
-const selectedContactoId=ref<number>();
+const selectedRecetaId=ref<string>();
+const selectedContactoId=ref<string>();
 
 const currentCliente = ref<Cliente>();
 const recetasClienteAereos = ref<RecetasAereos[]>();
@@ -49,9 +49,9 @@ onMounted(async()=>{
     }
     if(query.recetaId){
         if(openTab.value=='recetados'){
-            selectedRecetaId.value=Number(query.recetaId)
+            selectedRecetaId.value=query.recetaId.toString()
         }else{
-            selectedContactoId.value=Number(query.recetaId)
+            selectedContactoId.value=query.recetaId.toString()
         }
     }
     await loadData();
@@ -72,6 +72,7 @@ const loadData = async ()=>{
             recetasClienteAereos.value = res.recetasLentesAereos;
             recetasClienteContacto.value = res.recetasLentesContacto;
             historiaClinicaCliente.value = res.historiaClinicaContacto;
+            console.log(historiaClinicaCliente.value)
         }
         loader.hide();
     }catch(err: any){
@@ -136,18 +137,19 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                         Lentes De Contacto
                     </TabsTrigger>
                 </TabsList>
-                <TabsContent class="bg-secondary min-h-[40rem] px-2 py-6 rounded" value="recetados">
+                <TabsContent class="bg-secondary min-h-[60rem] px-2 py-6 rounded" value="recetados">
                     <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" :id-cliente="Number(currentCliente?.id)" :selectedId="selectedRecetaId" />
                     <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
                         <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">anteojos recetados </span> </h2>
                         <Button @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
                     </div>
                 </TabsContent>
-                <TabsContent class="bg-secondary h-[75rem] px-2 py-6 rounded" value="contacto">
-                    <ListadoRecetasContacto v-if="recetasClienteContacto && recetasClienteContacto.length > 0" :nombreCliente="nombreCliente"  :id-cliente="Number(currentCliente?.id)" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" :selectedId="selectedContactoId"  />
+                <TabsContent class="bg-secondary min-h-[60rem] px-2 py-6 rounded" value="contacto">
+                    <ListadoRecetasContacto v-if="(recetasClienteContacto && recetasClienteContacto.length > 0 || historiaClinicaCliente)" :nombreCliente="nombreCliente"  :id-cliente="Number(currentCliente?.id)" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" :selectedId="selectedContactoId"  />
                     <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
                         <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">lentes de contacto </span> </h2>
-                        <Button @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
+                        <Button  class="w-[15rem] mb-8 " @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
+                        <Button class="w-[15rem]"  @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${currentCliente?.id}`)"> Registrar historia clínica </Button>
                     </div>
                 </TabsContent>
             </Tabs>

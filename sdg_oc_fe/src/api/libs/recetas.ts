@@ -4,6 +4,7 @@ import {http} from '../http';
 import { ClienteRecetasCount } from '../entities/clientes';
 import { EditedRecetaType, NewRecetaType, RecetasAereos } from '../entities/recetasAereos';
 import { EditedRecetaContactoType, NewRecetaContactoType, RecetaContacto } from '../entities/recetasContacto';
+import { HistoriaClinica, NewHistoriaClinicaType } from '../entities/historiaClinica';
 
 const getAllGroupByCliente = async () => {
     try {
@@ -89,6 +90,42 @@ const getOneContacto = async (_id: number)=>{
     }
 }
 
+const getHistoriaClinica = async (_id:number) => {
+    try {
+        const resp = await http.get(`/historia-clinica-lentes-contacto/${_id}`,);
+        return resp.data.data as HistoriaClinica;
+    } catch (error) {
+        console.log(error)
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+};
+
+const createHistoriaClinica = async (_historiaClinica: NewHistoriaClinicaType) => {
+    try {
+        const resp = await http.post('/historia-clinica-lentes-contacto', _historiaClinica);
+        return resp.data.data as HistoriaClinica;
+    } catch (error) {
+        console.log(error)
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+};
+
+const editHistoriaClinica  = async (_historiaClinica: HistoriaClinica) => {
+    try {
+        const resp = await http.patch(`/historia-clinica-lentes-contacto/${_historiaClinica.id}`, _historiaClinica );
+        return resp.data.data as HistoriaClinica;
+    } catch (error) {
+        throw error instanceof AxiosError ?  
+            new Error(error?.response?.data?.message) : 
+            new Error('Algo salió mal');
+    }
+};
+
+
 
 export const recetasApi ={
     getAllGroupByCliente: ()=> getAllGroupByCliente(),
@@ -98,5 +135,8 @@ export const recetasApi ={
     createRecetaContacto: (_newReceta: NewRecetaContactoType)=> createRecetaContacto(_newReceta),
     editRecetaAereos: (_editedReceta: EditedRecetaType)=> editRecetaAereos(_editedReceta),
     editRecetaContacto: (_editedReceta: EditedRecetaContactoType)=> editRecetaContacto(_editedReceta),
+    getHistoriaClinica: (_id: number) => getHistoriaClinica(_id),
+    createHistoriaClinica: (_historiaClinica: NewHistoriaClinicaType) => createHistoriaClinica(_historiaClinica),
+    editHistoriaClinica: (_historiaClinica: HistoriaClinica) => editHistoriaClinica(_historiaClinica)
 }
 

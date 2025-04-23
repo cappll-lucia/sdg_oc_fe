@@ -5,26 +5,23 @@ import { Pencil1Icon } from '@radix-icons/vue';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
+import { router } from '@/router';
 
 
 const props = defineProps<{
-    historiaClinica: HistoriaClinica | undefined
+    historiaClinica: HistoriaClinica | undefined,
+    clienteId: number
 }>();
 // TODO inicializar en primera receta
 
-const emit = defineEmits(['showForm'])
-
-const handleShowForm = ()=>{
-    emit('showForm')
-}
 
 </script>
 
 
 <template>
-    <div class="datos flex flex-col" v-if="!props.historiaClinica">
-        <span class="text-lg font-bold">Historia clinica no registrada para el cliente </span>
-        <Button @click="handleShowForm" >Registrar historia clínica</Button>
+    <div class="datos flex flex-col justify-center items-center mt-10" v-if="!props.historiaClinica">
+        <span class="text-lg text-center mb-4 font-bold">Historia clinica no registrada para el cliente </span>
+        <Button class="w-[20rem]" @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${clienteId}`)" >Registrar historia clínica</Button>
     </div>
     <div class="datos flex flex-col" v-if="props.historiaClinica">
         <div class="flex flex-row justify-between items-center">
@@ -33,7 +30,7 @@ const handleShowForm = ()=>{
             </div>
             <div class="flex flex-col ">
                 <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                    @click="() => { console.log('editar historia clinica'); }">
+                    @click="() => router.push(`/recetas/contacto/historia-clinica/edit/${props.historiaClinica?.id}?cliente=${clienteId}`)">
                     Editar
                     <Pencil1Icon class="w-4 h-4" />
                 </Button>
@@ -320,9 +317,6 @@ const handleShowForm = ()=>{
                     </div>
                 </div>
             </div>
-            <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light ">{{ props.historiaClinica.observacionesTratamiento || ' - ' }} </span>
         </div>
-
     </div>
 </template>
