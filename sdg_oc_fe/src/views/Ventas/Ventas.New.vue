@@ -239,7 +239,7 @@ const onSubmit = async () => {
       descuentoPorcentaje: porcDto.value && dto.value ? porcDto.value : 0,
       mediosDePago: mediosDePago.value,
       lineasDeVenta: lineasDeVenta.value,
-      ventaObraSocial: ventaObrasSociales.value,
+      ventaObraSocial: ventaObrasSociales.value && obrasSociales.value ? ventaObrasSociales.value : [],
       observaciones: observaciones.value,
     };
     console.log(newVenta)
@@ -449,7 +449,11 @@ const montoDto = computed(() => {
 });
 
 const totalVentaFinal = computed(() => {
-  return totalVentaBruto.value - montoObrasSociales.value;
+  if(obrasSociales.value){
+    return totalVentaBruto.value - montoObrasSociales.value;
+  }else{
+    return totalVentaBruto.value
+  }
 });
 
 const caluclateImportePago = computed(() => {
@@ -504,7 +508,7 @@ const handleShowNewObraSocialCliente = async (index: number) => {
   openSelectOSIndex.value = index;
   newOsIndex.value = index;
   openNewClienteOS.value = true;
-  addVentaObraSocial();
+  //addVentaObraSocial();
 };
 
 const handleAddObraSocialCliente = async (obraSocialId: number) => {
@@ -879,11 +883,10 @@ const abrirCajaDiaria = async () => {
                           obrasSociales = !obrasSociales;
                           if (
                             obrasSociales &&
-                            selectedCliente?.clienteObrasSociales.length
+                            selectedCliente?.clienteObrasSociales.length &&
+                            !ventaObrasSociales.length
                           ) {
                             addVentaObraSocial();
-                          } else {
-                            ventaObrasSociales = [];
                           }
                         }
                       "
@@ -1066,6 +1069,7 @@ const abrirCajaDiaria = async () => {
                           sociales no puede ser superior al importe total
                         </p>
                         <Button
+                          :disabled="!ventaObrasSociales[ventaObrasSociales.length-1]?.obraSocial.id"
                           variant="outline"
                           type="button"
                           class="mt-8"
