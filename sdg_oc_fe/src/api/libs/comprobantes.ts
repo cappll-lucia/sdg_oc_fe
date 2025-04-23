@@ -44,10 +44,19 @@ const getAllByCliente = async (_nroDoc: number) => {
     }
 };
 
-const getFacturasByCliente = async (_id: number) => {
+const getFacturasByCliente = async (filters: ComprobanteFilters) => {
     try {
-        const resp = await http.get(`/comprobante/facturas?nroDocumento=${_id}`);
-        return resp.data.data.items as Comprobante[];
+        const params = new URLSearchParams();
+        if (filters.nroDocumento) params.append("nroDocumento", filters.nroDocumento)
+        if (filters.fechaDesde) params.append("fechaDesde", filters.fechaDesde)
+        if (filters.fechaHasta) params.append("fechaHasta", filters.fechaHasta)
+
+        params.append("limit", filters.limit?.toString() || "10");
+        params.append("offset",filters.offset?.toString() || "0");
+
+        const url = `/comprobante/facturas?${params.toString()}`
+        const resp = await http.get(url);
+        return resp.data.data as {items: Comprobante[],  nextPage: number|null, previousPage: number|null};;
     } catch (error) {
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
     }
@@ -128,7 +137,7 @@ export const comprobantesApi = {
     getOne: (_id: string)=> getOne(_id),
     print: (_id: string, _duplicado: number)=> print(_id, _duplicado),
     email: (_id: string)=> email(_id),
-    getFacturasByCliente: (_nroDoc: number)=> getFacturasByCliente(_nroDoc),
+    getFacturasByCliente: (filters:ComprobanteFilters)=> getFacturasByCliente(filters),
     getComprobantesByVenta: (_ventaId: string)=> getComprobantesByVenta(_ventaId),
     create: (_comprobante: any)=> create(_comprobante),
     facturarPendientes: ()=> facturarPendientes()

@@ -53,12 +53,13 @@ const selectProducto = (producto: Producto) => {
 };
 
 onMounted(async ()=>{
+    loadingForm.value=true;
     await handleFilterProducts();
+    loadingForm.value=false;
 })
 
 const handleFilterProducts = async () => {
     try{
-        loadingForm.value=true;
         const resp = await productosApi.getAll({
             codigo: searchProdCodTxt.value,
             descripcion: searchProdDscTxt.value,
@@ -68,8 +69,6 @@ const handleFilterProducts = async () => {
         foundProductos.value = resp.items;
         nextPage.value = resp.nextPage;
         previousPage.value =resp.previousPage;
-        loadingForm.value=false;
-        console.log(nextPage)
     }catch(err: any){
         errorMessage.value=err.message as string
         showError.value = true;
@@ -101,8 +100,8 @@ const handleLimitChange = async (newLimit: string) => {
             </DialogHeader>
             <Separator class="my-2" />
             <div class="flex flex-row justify-between px-6 h-2 mb-4">
-                <Input type="text" v-model="searchProdCodTxt" class=" w-[23%] mr-4 text-center" placeholder="Código" @keyup.enter="handleFilterProducts()" />
-                <Input type="text" v-model="searchProdDscTxt" class="mr-4" placeholder="Descripción" @keyup.enter="handleFilterProducts()" />
+                <Input type="text" v-model="searchProdCodTxt" class=" w-[23%] mr-4 text-center" placeholder="Código" @keyup.enter="handleFilterProducts()"  @input="(e: any) => e.target.value.length >= 0 && handleFilterProducts()" />
+                <Input type="text" v-model="searchProdDscTxt" class="mr-4" placeholder="Descripción" @keyup.enter="handleFilterProducts()"  @input="(e: any) => e.target.value.length >= 0 && handleFilterProducts()" />
                 <Button variant="default" size="icon" class="w-12 h-9" @click="handleFilterProducts()">
                     <MagnifyingGlassIcon />
                 </Button>
