@@ -26,7 +26,7 @@ import { computed, onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
-import { router } from '@/router';
+import { router, previousRoute } from '@/router';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 import { SlashIcon, AsteriskIcon, PlusIcon, ImageUpIcon} from 'lucide-vue-next';
 import {
@@ -292,14 +292,15 @@ const validateAndSubmit = async()=>{
 
 const onSubmit = async()=>{
     try{
+        loader.show();
         const recetaObj = {...newReceta.value, pruebasLentesContacto: newPruebas.value}
         recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-        await recetasApi.createRecetaContacto(recetaObj)
+       const createdReceta= await recetasApi.createRecetaContacto(recetaObj)
        loader.hide();
         toast({
             title: 'Receta registrada con éxito',
         })
-        router.push('/recetas')
+        router.push(`/recetas/${newReceta.value.cliente.id}?tab=contacto&recetaId=${createdReceta.id}`)
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -308,22 +309,59 @@ const onSubmit = async()=>{
 }
 const nombreCliente = computed(()=> selectedCliente.value?.apellido +", "+selectedCliente.value?.nombre)
 
-const redirectCancel = ()=>{
-    selectedCliente.value
-    ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
-    : router.push(`/`)
+const loadImage1 = async(dataImage:  { queterometria: {OD: string[], OI: string[]}, observaciones: string})=>{
+    newReceta.value.quet_m1_od= dataImage.queterometria.OD[0] ? Number(dataImage.queterometria.OD[0]) : undefined
+    newReceta.value.quet_m2_od= dataImage.queterometria.OD[1] ? Number(dataImage.queterometria.OD[1]) : undefined
+    newReceta.value.quet_m1_oi= dataImage.queterometria.OI[0] ? Number(dataImage.queterometria.OI[0]) : undefined
+    newReceta.value.quet_m2_oi= dataImage.queterometria.OI[1] ? Number(dataImage.queterometria.OI[1]) : undefined
+    newReceta.value.observaciones_queterometria = dataImage.observaciones;
 }
 
-const loadImages = async(dataImage:  { oftalmometria: {OD: string[], OI: string[]}, observaciones: string})=>{
-    console.log(dataImage)
-    newReceta.value.quet_m1_od= dataImage.oftalmometria.OD[0] ? Number(dataImage.oftalmometria.OD[0]) : undefined
-    newReceta.value.quet_m2_od= dataImage.oftalmometria.OD[1] ? Number(dataImage.oftalmometria.OD[1]) : undefined
-    newReceta.value.quet_m1_oi= dataImage.oftalmometria.OI[0] ? Number(dataImage.oftalmometria.OI[0]) : undefined
-    newReceta.value.quet_m2_oi= dataImage.oftalmometria.OI[1] ? Number(dataImage.oftalmometria.OI[1]) : undefined
-    newReceta.value.observaciones = dataImage.observaciones;
+const normalize = (value: string | number): number | undefined => {
+  if (value === null || value === undefined) return undefined;
+  const stringValue = String(value).replace(",", ".").replace(/[^\d.-]/g, "");
+  const parsed = parseFloat(stringValue);
+  return isNaN(parsed) ? undefined : parsed;
+};
+
+const loadImage2 = async (dataImage: {
+  lentes_definitivas: {
+    OD: { CB: number | string, Esf: number | string, Cil: number | string, Eje: number | string, Diam: number | string },
+    OI: { CB: number | string, Esf: number | string, Cil: number | string, Eje: number | string, Diam: number | string }
+  }
+}) => {
+  const { OD, OI } = dataImage.lentes_definitivas;
+  newReceta.value.od_cb = normalize(OD.CB);
+  newReceta.value.od_esferico = normalize(OD.Esf);
+  newReceta.value.od_cilindrico = normalize(OD.Cil);
+  newReceta.value.od_eje = normalize(OD.Eje);
+  newReceta.value.od_diametro = normalize(OD.Diam);
+
+  newReceta.value.oi_cb = normalize(OI.CB);
+  newReceta.value.oi_esferico = normalize(OI.Esf);
+  newReceta.value.oi_cilindrico = normalize(OI.Cil);
+  newReceta.value.oi_eje = normalize(OI.Eje);
+  newReceta.value.oi_diametro = normalize(OI.Diam);
+
+  openOCR.value = false;
+};
+
+const handleOcrError = async(error: any)=>{
+    errorMessage.value=error.message as string
+    showError.value = true;
     openOCR.value=false;
 }
 
+
+const redirectCancel = ()=>{
+  if (previousRoute) {
+    router.push(previousRoute);
+  } else {
+    if(selectedCliente.value){
+        router.push(`/clientes/dashboard/${selectedCliente.value.id}`); 
+    }
+  }
+}
 
 </script>
 
@@ -371,21 +409,26 @@ const loadImages = async(dataImage:  { oftalmometria: {OD: string[], OI: string[
         <div class="pt-2 mb-4 " >
             <form @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
                 <div class="w-full ">
-                    <div class="flex w-full justify-center">
-                        <h3 class="page-subtitle text-center">Nueva Receta - Lentes de contacto</h3>
-                        <Dialog v-model:open="openOCR" >
-                            <DialogTrigger >
-                                <Button type="button" class="absolute right-[10rem]" >
-                                    <ImageUpIcon /> Carga con imágenes
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent class="max-w-[100rem] min-h-[40rem] ">
-                                <OCRRecetasContacto 
-                                    @handle-submit="loadImages"
-                                    @handle-cancel="openOCR=false"
-                                />
-                            </DialogContent>
+                    <div class="grid grid-cols-3 items-center mb-4">
+                    <div></div>
+                    <h3 class="page-subtitle text-center">Nueva Receta - Lentes de contacto</h3>
+                    <div class="flex justify-end">
+                        <Dialog v-model:open="openOCR">
+                        <DialogTrigger>
+                            <Button type="button">
+                            <ImageUpIcon /> Carga con imágenes
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent class="max-w-[100rem] min-h-[40rem]">
+                            <OCRRecetasContacto 
+                            @handle-submit-image1="loadImage1"
+                            @handle-submit-image2="loadImage2"
+                            @handle-cancel="openOCR=false"
+                            @handle-error="handleOcrError"
+                            />
+                        </DialogContent>
                         </Dialog>
+                    </div>
                     </div>
                     <Separator class="my-10 w-full" />
                 </div>

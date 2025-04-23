@@ -27,7 +27,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
-import { router } from '@/router';
+import { previousRoute, router } from '@/router';
 import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
 import { computed, onMounted, ref} from 'vue';
 import {
@@ -214,12 +214,12 @@ const onSubmit = async()=>{
                 break;
         }
         newRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-        await recetasApi.createRecetaAereos(newRecetaObj)
+        const createdReceta = await recetasApi.createRecetaAereos(newRecetaObj);
         loader.hide();
         toast({
             title: 'Receta registrada con éxito',
         })
-        router.push('/recetas')
+        router.push(`/recetas/${newReceta.value.cliente.id}?tab=recetados&recetaId=${createdReceta.id}`)
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -268,10 +268,15 @@ const validateDetalles = ()=>{
 const nombreCliente = computed(()=> selectedCliente.value?.apellido +", "+selectedCliente.value?.nombre)
 
 const redirectCancel = ()=>{
-    selectedCliente.value
-    ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
-    : router.push(`/`)
+  if (previousRoute) {
+    router.push(previousRoute);
+  } else {
+    if(selectedCliente.value){
+        router.push(`/clientes/dashboard/${selectedCliente.value.id}`); 
+    }
+  }
 }
+
 </script>
 
 

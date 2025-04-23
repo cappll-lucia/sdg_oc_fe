@@ -12,12 +12,19 @@ const props = defineProps<{
 }>();
 // TODO inicializar en primera receta
 
+const emit = defineEmits(['showForm'])
+
+const handleShowForm = ()=>{
+    emit('showForm')
+}
+
 </script>
 
 
 <template>
     <div class="datos flex flex-col" v-if="!props.historiaClinica">
         <span class="text-lg font-bold">Historia clinica no registrada para el cliente </span>
+        <Button @click="handleShowForm" >Registrar historia clínica</Button>
     </div>
     <div class="datos flex flex-col" v-if="props.historiaClinica">
         <div class="flex flex-row justify-between items-center">

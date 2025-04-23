@@ -31,7 +31,7 @@ import AccordionTrigger from '@/components/ui/accordion/AccordionTrigger.vue';
 import AccordionContent from '@/components/ui/accordion/AccordionContent.vue';
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue';
 import Button from '@/components/ui/button/Button.vue';
-import { router } from '@/router';
+import { previousRoute, router } from '@/router';
 import AlertError from '@/components/AlertError.vue';
 import { PruebaLentesContacto, pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
 import { toast } from '@/components/ui/toast';
@@ -222,9 +222,9 @@ const onSubmit = async()=>{
             await recetasApi.editRecetaContacto(recetaObj)
             loader.hide();
             toast({
-                title: 'Receta registrada con éxito',
+                title: 'Receta editada con éxito',
             })
-            router.push('/recetas')
+            router.push(`/recetas/${currentReceta.value.cliente.id}?tab=contacto&recetaId=${currentReceta.value.id}`)
         }
     } catch (err: any) {
         errorMessage.value=err.message as string
@@ -236,10 +236,15 @@ const onSubmit = async()=>{
 const nombreCliente = computed(()=> currentReceta.value?.cliente.apellido +", "+currentReceta.value?.cliente.nombre);
 
 const redirectCancel = ()=>{
-    currentReceta.value?.cliente
-    ? router.push(`/clientes/dashboard/${currentReceta.value.cliente.id}`)
-    : router.push(`/`)
+  if (previousRoute ) {
+    router.push(previousRoute);
+  } else {
+    if(currentReceta.value?.cliente){
+        router.push(`/clientes/dashboard/${currentReceta.value?.cliente.id}`); 
+    }
+  }
 }
+
 
 </script>
 

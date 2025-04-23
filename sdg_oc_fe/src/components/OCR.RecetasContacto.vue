@@ -15,7 +15,7 @@ import { ocrApi } from '@/api/libs/ocr';
 
 const loadingForm =ref<boolean>(false);
 
-const emit = defineEmits(['handleSubmit', 'handleCancel']);
+const emit = defineEmits(['handleSubmitImage1', 'handleSubmitImage2', 'handleCancel']);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
@@ -25,6 +25,9 @@ const imageFile1URL= ref<any>();
 const imageFile2= ref<any>();
 const imageFile2URL= ref<any>();
 
+const dataImage1 = ref<{ queterometria: {OD: string[], OI: string[]}, observaciones: string}>();
+const dataImage2 = ref();
+
 const isValidForm = ref<{image1: boolean, image2: boolean}>({
     image1: true,
     image2: true,
@@ -33,16 +36,31 @@ const isValidForm = ref<{image1: boolean, image2: boolean}>({
 
 
 const validateAndSubmit = async () => {
-    //todo Validate    loadingForm.value=false;
-    await onSubmitImage1()
+    //todo Validate    
+    loadingForm.value=true;
+    await onSubmitImage1();
+    await onSubmitImage2();
+    emit('handleSubmitImage1', dataImage1.value)
+    emit('handleSubmitImage2', dataImage2.value)
+    loadingForm.value=false;
 };
 
 const onSubmitImage1 = async()=>{
     try{
-        loadingForm.value=true;
-        const dataImage1 = await ocrApi.processRecetaImg1(imageFile1.value)
+        const image1 = await ocrApi.processRecetaImg1(imageFile1.value)
+        dataImage1.value=image1;
+    } catch (err: any) {
+        errorMessage.value=err.message as string
+        showError.value = true;
         loadingForm.value=false;
-        emit('handleSubmit', dataImage1)
+    };
+}
+const onSubmitImage2 = async()=>{
+    try{
+        
+        const image2 = await ocrApi.processRecetaImg2(imageFile2.value)
+        console.log('2>>> ', image2)
+        dataImage2.value=image2;
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -128,10 +146,9 @@ const handleCancel = ()=>{
                                     <span class="font-light text-gray-600">Ninguna imagen seleccionada</span>
                                     <TooltipProvider >
                                         <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs underline mt-2"> Ejemplo imagen 1</TooltipTrigger>
+                                            <TooltipTrigger type="button" class="bg-transparent text-xs underline mt-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 disabled"> Ejemplo imagen 1</TooltipTrigger>
                                             <TooltipContent class="font-thin text-xs ">
                                                     <img src="/example-ocr-img1.png " alt="" class="w-[300px] h-auto"   />
-                                                
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -144,7 +161,7 @@ const handleCancel = ()=>{
                             <Input type="file" class="w-[22rem]" accept=".jpg, .jpeg, .png" @change="handleImage2Upload" />
                             <TooltipProvider  v-if="!isValidForm.image2" >
                                 <Tooltip>
-                                    <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
+                                    <TooltipTrigger type="button" class="bg-transparent text-xs underline mt-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 disabled"> <AsteriskIcon :size="14" /> </TooltipTrigger>
                                     <TooltipContent class="text-destructive border-destructive font-thin text-xs">
                                         <p>Archivo inválido, debe ser un archivo .jpg, .jpeg, .png</p>
                                     </TooltipContent>

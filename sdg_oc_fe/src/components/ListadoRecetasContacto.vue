@@ -20,21 +20,29 @@ import Input from './ui/input/Input.vue';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
+import CreateHistoriaClinicaForm from './CreateHistoriaClinicaForm.vue';
 
 const printOpen = ref<boolean>(false);
 const props = defineProps<{
     historiaClinica: HistoriaClinica | undefined,
     recetas: RecetaContacto[],
     nombreCliente: string,
-    idCliente: number
+    idCliente: number,
+    selectedId: number|undefined,
 }>();
+
+const showFormCreateHC = ref<boolean>(false);
 
 const currentRec = ref<RecetaContacto|undefined>();
 const selectedHistoriaClinica = ref(false);
 const selectedToPrint = ref<RecetaContacto[]>([])
 
 onMounted(()=>{
-    currentRec.value=props.recetas[0]
+    if(props.selectedId){
+        currentRec.value=props.recetas.find(r=>r.id==props.selectedId)
+    }else{
+        currentRec.value=props.recetas[0]
+    }
 })
 
 const handleCheckboxChange = (receta: RecetaContacto) => {
@@ -136,7 +144,8 @@ const printRecetas = () => {
         <Separator orientation="vertical" />
 
         <div v-if="selectedHistoriaClinica" class="view w-[75%] h-[100%] px-8">
-            <DetalleHistoriaClinicaContacto :historiaClinica="props.historiaClinica" />
+            <DetalleHistoriaClinicaContacto :historiaClinica="props.historiaClinica" @showForm="showFormCreateHC=true" @handle-cancel="showFormCreateHC=false" />
+            <CreateHistoriaClinicaForm v-if="showFormCreateHC" />
         </div>
 
 

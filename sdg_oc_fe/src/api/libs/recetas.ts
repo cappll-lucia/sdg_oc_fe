@@ -33,7 +33,7 @@ const getOneAereos = async (_id: number)=>{
 const createRecetaAereos = async (_newReceta: NewRecetaType) => {
     try {
         const resp = await http.post('/receta-lentes-aereos', _newReceta);
-        return resp.data.data as RecetasAereos[];
+        return resp.data.data as RecetasAereos;
     } catch (error) {
         throw error instanceof AxiosError ?  
             new Error(error?.response?.data?.message) : 
@@ -55,7 +55,7 @@ const editRecetaAereos = async (_editedReceta: EditedRecetaType) => {
 const createRecetaContacto = async (_newReceta: NewRecetaContactoType) => {
     try {
         const resp = await http.post('/receta-lentes-contacto', _newReceta);
-        return resp.data.data as RecetaContacto[];
+        return resp.data.data as RecetaContacto;
     } catch (error) {
         console.log(error)
         throw error instanceof AxiosError ?  
