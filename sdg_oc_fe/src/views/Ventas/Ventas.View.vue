@@ -559,6 +559,9 @@ const tipoFactura = (condicionIva: CondicionIva) => {
         </div>
       </div>
     </div>
+     <div v-else class="flex flex-row justify-between items-center py-4">
+        <span>Error al cargar la venta</span>
+    </div>
   </div>
   <AlertError
     v-model="showError"

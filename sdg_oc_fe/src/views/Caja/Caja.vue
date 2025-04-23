@@ -271,6 +271,15 @@ const resetNewMovimiento = ()=>{
     newMovimeintoCaja.value.importe= 0,
     newMovimeintoCaja.value.tipo= "INGRESO"
 }
+
+const isTodaySelected = computed(() => {
+  return selectedDate.value &&
+         todayDate.value &&
+         selectedDate.value.year === todayDate.value.year &&
+         selectedDate.value.month === todayDate.value.month &&
+         selectedDate.value.day === todayDate.value.day;
+});
+
 </script>
 
 <template>
@@ -483,7 +492,8 @@ const resetNewMovimiento = ()=>{
                 </div>
                 <div class="w-[57%] h-[40rem] border rounded-lg p-4 flex flex-col justify-start items-end">
                     <div class="flex flex-row justify-center items-center h-10">
-                        <Button variant="outline" v-if="selectedDate!=todayDate && dateMovements.length && !loadingMovements" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
+
+                        <Button variant="outline" v-if="(isTodaySelected && cierreToday) || (!isTodaySelected &&  dateMovements.length && !loadingMovements)" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
                         <Popover>
                             <PopoverTrigger as-child>
                                 <Button

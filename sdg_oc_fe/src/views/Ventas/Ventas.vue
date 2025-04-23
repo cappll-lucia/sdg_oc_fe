@@ -48,6 +48,8 @@ const txtSearch = ref<string>("");
 const currentLimit = ref<string>("10");
 const currentOffset = ref<number>(0);
 
+const qtyPendientes = ref<number>(0);
+
 const showError = ref<boolean>(false);
 const errorMessage = ref<string>("");
 const showPendientesAlert = ref<boolean>(false);
@@ -107,6 +109,8 @@ const clearFilters = async () => {
 };
 
 onMounted(async () => {
+  const pendientes = await ventasApi.getAll({tipoComprobante: "pendiente"});
+  qtyPendientes.value = pendientes.items.length;
   await handleFilterVentas();
 });
 
@@ -245,7 +249,7 @@ const handleFacturarPendientes = async () => {
             <ReloadIcon />
           </Button>
         </div>
-        <Button @click="handleFacturarPendientes" class="text-xs">
+        <Button @click="handleFacturarPendientes" variant="outline" v-if="qtyPendientes" class="text-xs">
           Emitir facturas pendientes</Button
         >
       </div>
