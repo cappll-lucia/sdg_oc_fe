@@ -236,15 +236,16 @@ const onSubmit = async () => {
     const newVenta = {
       cliente: { id: selectedCliente.value?.id },
       condicionIva: condicionIvaVenta.value,
-      descuentoPorcentaje: porcDto.value,
+      descuentoPorcentaje: porcDto.value && dto.value ? porcDto.value : 0,
       mediosDePago: mediosDePago.value,
       lineasDeVenta: lineasDeVenta.value,
-      ventaObraSocial: ventaObrasSociales.value,
+      ventaObraSocial: ventaObrasSociales.value && obrasSociales.value ? ventaObrasSociales.value : [],
       observaciones: observaciones.value,
     };
+    console.log(newVenta)
     const createdVenta = await ventasApi.create(newVenta);
-    router.push(`/ventas/view/${createdVenta.venta.id}`);
     loader.hide();
+    router.push(`/ventas/view/${createdVenta.venta.id}`);
     toast({
       title: "Venta registrada con éxito",
     });
@@ -448,11 +449,18 @@ const montoDto = computed(() => {
 });
 
 const totalVentaFinal = computed(() => {
-  return totalVentaBruto.value - montoObrasSociales.value;
+  if(obrasSociales.value){
+    return totalVentaBruto.value - montoObrasSociales.value;
+  }else{
+    return totalVentaBruto.value
+  }
 });
 
 const caluclateImportePago = computed(() => {
-  return totalVentaFinal.value - montoDto.value;
+  if(dto.value && montoDto.value){
+    return totalVentaFinal.value - montoDto.value;
+  }
+  return totalVentaFinal.value;
 });
 
 const montoObrasSociales = computed(() => {
@@ -500,7 +508,7 @@ const handleShowNewObraSocialCliente = async (index: number) => {
   openSelectOSIndex.value = index;
   newOsIndex.value = index;
   openNewClienteOS.value = true;
-  addVentaObraSocial();
+  //addVentaObraSocial();
 };
 
 const handleAddObraSocialCliente = async (obraSocialId: number) => {
@@ -875,11 +883,10 @@ const abrirCajaDiaria = async () => {
                           obrasSociales = !obrasSociales;
                           if (
                             obrasSociales &&
-                            selectedCliente?.clienteObrasSociales.length
+                            selectedCliente?.clienteObrasSociales.length &&
+                            !ventaObrasSociales.length
                           ) {
                             addVentaObraSocial();
-                          } else {
-                            ventaObrasSociales = [];
                           }
                         }
                       "
@@ -1062,6 +1069,7 @@ const abrirCajaDiaria = async () => {
                           sociales no puede ser superior al importe total
                         </p>
                         <Button
+                          :disabled="!ventaObrasSociales[ventaObrasSociales.length-1]?.obraSocial.id"
                           variant="outline"
                           type="button"
                           class="mt-8"
@@ -1105,7 +1113,6 @@ const abrirCajaDiaria = async () => {
                       @update:model-value="
                         () => {
                           dto = !dto;
-                          porcDto = 0;
                         }
                       "
                     ></Switch>
@@ -1152,7 +1159,7 @@ const abrirCajaDiaria = async () => {
                 class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center"
               >
                 <div
-                  v-if="(obrasSociales && montoObrasSociales > 0) || porcDto"
+                  v-if="(obrasSociales && montoObrasSociales > 0) || (porcDto && dto)"
                   class="flex justify-center my-2"
                 >
                   <Label class="w-[9rem] text-right mr-4"
@@ -1174,7 +1181,7 @@ const abrirCajaDiaria = async () => {
                   >
                 </div>
                 <div
-                  v-if="porcDto"
+                  v-if="porcDto && dto"
                   class="flex justify-center items-center my-2"
                 >
                   <Label class="w-[9rem] text-right mr-4">Descuento: </Label>
