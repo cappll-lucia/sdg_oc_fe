@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
-import { router } from '@/router';
+import { previousRoute, router } from '@/router';
 import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
 import { computed, onMounted, ref} from 'vue';
 import {
@@ -207,10 +207,10 @@ const onSubmit = async()=>{
         editedRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
         await recetasApi.editRecetaAereos(editedRecetaObj)
         loader.hide();
-        router.push(`/recetas/${currentReceta.value.cliente.id}`)
         toast({
             title: 'Receta actualizada con éxito',
         })
+        router.push(`/recetas/${currentReceta.value.cliente.id}?tab=recetados&recetaId=${currentReceta.value.id}`)
     } catch (err: any) {
         errorMessage.value=err.message as string
         showError.value = true;
@@ -257,9 +257,13 @@ const validateDetalles = ()=>{
 const nombreCliente = computed(()=> currentReceta.value?.cliente.apellido +", "+currentReceta.value?.cliente.nombre)
 
 const redirectCancel = ()=>{
-    currentReceta.value?.cliente
-    ? router.push(`/clientes/dashboard/${currentReceta.value.cliente.id}`)
-    : router.push(`/`)
+  if (previousRoute ) {
+    router.push(previousRoute);
+  } else {
+    if(currentReceta.value?.cliente){
+        router.push(`/clientes/dashboard/${currentReceta.value?.cliente.id}`); 
+    }
+  }
 }
 
 </script>

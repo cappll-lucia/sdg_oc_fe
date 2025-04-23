@@ -167,7 +167,9 @@ const printComprobante = async(id: string, tipoComprobante: number, fecha:Date, 
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     } catch (error) {
-        console.error('Error al descargar el PDF:', error);
+        errorMessage.value='Ocurrió un error al descargar el archivo PDF'
+        showError.value = true;
+        loader.hide();
     }
 }
 
@@ -179,7 +181,9 @@ const emailComprobante = async(_id: string)=>{
             title: 'Comprobante enviado por email'
         })
     } catch (error) {
-        console.error('Error al enviar el comprobante:', error);
+        errorMessage.value='Ocurrió un error al enviar el comprobante por email'
+        showError.value = true;
+        loader.hide();
     }
 }
 
@@ -218,6 +222,12 @@ const onSubmit = async()=>{
         loadingForm.value=false;
         showError.value = true;
     }
+}
+
+
+const redirectReceta=(receta: {id: number, clase:string, tipo?:TipoReceta, fecha:Date} )=>{
+   const tab = receta.clase=='Lentes Contacto' ? 'contacto' : 'recetados'
+ router.push(`/recetas/${currentCliente.value?.id}?tab=${tab}&recetaId=${receta.id}`)
 }
 
 </script>
@@ -334,7 +344,7 @@ const onSubmit = async()=>{
                             </div>
                         </div>
                         <ScrollArea v-if="recetasCliente.length" class=" mt-2 w-full h-[20rem] rounded-lg  bg-white border pr-4 scroll-ml-2">
-                            <div v-for="receta in recetasCliente" @click="router.push(`/recetas/${currentCliente?.id}`)" class="cursor-pointer flex flex-row justify-center items-center h-[4rem] rounded-lg mx-2 my-4 mr-4">
+                            <div v-for="receta in recetasCliente" @click="redirectReceta(receta)" class="cursor-pointer flex flex-row justify-center items-center h-[4rem] rounded-lg mx-2 my-4 mr-4">
                                 <div class=" cursor-pointer w-[39%]  rounded-tl-lg h-full rounded-bl-lg  border-r border font-semibold text-sm bg-secondary flex  justify-end items-center">
                                     <Label class=" cursor-pointer p-4" > {{formatDate(receta.fecha.toString())}} </Label>     
                                     <span class="w-[0px] mr-1"><CircleDot class="w-2 text-gray-700" /> </span>

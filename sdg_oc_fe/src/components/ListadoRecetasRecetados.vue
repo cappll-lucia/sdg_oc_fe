@@ -24,7 +24,8 @@ import { router } from '@/router';
 const props = defineProps<{
     recetas: RecetasAereos[],
     nombreCliente: string,
-    idCliente: number
+    idCliente: number,
+    selectedId: number|undefined
 }>();
 const currentRec = ref<RecetasAereos|undefined>();
 const detalleCerca = ref<DetalleRecetaAereos|undefined>();
@@ -33,7 +34,11 @@ const selectedToPrint = ref<RecetasAereos[]>([]);
 const printOpen = ref<boolean>(false);
 
 onMounted(()=>{
-    currentRec.value = props.recetas[0];
+    if(props.selectedId){
+        currentRec.value=props.recetas.find(r=>r.id==props.selectedId)
+    }else{
+        currentRec.value=props.recetas[0]
+    }
     detalleCerca.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Cerca')
     detalleLejos.value = currentRec.value?.detallesRecetaLentesAereos.find(det=> det.tipo_detalle=='Lejos')
 })
