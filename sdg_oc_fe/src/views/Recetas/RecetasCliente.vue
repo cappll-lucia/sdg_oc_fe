@@ -27,7 +27,6 @@ const route = useRoute();
 const loader = useLoaderStore();
 
 const openTab=ref<string>('recetados')
-const openRecetaId=ref<string>();
 
 const selectedRecetaId=ref<number>();
 const selectedContactoId=ref<number>();

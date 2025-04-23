@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios';
 import { http_files } from '../http.files';
-import { number } from 'zod';
 
 
 const processRecetaImg1 = async( _image1: File)=>{
