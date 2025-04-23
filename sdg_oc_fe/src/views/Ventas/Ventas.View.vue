@@ -478,7 +478,7 @@ const tipoFactura = (condicionIva: CondicionIva) => {
               class="h-[4rem] flex justify-start items-center py-2 px-8 border-b"
             >
               <span class="text-sm w-[9rem]">Factura no emitida</span>
-              <Button variant="outline" @click="emitirFactura()" class="ml-7">
+              <Button variant="outline" @click="emitirFactura()" class="ml-6">
                 Emitir
               </Button>
             </div>

@@ -16,10 +16,12 @@ import { MagnifyingGlassIcon } from "@radix-icons/vue";
 import { CircleXIcon, PlusIcon, User } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
 import CreateClienteForm from "./CreateCliente.Form.vue";
+import LoaderForm from "./LoaderForm.vue";
 
 const searchClientesTxt = ref<string>("");
 const foundClientes = ref<Cliente[]>([]);
 const showCreateForm = ref<boolean>(false);
+const loadingForm = ref<boolean>(false);
 
 defineProps<{
   modelValue: boolean;
@@ -39,11 +41,15 @@ const searchClientes = async () => {
 };
 
 const handleCreateCliente = (cliente: Cliente) => {
+  loadingForm.value=true;
   selectCliente(cliente);
+  loadingForm.value=false;
 };
 
 onMounted(async () => {
+  loadingForm.value=true;
   await searchClientes();
+  loadingForm.value=false;
 });
 </script>
 
@@ -85,8 +91,8 @@ onMounted(async () => {
           Nuevo Cliente <PlusIcon />
         </Button>
       </div>
-      <div v-if="!showCreateForm" class="flex justify-center">
-        <ScrollArea class="h-[30rem] w-[30rem] mt-4">
+      <div v-if="!showCreateForm && !loadingForm" class="flex justify-center">
+        <ScrollArea class="h-[40rem] w-[30rem] mt-4">
           <div
             v-for="cliente in foundClientes"
             :key="cliente.id"
@@ -107,7 +113,7 @@ onMounted(async () => {
           </div>
         </ScrollArea>
       </div>
-      <div v-if="showCreateForm">
+      <div v-if="showCreateForm && !loadingForm">
         <div class="flex flex-row w-full justify-end pr-4">
           <Button @click="showCreateForm = false" variant="ghost">
             <CircleXIcon />
@@ -119,6 +125,9 @@ onMounted(async () => {
             @handle-cancel="showCreateForm = false"
           />
         </ScrollArea>
+      </div>
+      <div v-if="loadingForm" class="h-[40rem] w-[30rem] mt-4" >
+        <LoaderForm />
       </div>
     </DialogContent>
   </Dialog>

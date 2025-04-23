@@ -24,7 +24,7 @@ const getAll = async (filters: ProductoFilters = {}) => {
         if (filters.marcaId) params.append("marcaId", filters.marcaId);
         if (filters.categoria) params.append("categoria", filters.categoria);
         if (filters.filtro) params.append("filtro", filters.filtro);
-        if (filters.codigo) params.append("codigo", filters.codigo);
+        if (filters.codigo) params.append("cod", filters.codigo);
         if (filters.descripcion) params.append("descripcion", filters.descripcion);
         
         params.append("limit", filters.limit?.toString() || "10");

@@ -69,7 +69,10 @@ import {
 } from "@radix-icons/vue";
 import { AlertCircleIcon, AsteriskIcon, PlusCircleIcon } from "lucide-vue-next";
 import { computed, nextTick, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 
+
+const route = useRoute();
 const cajaStore = useCajaStore();
 const loader = useLoaderStore();
 const loadingForm = ref<boolean>(false);
@@ -367,6 +370,11 @@ onMounted(async () => {
   addLineaVenta();
   const cajaOpened = await cajaStore.isCajaOpenedToday();
   openDialogOpenCaja.value = !cajaOpened;
+  const query = route.query
+  if(query.cliente){
+      const foundCliente = await clientesApi.getOne(Number(query.cliente))
+      if(foundCliente) handleSelectCliente(foundCliente)
+  }
   loader.hide();
 });
 
