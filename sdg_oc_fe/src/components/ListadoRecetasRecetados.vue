@@ -120,7 +120,7 @@ const handleChangeReceta = (receta: RecetasAereos)=>{
             <div v-for="receta in recetas" class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': currentRec === receta }">
-                    <p class="font-light text-sm ">{{ receta.id}}</p>
+                    <p class="font-light text-sm "> </p>
                     <div class="flex-col  w-[50%]">
                         <p class="font-bold ">{{ formatDate(receta.fecha.toString())}}</p>
                         <p class="font-light  ">{{receta.tipoReceta}}</p>

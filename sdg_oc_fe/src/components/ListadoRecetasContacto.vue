@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronRightIcon, DownloadIcon, ArchiveIcon, PlusIcon, ValueNoneIcon, Pencil1Icon  } from '@radix-icons/vue'
+import { ChevronRightIcon, DownloadIcon, PlusIcon, ValueNoneIcon, Pencil1Icon  } from '@radix-icons/vue'
 import {
     Dialog,
     DialogContent,
@@ -125,7 +125,7 @@ const printRecetas = () => {
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': selectedHistoriaClinica }">
                     <p class="font-light text-sm ml-1">
-                        <ArchiveIcon class="w-4 h-4" />
+                        
                     </p>
                     <div class="flex-col  w-[50%]">
                         <p class="font-bold ">Historia Clínica</p>
@@ -140,7 +140,7 @@ const printRecetas = () => {
             <div v-for="receta in recetas" class="mr-4">
                 <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                     :class="{ 'bg-[#d7e5ec]': currentRec === receta }">
-                    <p class="font-light text-sm ">{{ receta.id }}</p>
+                    <p class="font-light text-sm "> </p>
                     <div class="flex-col  w-[50%]">
                         <p class="font-bold ">{{ formatDate(receta.fecha.toString())}}</p>
                     </div>

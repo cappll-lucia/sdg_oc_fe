@@ -131,7 +131,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                     <div v-for="audiom in audiometriasCliente" :key="audiom.id" class="mr-4">
                         <div class="panel-inde-item px-2 py-6 h-16 flex flex-row justify-between items-center rounded-sm"
                             :class="{ 'bg-[#d7e5ec]': selectedAudiom === audiom }">
-                            <p class="font-light text-sm ">{{ audiom.id }}</p>
+                            <p class="font-light text-sm "></p>
                             <div class="flex-col  w-[50%]">
                                 <p class="font-bold ">{{ formatDate(audiom.fechaInforme.toString()) }}</p>
                                 <p class="font-light  ">Audiometría</p>

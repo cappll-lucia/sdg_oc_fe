@@ -6,7 +6,7 @@ import Loader from './components/Loader.vue';
 </script>
 
 <template>
-  <main class="w-full px-4">
+  <main class="w-full pt-[4rem]">
     <Navbar />
     <Toaster />
     <RouterView />
