@@ -43,7 +43,7 @@ const reportes: { title: string, href: string}[] = [
 </script>
 
 <template>
-    <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 justify-between ">
+    <NavigationMenu v-if="$route.name!='login'" class="border-y max-w-100 py-2 justify-between  bg-white sticky top-0">
         <NavigationMenuList>
             <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/" :class="navigationMenuTriggerStyle()">

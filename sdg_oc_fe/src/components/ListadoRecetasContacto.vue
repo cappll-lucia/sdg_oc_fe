@@ -46,6 +46,9 @@ onMounted(()=>{
     }else{
         currentRec.value=props.recetas ? props.recetas[0] : undefined
     }
+    if(props.historiaClinica && !props.recetas?.length){
+        selectedHistoriaClinica.value=true
+    }
 })
 
 const handleCheckboxChange = (receta: RecetaContacto) => {
@@ -76,7 +79,6 @@ const printRecetas = () => {
     <div class="panel w-100 flex flew-row h-[100%]">
         <div class="panel-index w-[23%]  p-2 pt-0 h-[100%]">
             <div class="flex justify-between mr-2">
-                <!-- TODO add link to create -->
                 <Button variant="outline" @click="router.push(`/recetas/contacto/new?cliente=${props.idCliente}`)" class="bg-transparent hover:bg-[#d7e5ec]">
                         Nueva Receta
                     <PlusIcon class="w-4 h-4" />
@@ -95,7 +97,7 @@ const printRecetas = () => {
                                 Cliente: {{ nombreCliente }}
                             </DialogDescription>
                         </DialogHeader>
-                        <div class="flex flex-col items-start justify-center ">
+                        <div v-if="recetas?.length" class="flex flex-col items-start justify-center ">
                             <div v-for="receta in recetas" class="flex items-center space-x-2 mb-4">
                                 <Checkbox :id="`${receta.id}`" @update:checked="handleCheckboxChange(receta)" />
                                 <label :for="`${receta.id}`"
@@ -104,9 +106,15 @@ const printRecetas = () => {
                                 </label>
                             </div>
                         </div>
+                        <div v-else class="flex flex-col items-start justify-center " >
+                            <p>El cliente no tiene recetas registradas</p>
+                        </div>
                         <DialogFooter class="sm:justify-end">
-                            <Button type="button" @click="printRecetas()">
+                            <Button  v-if="recetas?.length" type="button" @click="printRecetas()">
                                 Imprimir Recetas
+                            </Button>
+                            <Button  v-else type="button" @click="printOpen=false">
+                                Cerrar
                             </Button>
                         </DialogFooter>
                     </DialogContent>

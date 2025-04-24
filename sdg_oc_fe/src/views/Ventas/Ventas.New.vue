@@ -91,6 +91,7 @@ const newOsIndex = ref<number>();
 const importeOpenCaja = ref<number>(0);
 const isValidImporteOpenCaja = ref<boolean>(true);
 const openDialogOpenCaja = ref<boolean>(false);
+const openDialogClosedCaja = ref<boolean>(false);
 const showErrorNotCaja = ref<boolean>(false);
 
 const lineasDeVenta = ref<
@@ -368,11 +369,19 @@ const middleValidate = async () => {
 onMounted(async () => {
   loader.show();
   addLineaVenta();
+  const cierre = await cajaStore.isCajaClosedToday();
+  console.log(cierre, 'c')
+  openDialogClosedCaja.value = cierre;
+  if(cierre){
+    openDialogClosedCaja.value=true;
+    loader.hide();
+    return;
+  }
   const cajaOpened = await cajaStore.isCajaOpenedToday();
   openDialogOpenCaja.value = !cajaOpened;
   const query = route.query
   if(query.cliente){
-      const foundCliente = await clientesApi.getOne(Number(query.cliente))
+    const foundCliente = await clientesApi.getOne(Number(query.cliente))
       if(foundCliente) handleSelectCliente(foundCliente)
   }
   loader.hide();
@@ -516,7 +525,9 @@ const handleShowNewObraSocialCliente = async (index: number) => {
   openSelectOSIndex.value = index;
   newOsIndex.value = index;
   openNewClienteOS.value = true;
-  //addVentaObraSocial();
+  if(!ventaObrasSociales.value.length){
+    addVentaObraSocial()
+  }
 };
 
 const handleAddObraSocialCliente = async (obraSocialId: number) => {
@@ -584,14 +595,14 @@ const abrirCajaDiaria = async () => {
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
-    <h1 class="page-title">Nueva Venta</h1>
+    <h1 class="page-title text-center">Nueva Venta</h1>
     <div class="pt-2">
       <form
         @submit.prevent="validateAndSubmit"
-        class="flex flex-row justify-between items-center py-4"
+        class="flex  flex-row justify-center items-center py-4"
       >
         <div
-          class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-start"
+          class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-center"
         >
           <div
             class="flex flex-col sm:flex-row sm:justify-between w-full items-center border rounded-lg p-8"
@@ -1511,6 +1522,17 @@ const abrirCajaDiaria = async () => {
         </div>
       </DialogContent>
     </Dialog>
+      <Dialog v-model:open="openDialogClosedCaja" @update:open="router.push('/')"  >
+        <DialogContent class="max-w-[530px] min-h-[15rem] flex justify-center items-center flex-col text-center">
+          <DialogHeader>
+            <DialogTitle class="text-destructive" >Caja cerrada</DialogTitle>
+          </DialogHeader>
+          <DialogDescription class="text-destructive mb-4">
+            No se puede registrar una nueva venta porque la caja del día ya fue cerrada.
+          </DialogDescription>
+          <Button @click="router.push('/'); openDialogClosedCaja=false;" type="button">Volver al inicio</Button>
+        </DialogContent>
+      </Dialog>
     <AlertError
       v-model="showError"
       title="Error"

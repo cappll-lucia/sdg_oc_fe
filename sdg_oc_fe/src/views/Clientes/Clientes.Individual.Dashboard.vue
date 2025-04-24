@@ -55,7 +55,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
     DropdownMenu,
@@ -73,9 +72,12 @@ import AlertError from '@/components/AlertError.vue';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import LoaderForm from '@/components/LoaderForm.vue';
 import Badge from '@/components/ui/badge/Badge.vue';
+import { useCajaStore } from '@/stores/CajaStore';
 
 const loader = useLoaderStore();
 const route = useRoute();
+const cajaStore = useCajaStore();
+
 const currentCliente = ref<Cliente>();
 const ctaCorriente = ref<CuentaCorriente>();
 const recetasCliente = ref<{id: number, clase:string, tipo?:TipoReceta, fecha:Date}[]>([]);
@@ -86,6 +88,7 @@ const loadingForm = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
+const openDialogClosedCaja = ref<boolean>(false);
 
 const newMovimiento = ref<{tipoMovimiento: TipoMovimiento| undefined, importe: number, formaPago: TipoMedioDePagoEnum| undefined, redDePago: RedDePago| undefined, entidadBancaria: string|undefined}>({
     tipoMovimiento: undefined, 
@@ -208,6 +211,31 @@ const redirectReceta=(receta: {id: number, clase:string, tipo?:TipoReceta, fecha
  router.push(`/recetas/${currentCliente.value?.id}?tab=${tab}&recetaId=${receta.id}`)
 }
 
+const handleNewMovimiento = async ()=>{
+    const cierre = await cajaStore.isCajaClosedToday();
+    openDialogClosedCaja.value = cierre ;
+    if(cierre){
+        openDialogClosedCaja.value=true;
+        loader.hide();
+        return;
+    }else{
+        openDialog.value=true;
+    }
+}
+
+const hanldeRedirectVenta = async()=>{
+    if(!currentCliente.value) return;
+    const cierre = await cajaStore.isCajaClosedToday();
+    if(cierre){
+        openDialogClosedCaja.value = true;  
+    }else {
+        console.log(cierre)
+        console.log('a')
+        router.push(`/ventas/new?cliente=${currentCliente.value.id}`)
+    }
+}
+
+
 </script>
 
 <template>
@@ -305,7 +333,7 @@ const redirectReceta=(receta: {id: number, clase:string, tipo?:TipoReceta, fecha
                         <div v-else class=" mt-4 w-[90%] rounded-lg p-4 items-center justify-center flex flex-col bg-white border h-20">
                             <Label class=" font-mono text-center">La cuenta corriente del cliente no ha sido creada </Label>
                         </div>
-                        <Button variant="outline" type="button" @click="openDialog=true" >
+                        <Button variant="outline" type="button" @click="handleNewMovimiento()" >
                                     Nuevo movimiento
                                 </Button>
                 </div>
@@ -374,7 +402,7 @@ const redirectReceta=(receta: {id: number, clase:string, tipo?:TipoReceta, fecha
                     <div class="h-[50%] w-full bg-secondary rounded-lg p-4 flex flex-col justify-start">
                         <div class=" flex flex-row justify-between">
                             <h2 class="page-subtitle">Ventas y Comprobantes</h2>
-                                <Button variant="outline" type="button" @click="router.push(`/ventas/new?cliente=${currentCliente.id}`)" >
+                                <Button variant="outline" type="button" @click="hanldeRedirectVenta" >
                                     Nueva Venta
                                 </Button>
                         </div>
@@ -419,11 +447,9 @@ const redirectReceta=(receta: {id: number, clase:string, tipo?:TipoReceta, fecha
                         <div class=" flex flex-row justify-between">
                             <h2 class="page-subtitle">Movimientos de Cuenta Corriente</h2>
                             <Dialog v-model:open="openDialog" >
-                                <DialogTrigger as-child>
-                                <Button variant="outline">
+                                <Button variant="outline" type="button" @click="handleNewMovimiento()" >
                                     Nuevo Movimiento
                                 </Button>
-                                </DialogTrigger>
                                 <DialogContent class="max-w-[40rem] min-h-[25rem] ">
                                 <DialogHeader>
                                     <DialogTitle>Nuevo movimiento de cuenta corriente</DialogTitle>
@@ -641,4 +667,16 @@ const redirectReceta=(receta: {id: number, clase:string, tipo?:TipoReceta, fecha
             button="Aceptar"
             :action="()=>{showError=false}"
         />
+        <Dialog v-model:open="openDialogClosedCaja"  >
+        <DialogContent class="max-w-[530px] min-h-[15rem] flex justify-center items-center flex-col text-center">
+          <DialogHeader>
+            <DialogTitle class="text-destructive" >Caja cerrada</DialogTitle>
+          </DialogHeader>
+          <DialogDescription class="text-destructive mb-4">
+            No se puede registrar una nueva venta porque la caja del día ya fue cerrada.
+          </DialogDescription>
+          <Button @click="openDialogClosedCaja=false;" type="button">Aceptar</Button>
+        </DialogContent>
+      </Dialog>
+      
 </template>

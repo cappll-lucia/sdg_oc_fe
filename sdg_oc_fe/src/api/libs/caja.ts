@@ -21,6 +21,15 @@ const getApertura = async(_fecha: string)=>{
     }
 }
 
+const getCierre = async(_fecha: string)=>{
+    try {
+        const resp = await http.get(`/caja/cierre?fecha=${_fecha}`);
+        return resp.data.data as Caja;
+    } catch (error) {
+        throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal');
+    }
+}
+
 const apertura = async(_importe: number)=>{
     try {
         const resp = await http.post('/caja/apertura', {
@@ -54,6 +63,7 @@ const afectar = async(_movimientoCaja: {detalle:string, importe: number})=>{
 export const cajaApi = {
     getMovimientos: (_fecha: string)=> getMovimientos(_fecha),
     getApertura: (_fecha: string)=> getApertura(_fecha),
+    getCierre: (_fecha: string)=> getCierre(_fecha),
     apertura: (_importe: number)=> apertura(_importe),
     cierre: ()=> cierre(),
     afectar: (_movimientoCaja: {detalle: string, importe: number})=> afectar(_movimientoCaja)
