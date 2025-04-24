@@ -3,13 +3,13 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-vue-next';
 import { router } from '@/router/index';
-import { CondicionIva, Venta } from '@/api/entities/venta';
+import { Venta } from '@/api/entities/venta';
 import { useLoaderStore } from '@/stores/LoaderStore';
-import { TipoComprobante } from '@/api/entities/comprobante';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
 import { ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
+import { tipoFactura } from '@/lib/utils';
 
 const loader = useLoaderStore();
 
@@ -46,13 +46,6 @@ const handleEmitFactura = async()=>{
     }
 }
 
-const tipoFactura = ((condicionIva: CondicionIva)=>{
-    if(condicionIva==CondicionIva.MONOTRIBUTISTA || condicionIva == CondicionIva.RESPONSABLE_INSCRIPTO){
-        return TipoComprobante.FACTURA_A
-    }else{
-        return TipoComprobante.FACTURA_B
-    }
-})
 
 
 </script>
