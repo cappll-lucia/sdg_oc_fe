@@ -81,7 +81,7 @@ const create = async (_venta: NewVentaType) => {
   } catch (error: any) {
     throw error instanceof AxiosError
       ? new Error(error?.response?.data?.message)
-      : new Error("Algo salió mal al crear la obra social");
+      : new Error("Algo salió mal al crear la venta");
   }
 };
 

@@ -3,6 +3,8 @@ import type { Ref } from 'vue'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
+import { CondicionIva } from '@/api/entities/venta';
+import { TipoComprobante } from '@/api/entities/comprobante';
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -15,6 +17,14 @@ export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref
       ? updaterOrValue(ref.value)
       : updaterOrValue
 }
+
+export const tipoFactura = ((condicionIva: CondicionIva)=>{
+    if(condicionIva==CondicionIva.MONOTRIBUTISTA || condicionIva == CondicionIva.RESPONSABLE_INSCRIPTO){
+        return TipoComprobante.FACTURA_A
+    }else{
+        return TipoComprobante.FACTURA_B
+    }
+})
 
 export const fechaValidator= z
     .object({
