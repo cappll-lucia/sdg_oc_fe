@@ -1,3 +1,4 @@
+import { TipoMedioDePagoEnum } from "@/api/entities/mediosDePago";
 import { Venta } from "@/api/entities/venta";
 import { tipoComprobanteDisplay } from "@/lib/utils";
 import { formatDate } from "@/lib/utils.recetas";
@@ -30,23 +31,25 @@ export const columns: ColumnDef<Venta>[] = [
     cell: ({ row }) =>
       h(
         "div",
-        { class: " w-32" },
+
         row.original.mediosDePago.map((mp, i) =>
           h(
             "span",
             {
               class:
                 i === 0
-                  ? "mr-2 p-1 border rounded-lg  text-center"
+                  ? "mr-1 p-1 border rounded-lg  text-center"
                   : "p-1 border rounded-lg  text-center",
             },
-            mp.tipoMedioDePago
+            TipoMedioDePagoEnum[
+              mp.tipoMedioDePago as keyof typeof TipoMedioDePagoEnum
+            ]
           )
         )
       ),
   },
   {
-    accessorKey: "Factura",
+    accessorKey: "factura",
     header: () => h("div", "Factura"),
     cell: ({ row }) =>
       row.original.factura
