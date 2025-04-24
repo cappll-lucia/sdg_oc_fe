@@ -49,7 +49,8 @@ import autoTable from "jspdf-autotable";
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
 import LoaderForm from '@/components/LoaderForm.vue';
-
+import { RedDePago, TipoMedioDePagoEnum } from '@/api/entities/mediosDePago';
+import type { MovimientoConDetalle, MovimientoSimple } from '@/api/entities/caja';
 
 
 const df = new DateFormatter('es-AR', {
@@ -58,6 +59,7 @@ const df = new DateFormatter('es-AR', {
 
 const loader = useLoaderStore();
 const loadingForm = ref<boolean>(false);
+const loading= ref<boolean>(false);
 const loadingMovements = ref<boolean>(false);
 
 const saldoActual = ref<number>();
@@ -71,9 +73,8 @@ const openDialogCloseCaja = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
-
-const dateMovements = ref<Caja[]>([]);
-const todayMovements = ref<Caja[]>([]);
+const dateMovements = ref<Array<MovimientoConDetalle | MovimientoSimple>>([]);
+const todayMovements = ref<Array<MovimientoConDetalle | MovimientoSimple>>([]);
 
 const newMovimeintoCaja = ref<{detalle: string, importe: number, tipo:string}>({
     detalle: '',
@@ -92,22 +93,23 @@ const isValidImporteOpenCaja = ref<boolean>(true)
 
 const loadData = async()=>{
     const saldoCaja = await cajaApi.getMovimientos(formatDateValue.value)
+    const today = new Date();
     saldoActual.value = saldoCaja.cajaEfectivo;
-    dateMovements.value = saldoCaja.cajaFinal;
-    cierreToday.value = dateMovements.value.find(m=>m.detalle=="CIERRE");
-    aperturaToday.value = dateMovements.value.find(m=>m.detalle=="APERTURA");
+    dateMovements.value = saldoCaja.cajaDetallada;
+    aperturaToday.value = await cajaApi.getApertura(today.toDateString());
+    cierreToday.value = await cajaApi.getCierre(today.toDateString());
     todayMovements.value = dateMovements.value;
 }
 
 onMounted(async () => {
     loader.show();
+    loading.value=true;
     const today = new Date();
     todayDate.value=new CalendarDate(today.getFullYear(), today.getMonth()+1, today.getDate());
     selectedDate.value = todayDate.value;
     await loadData();
-    cierreToday.value = dateMovements.value.find(m=>m.detalle=="CIERRE");
-    aperturaToday.value = dateMovements.value.find(m=>m.detalle=="APERTURA");
     todayMovements.value = dateMovements.value;
+    loading.value=false;
     loader.hide();
 });
 
@@ -199,9 +201,10 @@ const informeCierre = async(date: DateValue | undefined)=>{
 }
 
 const generateCierreCajaPDF = (cierreCaja:SaldoCaja, fecha:string) => {
-    const cierreMov = cierreCaja.cajaFinal.find(m=>m.detalle=="CIERRE")
-    const aperturaMov = cierreCaja.cajaFinal.find(m=>m.detalle=="APERTURA")
+    const cierreMov = cierreCaja.cajaDetallada.find(m=>m.detalle=="CIERRE")
+    const aperturaMov = cierreCaja.cajaDetallada.find(m=>m.detalle=="APERTURA")
 
+    console.log(cierreCaja)
     const doc = new jsPDF();
     const filePath = `cierre_caja_${fecha}.pdf`;
 
@@ -210,7 +213,7 @@ const generateCierreCajaPDF = (cierreCaja:SaldoCaja, fecha:string) => {
 
     doc.setFontSize(12);
     doc.text(`Fecha de Cierre: ${ cierreMov ? new Date(cierreMov.fechaMovimiento).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }) : fecha}`, 105, 30, {align: "center"});
-    if(aperturaMov){
+    if(aperturaMov && typeof aperturaMov === 'object' && 'importe' in aperturaMov){
         doc.text(`Apertura de Caja: $ ${ aperturaMov.importe} (Efectivo)`, 20, 40, {align: "left"});
     }
 
@@ -227,6 +230,7 @@ const generateCierreCajaPDF = (cierreCaja:SaldoCaja, fecha:string) => {
         { label: "PagoFácil", value: cierreCaja.cajaPagofacil },
     ];
 
+    console.log(pagos)
     const rows = pagos.map(p => [p.label, `$${p.value.toFixed(2)}`]);
 
     autoTable(doc, {
@@ -248,22 +252,10 @@ const handleDateRangeChange = async(newDate: DateValue | undefined) => {
     loadingMovements.value=true;
     selectedDate.value = newDate;
     const saldoCaja = await cajaApi.getMovimientos(formatDateValue.value);
-    dateMovements.value = saldoCaja.cajaFinal;
+    dateMovements.value = saldoCaja.cajaDetallada;
     loadingMovements.value=false;
 }
 
-const totalIngresosToday = computed(() => {
-    return todayMovements.value.reduce((total, mov) => {
-        if (mov.importe < 0) return total;
-        return total + mov.importe;
-    }, 0);
-});
-const totalEgresosToday = computed(() => {
-    return todayMovements.value.reduce((total, mov) => {
-        if (mov.importe > 0) return total;
-        return total + mov.importe;
-    }, 0);
-});
 
 
 const resetNewMovimiento = ()=>{
@@ -280,6 +272,36 @@ const isTodaySelected = computed(() => {
          selectedDate.value.day === todayDate.value.day;
 });
 
+
+const getImporteVenta = (movDetalle: { 
+    importe: number;
+    formaPago: string;
+    redDePago: string | null;
+  }[])=> {
+    const total = movDetalle.reduce((total, {importe})=>(
+        total + importe    
+    ),0)
+    return total
+}
+
+const totalIngresosToday = computed(() =>
+  todayMovements.value.reduce((total, mov) => {
+    if ('id' in mov) {
+      return total + mov.detalle.reduce((sub, d) => sub + (d.importe > 0 ? d.importe : 0), 0);
+    } else {
+      return total + (mov.importe > 0 ? mov.importe : 0);
+    }
+  }, 0)
+);
+const totalEgresosToday = computed(() =>
+  todayMovements.value.reduce((total, mov) => {
+    if ('id' in mov) {
+      return total + mov.detalle.reduce((sub, d) => sub + (d.importe < 0 ? Math.abs(d.importe) : 0), 0);
+    } else {
+      return total + (mov.importe < 0 ? Math.abs(mov.importe) : 0);
+    }
+  }, 0)
+);
 </script>
 
 <template>
@@ -299,7 +321,7 @@ const isTodaySelected = computed(() => {
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <div class="pt-2">
+        <div class="pt-2" v-if="!loading">
             <div class="flex flex-row justify-between items-center">
                 <h1 class="page-title ">Movimientos de Caja </h1>
                 <Dialog v-if="aperturaToday && !cierreToday" v-model:open="openDialog" @update:open="resetNewMovimiento()" >
@@ -391,7 +413,7 @@ const isTodaySelected = computed(() => {
                 </Dialog>
             </div>
             <div  class="w-full mt-10 flex flex-row justify-between h-[21rem]">
-                <div class="w-[40%] bg-secondary rounded-lg p-4 flex border flex-col justify-center items-center">
+                <div class="w-[38%] bg-secondary rounded-lg p-4 flex border flex-col justify-center items-center">
                     <div class="flex flex-row w-[90%] justify-between">
                         <div class="flex flex-row justify-start items-center">
                             <h2 class="page-subtitle">Caja Diaria</h2>
@@ -490,7 +512,7 @@ const isTodaySelected = computed(() => {
                         <span v-if="cierreToday" class=" mt-4 font-bold  text-lg text-red-800">Caja del día cerrada</span>
                     </div>
                 </div>
-                <div class="w-[57%] h-[40rem] border rounded-lg p-4 flex flex-col justify-start items-end">
+                <div class="w-[60%] h-[40rem] border rounded-lg p-4 flex flex-col justify-start items-end">
                     <div class="flex flex-row justify-center items-center h-10">
 
                         <Button variant="outline" v-if="(isTodaySelected && cierreToday) || (!isTodaySelected &&  dateMovements.length && !loadingMovements)" @click="informeCierre(selectedDate)" > Imprimir Cierre</Button>
@@ -517,16 +539,37 @@ const isTodaySelected = computed(() => {
                             <LoaderForm />
                         </div>
                         <div v-else>
-                            <div v-for="mov in dateMovements" class="flex flex-row justify-between w-ful h-[4rem]  mb-2 border-b items-center px-4 ">
-                                <Label class="w-[8rem] text-sm ">{{ formatTime(mov.fechaMovimiento) }} hs.</Label>
-                                <Label v-if="mov.detalle && ['APERTURA', 'CIERRE'].includes(mov.detalle)" class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.detalle }}</Label></Label>
-                                <Label v-else class="w-[13rem] text-sm flex justify-start "> <Label class="bg-secondary px-4 py-2 rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
-                                <Label class="w-[13rem] text-sm flex justify-start ">{{ (mov.detalle && !['APERTURA', 'CIERRE'].includes(mov.detalle)) ? (mov.detalle ?? "CTA. CTE. CLIENTE") : ''}}</Label>
-                                <Label class="w-[11rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
+                            <div class="flex flex-row justify-between items-center bg-secondary h-[3rem] rounded-t-lg text-xs px-4 ">
+                                <Label class="w-[4rem]" >HORA</Label>
+                                <Label class="w-[7rem] text-center" >TIPO MOVIMIENTO</Label>
+                                <Label class="w-[7rem]" >DETALLE</Label>
+                                <Label class="w-[15rem]" >MEDIO DE PAGO</Label>
+                                <Label class="w-[8rem]" >MEDIO DE PAGO</Label>
                             </div>
-                            <div v-if="!dateMovements.length && selectedDate==todayDate" class="flex justify-center items-center flex-col mt-10">
-                                <Lebel v-if="selectedDate==todayDate">No se encontraron movimientos de caja registrados para hoy.</Lebel>
-                                <Button class="w-[10rem] mt-4" @click="openDialogOpenCaja=true"> Abrir caja</Button>
+                                <div v-for="mov in dateMovements">
+                                    <div v-if="typeof mov === 'object' && 'id' in mov" class="flex flex-row justify-between w-ful h-[4rem]  y-1 border-b items-center px-4">
+                                        <Label class="w-[4rem] text-sm ">{{ formatTime(mov.fechaMovimiento) }} hs.</Label>
+                                        <Label class="w-[7rem] text-sm flex justify-center text-center"> <Label class="bg-secondary px-4 py-2 w-[6.5rem]  rounded-lg">VENTA</Label></Label>
+                                        <Label class="w-[7rem] text-sm flex justify-start "></Label>
+                                        <Label class="w-[15rem] flex justify-start flex-row gap-1 flex-wrap"><span v-for="mp in mov.detalle" class="text-xs rounded-lg border p-1 h-min">{{ 
+                                            TipoMedioDePagoEnum[mp.formaPago as keyof typeof TipoMedioDePagoEnum].toUpperCase() || mp.formaPago.toUpperCase()
+                                            }}</span></Label>
+                                        <Label class="w-[8rem] text-sm flex justify-start ">$ {{ getImporteVenta(mov.detalle) }}</Label>
+                                    </div>
+                                    <div v-else class="flex flex-row justify-between w-ful h-[4rem]  py-1 border-b items-center px-4">
+                                        <Label class="w-[4rem] text-sm ">{{ formatTime(mov.fechaMovimiento) }} hs.</Label>
+                                        <Label v-if="mov.detalle=='APERTURA'|| mov.detalle=='CIERRE'" class="w-[7rem] text-sm flex justify-center text-center"> <Label class="bg-secondary px-4 py-2 w-[6.5rem] rounded-lg">{{mov.detalle}}</Label></Label>
+                                        <Label v-else class="w-[7rem] text-sm flex justify-center text-center "> <Label class="bg-secondary px-4 py-2 w-[6.5rem] rounded-lg">{{ mov.importe >=0 ? "INGRESO" : "EGRESO" }}</Label></Label>
+                                        <Label v-if="!(mov.detalle=='APERTURA'|| mov.detalle=='CIERRE')" class="w-[8rem]"><p class="text-xs w-min  p-1" >{{mov.detalle.toUpperCase()}}</p></Label>
+                                        <Label v-else class="w-[7rem]"></Label>
+                                        <div class="w-[15rem] text-sm"> </div>
+                                        <Label class="w-[8rem] text-sm"> $ {{ mov.importe.toFixed(2)}}</Label>
+                                    </div>
+                                </div>
+
+                            <div v-if="!dateMovements.length && isTodaySelected" class="flex justify-center items-center flex-col mt-10">
+                                <Lebel v-if="isTodaySelected">No se encontraron movimientos de caja registrados para hoy.</Lebel>
+                                <Button  v-if="isTodaySelected" class="w-[10rem] mt-4" @click="openDialogOpenCaja=true"> Abrir caja</Button>
                             </div>
                             <div v-else-if="!dateMovements.length" class="flex justify-center items-center flex-col mt-10">
                                 <Lebel>No se encontraron movimientos de caja registrados para el día seleccionado.</Lebel>

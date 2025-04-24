@@ -220,16 +220,16 @@ const tipoFactura = (condicionIva: CondicionIva) => {
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
-    <h1 class="page-title">Venta</h1>
     <div
       v-if="currentVenta"
-      class="w-full pt-6 rounded-lg flex flex-col justify-between items-start"
+      class="w-full pt-6 rounded-lg flex flex-col justify-between items-center"
     >
+
       <div
         class="rounded-lg h-full w-full flex flex-col justify-start items-start"
       >
-        <div class="w-full flex flex-row items-center justify-start">
-          <div class="w-[26rem] flex flex-col items-center justify-start">
+        <div class="w-[52%] flex flex-row items-center justify-center">
+          <div class="w-full flex flex-col items-center justify-center">
             <div class="flex flex-row justify-start items-center w-full">
               <Label class="form-label w-[11rem] text-md font-bold"
                 >Cliente:
@@ -237,7 +237,7 @@ const tipoFactura = (condicionIva: CondicionIva) => {
               <Label class="form-label w-[15rem] text-md">{{
                 currentVenta?.cliente.id == 0
                   ? "CONSUMIDOR FINAL"
-                  : currentVenta?.cliente.nombre
+                  : `${currentVenta.cliente.apellido}, ${currentVenta?.cliente.nombre}`
               }}</Label>
             </div>
             <div class="flex flex-row justify-start items-center w-full">
@@ -559,7 +559,8 @@ const tipoFactura = (condicionIva: CondicionIva) => {
         </div>
       </div>
     </div>
-     <div v-else class="flex flex-row justify-between items-center py-4">
+     <div v-else class="flex flex-col  w-[40rem] justify-start items-start py-4">
+          <h1 class="font-bold text-xl   text-center ">Venta</h1>
         <span>Error al cargar la venta</span>
     </div>
   </div>
@@ -640,4 +641,3 @@ const tipoFactura = (condicionIva: CondicionIva) => {
 }
 </style>
 
-mr-4

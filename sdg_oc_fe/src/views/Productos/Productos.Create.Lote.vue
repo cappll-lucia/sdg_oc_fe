@@ -175,7 +175,7 @@ const onSubmit = async()=>{
                         <h5 class="page-subtitle">Instrucciones</h5>
                         <div v-for="step in steps" class="mt-4 ">
                             <Label class=" font-bold text-[1rem]">{{ `${step.step}. ${step.title}` }}</Label>
-                            <p class="pl-5 text-sm">- {{ step.description }} <a class="text-blue-600 underline" v-if="step.step==1" href="../../../public/productos_upload_template.xlsm">en este enlace.</a> </p>
+                            <p class="pl-5 text-sm">- {{ step.description }} <a class="text-blue-600 underline" v-if="step.step==1" href="../../../public/productos_upload_template_v3.xlsm">en este enlace.</a> </p>
                             <p class="pl-5 text-sm" v-if="step.description2">- {{ step.description2 }}</p>
                         </div>
                     </div>
