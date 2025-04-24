@@ -21,7 +21,7 @@ export const columns: ColumnDef<Venta>[]=[
     {
         accessorKey: 'importe',
         header: () => h('div', 'Importe Total'),
-        cell: ({row})=> `$ ${totalVenta(row.original).toFixed(2)}`
+        cell: ({row})=> `$ ${row.original.importe.toFixed(2)}`
     },
     {
         accessorKey: 'mediosPago',

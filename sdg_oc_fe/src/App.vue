@@ -2,6 +2,7 @@
 import Navbar from '@/components/Navbar.vue';
 import {Toaster} from '@/components/ui/toast';
 import Loader from './components/Loader.vue';
+
 </script>
 
 <template>

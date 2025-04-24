@@ -41,7 +41,7 @@ const handleEmitFactura = async()=>{
             })
         }
     }catch (err: any) {
-        ErrorMessage.value = 'Ocurrió un error al emitir la factura'
+        errorMessage.value =err.message 
         showError.value = true;
         loader.hide();
     }
