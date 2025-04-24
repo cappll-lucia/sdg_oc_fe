@@ -19,7 +19,7 @@ import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { router } from '@/router';
 import { useLoaderStore } from '@/stores/LoaderStore';
-import { SlashIcon } from 'lucide-vue-next';
+import { SlashIcon } from '@radix-icons/vue';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 

@@ -8,7 +8,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { SlashIcon } from 'lucide-vue-next';
+import { SlashIcon} from '@radix-icons/vue';
 
 </script>
 

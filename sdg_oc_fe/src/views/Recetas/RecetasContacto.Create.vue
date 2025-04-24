@@ -28,7 +28,8 @@ import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { router, previousRoute } from '@/router';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
-import { SlashIcon, AsteriskIcon, PlusIcon, ImageUpIcon} from 'lucide-vue-next';
+import { AsteriskIcon, PlusIcon, ImageUpIcon} from 'lucide-vue-next';
+import {  SlashIcon } from '@radix-icons/vue';
 import {
   Tooltip,
   TooltipContent,

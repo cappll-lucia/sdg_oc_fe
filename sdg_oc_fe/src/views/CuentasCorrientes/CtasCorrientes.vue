@@ -17,7 +17,8 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, SlashIcon } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import {  SlashIcon } from '@radix-icons/vue';
 import { onMounted, ref } from 'vue';
 import { cuentaCorrienteApi } from '@/api/libs/cuentaCorriente';
 import { CuentaCorriente } from '@/api/entities/cuentaCorriente';

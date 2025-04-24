@@ -12,7 +12,7 @@ import { toast } from '@/components/ui/toast';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-import { SlashIcon } from 'lucide-vue-next';
+import { SlashIcon } from '@radix-icons/vue';
 
 
 const handleCreateObraSocial = async()=>{
