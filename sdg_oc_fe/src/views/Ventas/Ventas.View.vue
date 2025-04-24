@@ -56,6 +56,8 @@ onMounted(async () => {
 const loadData = async (id: string) => {
   try {
     const res = await ventasApi.getOne(id);
+    console.log(res.venta);
+
     currentVenta.value = res.venta;
     comprobantesVenta.value = [...res.comprobantesRelacionados];
     if (res.venta.factura) {
