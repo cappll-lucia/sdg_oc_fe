@@ -24,7 +24,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { previousRoute, router } from '@/router';
-import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
+import { AsteriskIcon} from 'lucide-vue-next';
+import { SlashIcon} from '@radix-icons/vue';
 import { computed, onMounted, ref} from 'vue';
 import {
   Tooltip,

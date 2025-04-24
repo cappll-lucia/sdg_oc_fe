@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { SlashIcon, AsteriskIcon, PlusIcon} from 'lucide-vue-next';
+import { AsteriskIcon, PlusIcon} from 'lucide-vue-next';
 import { Separator } from '@/components/ui/separator';
 import { computed, onMounted, ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
@@ -36,7 +36,7 @@ import AlertError from '@/components/AlertError.vue';
 import { PruebaLentesContacto, pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
 import { toast } from '@/components/ui/toast';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
-import { Cross2Icon, ValueNoneIcon } from '@radix-icons/vue';
+import { Cross2Icon, ValueNoneIcon, SlashIcon } from '@radix-icons/vue';
 import { useLoaderStore } from '@/stores/LoaderStore';
 
 const route = useRoute();

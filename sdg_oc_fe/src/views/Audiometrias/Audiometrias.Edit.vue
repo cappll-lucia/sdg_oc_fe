@@ -12,7 +12,8 @@ import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/toast'
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
-import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
+import {  AsteriskIcon} from 'lucide-vue-next';
+import { SlashIcon} from '@radix-icons/vue';
 import {
   Tooltip,
   TooltipContent,
