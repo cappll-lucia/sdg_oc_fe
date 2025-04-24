@@ -7,6 +7,15 @@ import AlertError from "@/components/AlertError.vue";
 import { columns } from "@/components/tables/ventas/columns";
 import DataTable from "@/components/tables/ventas/data-table.vue";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -30,15 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog';
 import { useLoaderStore } from "@/stores/LoaderStore";
 import {
   CalendarDate,
@@ -46,7 +46,12 @@ import {
   getLocalTimeZone,
 } from "@internationalized/date";
 import { ReloadIcon, SlashIcon } from "@radix-icons/vue";
-import { AlertCircle, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-vue-next";
+import {
+  AlertCircle,
+  CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-vue-next";
 import type { DateRange } from "reka-ui";
 import { onMounted, ref } from "vue";
 
@@ -78,10 +83,10 @@ const ventas = ref<Venta[]>([]);
 const handleFilterVentas = async () => {
   loader.show();
   await handleSearchVentas();
-  loader.hide()
+  loader.hide();
 };
 
-const handleSearchVentas = async()=>{
+const handleSearchVentas = async () => {
   try {
     const resp = await ventasApi.getAll({
       nombreCliente: txtSearch.value,
@@ -101,10 +106,10 @@ const handleSearchVentas = async()=>{
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;
-  }finally{
+  } finally {
     loader.hide();
   }
-}
+};
 
 const formatDateValue = (dateValue: CalendarDate | undefined): string => {
   if (!dateValue) return "";
@@ -124,9 +129,11 @@ const clearFilters = async () => {
 };
 
 onMounted(async () => {
-  const pendientes = await ventasApi.getAll({tipoComprobante: "pendiente"});
+  loader.show();
+  const pendientes = await ventasApi.getAll({ tipoComprobante: "pendiente" });
   qtyPendientes.value = pendientes.items.length;
   await handleFilterVentas();
+  loader.hide();
 });
 
 const handlePageChange = async (targetOffset: number | null) => {
@@ -156,19 +163,21 @@ const handleDateRangeChange = async (newRange: DateRange) => {
 const handleFacturarPendientes = async () => {
   try {
     loader.show();
-      const res = await comprobantesApi.facturarPendientes();
-      messagePendientes.value = res.resultados.fallidas.length ? `La facturación falló para algunas ventas.` : res.message
-      if(res.resultados.fallidas.length){
-        showPendientesError.value=true;
-      }else{
-        showPendientesAlert.value=true;
-      }
-      const ventasRes = await ventasApi.getAll({});
-      ventas.value = ventasRes.items;
+    const res = await comprobantesApi.facturarPendientes();
+    messagePendientes.value = res.resultados.fallidas.length
+      ? `La facturación falló para algunas ventas.`
+      : res.message;
+    if (res.resultados.fallidas.length) {
+      showPendientesError.value = true;
+    } else {
+      showPendientesAlert.value = true;
+    }
+    const ventasRes = await ventasApi.getAll({});
+    ventas.value = ventasRes.items;
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;
-  }finally{
+  } finally {
     loader.hide();
   }
 };
@@ -257,7 +266,12 @@ const handleFacturarPendientes = async () => {
             <ReloadIcon />
           </Button>
         </div>
-        <Button @click="handleFacturarPendientes" variant="outline" v-if="qtyPendientes" class="text-xs">
+        <Button
+          @click="handleFacturarPendientes"
+          variant="outline"
+          v-if="qtyPendientes"
+          class="text-xs"
+        >
           Emitir facturas pendientes</Button
         >
       </div>
@@ -318,22 +332,31 @@ const handleFacturarPendientes = async () => {
     />
 
     <AlertDialog :open="showPendientesError">
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle class="text-center w-full">Facturar ventas pendiente</AlertDialogTitle>
-        <AlertDialogDescription class="text-center w-full text-md text-destructive flex flex-row justify-center items-center">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle class="text-center w-full"
+            >Facturar ventas pendiente</AlertDialogTitle
+          >
+          <AlertDialogDescription
+            class="text-center w-full text-md text-destructive flex flex-row justify-center items-center"
+          >
             <AlertCircle class="w-4 h-4 mr-2" />
-          <p>
-            {{ messagePendientes }}
-          </p>
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter class=" mt-4 flex sm:justify-center  lg:justify-center  md:justify-center  xs:justify-center  xl:justify-center 2xl:justify-center w-full" >
-        <AlertDialogAction class="w-[45%]" @click="showPendientesError=false">
-          Aceptar
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+            <p>
+              {{ messagePendientes }}
+            </p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter
+          class="mt-4 flex sm:justify-center lg:justify-center md:justify-center xs:justify-center xl:justify-center 2xl:justify-center w-full"
+        >
+          <AlertDialogAction
+            class="w-[45%]"
+            @click="showPendientesError = false"
+          >
+            Aceptar
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>

@@ -49,7 +49,7 @@ import autoTable from "jspdf-autotable";
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
 import LoaderForm from '@/components/LoaderForm.vue';
-import { RedDePago, TipoMedioDePagoEnum } from '@/api/entities/mediosDePago';
+import { TipoMedioDePagoEnum } from '@/api/entities/mediosDePago';
 import type { MovimientoConDetalle, MovimientoSimple } from '@/api/entities/caja';
 
 
