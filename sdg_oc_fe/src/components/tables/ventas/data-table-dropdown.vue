@@ -14,8 +14,9 @@ import { tipoFactura } from '@/lib/utils';
 const loader = useLoaderStore();
 
 const props = defineProps<{
-    venta: Venta
-}>()
+    venta: Venta;
+    onRefetch: ()=> void;
+}>();
 
 
 const showError = ref<boolean>(false);
@@ -34,6 +35,7 @@ const handleEmitFactura = async()=>{
             }
             const factura = await comprobantesApi.create(newFactura);
             props.venta.factura=factura;
+            await props.onRefetch?.();
             loader.hide();
             toast({
                 title: 'Factura emitida',
