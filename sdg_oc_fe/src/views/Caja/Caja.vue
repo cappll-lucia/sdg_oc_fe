@@ -544,7 +544,7 @@ const totalEgresosToday = computed(() =>
                                 <Label class="w-[7rem] text-center" >TIPO MOVIMIENTO</Label>
                                 <Label class="w-[7rem]" >DETALLE</Label>
                                 <Label class="w-[15rem]" >MEDIO DE PAGO</Label>
-                                <Label class="w-[8rem]" >MEDIO DE PAGO</Label>
+                                <Label class="w-[8rem]" >IMPORTE</Label>
                             </div>
                                 <div v-for="mov in dateMovements">
                                     <div v-if="typeof mov === 'object' && 'id' in mov" class="flex flex-row justify-between w-ful h-[4rem]  y-1 border-b items-center px-4">
