@@ -56,6 +56,8 @@ onMounted(async () => {
 const loadData = async (id: string) => {
   try {
     const res = await ventasApi.getOne(id);
+    console.log(res.venta);
+
     currentVenta.value = res.venta;
     comprobantesVenta.value = [...res.comprobantesRelacionados];
     if (res.venta.factura) {
@@ -559,8 +561,8 @@ const tipoFactura = (condicionIva: CondicionIva) => {
         </div>
       </div>
     </div>
-     <div v-else class="flex flex-row justify-between items-center py-4">
-        <span>Error al cargar la venta</span>
+    <div v-else class="flex flex-row justify-between items-center py-4">
+      <span>Error al cargar la venta</span>
     </div>
   </div>
   <AlertError
