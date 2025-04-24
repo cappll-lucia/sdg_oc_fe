@@ -50,16 +50,3 @@ export const columns: ColumnDef<Venta>[]=[
         },
     }
 ]
-
-
-const totalVenta = (venta: Venta)=>{
-    const totalBruto = venta.lineasDeVenta.reduce((total, linea) => {
-            return total + (linea.precioIndividual ? linea.precioIndividual * linea.cantidad : 0);
-        }, 0);
-    const montoOS = venta.ventaObraSocial.reduce((total, os)=>{
-            return total + os.importe
-        }, 0);
-    const totalFinalVenta = totalBruto - montoOS; 
-    const montoDto = totalFinalVenta * venta.descuentoPorcentaje / 100
-    return totalFinalVenta - montoDto
-}   
