@@ -30,6 +30,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { useLoaderStore } from "@/stores/LoaderStore";
 import {
   CalendarDate,
@@ -37,7 +46,7 @@ import {
   getLocalTimeZone,
 } from "@internationalized/date";
 import { ReloadIcon, SlashIcon } from "@radix-icons/vue";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-vue-next";
+import { AlertCircle, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-vue-next";
 import type { DateRange } from "reka-ui";
 import { onMounted, ref } from "vue";
 
@@ -52,8 +61,9 @@ const qtyPendientes = ref<number>(0);
 
 const showError = ref<boolean>(false);
 const errorMessage = ref<string>("");
-const showPendientesAlert = ref<boolean>(false);
 const messagePendientes = ref<string>("");
+const showPendientesAlert = ref<boolean>(false);
+const showPendientesError = ref<boolean>(false);
 
 const dateRange = ref<DateRange>({
   start: undefined,
@@ -66,8 +76,13 @@ const previousPage = ref<number | null>(null);
 const ventas = ref<Venta[]>([]);
 
 const handleFilterVentas = async () => {
+  loader.show();
+  await handleSearchVentas();
+  loader.hide()
+};
+
+const handleSearchVentas = async()=>{
   try {
-    //loader.show();
     const resp = await ventasApi.getAll({
       nombreCliente: txtSearch.value,
       fechaDesde: dateRange.value.start
@@ -83,13 +98,13 @@ const handleFilterVentas = async () => {
     ventas.value = resp.items;
     nextPage.value = resp.nextPage;
     previousPage.value = resp.previousPage;
-    loader.hide();
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;
+  }finally{
     loader.hide();
   }
-};
+}
 
 const formatDateValue = (dateValue: CalendarDate | undefined): string => {
   if (!dateValue) return "";
@@ -141,26 +156,19 @@ const handleDateRangeChange = async (newRange: DateRange) => {
 const handleFacturarPendientes = async () => {
   try {
     loader.show();
-    const pending = await ventasApi.getAll({
-      tipoComprobante: "pendiente",
-      limit: 10000,
-    });
-    if (pending.items.length) {
-      await comprobantesApi.facturarPendientes();
-      messagePendientes.value =
-        "Las facturas pendientes se han emitido exitosamente.";
-      showPendientesAlert.value = true;
+      const res = await comprobantesApi.facturarPendientes();
+      messagePendientes.value = res.resultados.fallidas.length ? `La facturación falló para algunas ventas.` : res.message
+      if(res.resultados.fallidas.length){
+        showPendientesError.value=true;
+      }else{
+        showPendientesAlert.value=true;
+      }
       const ventasRes = await ventasApi.getAll({});
       ventas.value = ventasRes.items;
-    } else {
-      messagePendientes.value =
-        "No se encontraron ventas pendientes de facturar.";
-      showPendientesAlert.value = true;
-    }
-    loader.hide();
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;
+  }finally{
     loader.hide();
   }
 };
@@ -191,7 +199,7 @@ const handleFacturarPendientes = async () => {
             class="max-w-sm"
             placeholder="Buscar cliente"
             v-model="txtSearch"
-            @input="(e: any) => e.target.value.length >= 0 && handleFilterVentas()"
+            @input="(e: any) => e.target.value.length >= 0 && handleSearchVentas()"
           />
           <Select
             v-model="selectedTipoFactura"
@@ -308,5 +316,24 @@ const handleFacturarPendientes = async () => {
       primary-btn="Aceptar"
       :primary-action="() => (showPendientesAlert = false)"
     />
+
+    <AlertDialog :open="showPendientesError">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle class="text-center w-full">Facturar ventas pendiente</AlertDialogTitle>
+        <AlertDialogDescription class="text-center w-full text-md text-destructive flex flex-row justify-center items-center">
+            <AlertCircle class="w-4 h-4 mr-2" />
+          <p>
+            {{ messagePendientes }}
+          </p>
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter class=" mt-4 flex sm:justify-center  lg:justify-center  md:justify-center  xs:justify-center  xl:justify-center 2xl:justify-center w-full" >
+        <AlertDialogAction class="w-[45%]" @click="showPendientesError=false">
+          Aceptar
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
   </div>
 </template>

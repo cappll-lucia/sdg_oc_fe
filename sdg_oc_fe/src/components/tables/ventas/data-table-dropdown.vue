@@ -8,7 +8,6 @@ import { useLoaderStore } from '@/stores/LoaderStore';
 import { TipoComprobante } from '@/api/entities/comprobante';
 import { comprobantesApi } from '@/api/libs/comprobantes';
 import { toast } from '@/components/ui/toast';
-import { ErrorMessage } from 'vee-validate';
 import { ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
 
@@ -41,7 +40,7 @@ const handleEmitFactura = async()=>{
             })
         }
     }catch (err: any) {
-        ErrorMessage.value = 'Ocurrió un error al emitir la factura'
+        errorMessage.value =err.message 
         showError.value = true;
         loader.hide();
     }

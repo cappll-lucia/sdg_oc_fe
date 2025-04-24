@@ -116,14 +116,15 @@ const create = async(_comprobante: any ) =>{
         comprobante.fechaEmision = new Date(comprobante.fechaEmision)
         return comprobante
     } catch (error: any) {
-        console.log(error)
+        console.log(error)  
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la obra social')
     }
 }
 
 const facturarPendientes = async() =>{
     try {
-        await http.post('/comprobante/facturarPendientes');
+        const resp = await http.post('/comprobante/facturarPendientes');
+        return resp.data.data as {message: string, resultados: {exitosas:string[], fallidas:[]}}
     } catch (error: any) {
         console.log(error)
         throw error instanceof (AxiosError) ?  new Error(error?.response?.data?.message) : new Error('Algo salió mal al crear la obra social')

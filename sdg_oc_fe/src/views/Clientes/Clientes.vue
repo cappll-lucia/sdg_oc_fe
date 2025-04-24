@@ -63,9 +63,8 @@ const clearFilters = async () => {
   await handleFilterClientes();
 };
 
-const handleFilterClientes = async () => {
+const handleSearchClientes = async () => {
   try {
-    //loader.show();
     const res = await clientesApi.getAll({
       filtro: txtSearch.value,
       sexo: selectedSexo.value,
@@ -73,18 +72,22 @@ const handleFilterClientes = async () => {
       offset: currentOffset.value,
       limit: currentLimit.value,
     });
-    console.log(res);
     clientes.value = res.items.filter((c) => c.id != 0);
     nextPage.value = res.nextPage;
     previousPage.value = res.previousPage;
-    loader.hide();
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;
+  }finally{
     loader.hide();
   }
 };
 
+const handleFilterClientes = async () => {
+  loader.show();
+  await handleSearchClientes();
+  loader.hide();
+}
 const handlePageChange = async (targetOffset: number | null) => {
   if (targetOffset == null) return;
   currentOffset.value = targetOffset;
@@ -121,7 +124,7 @@ const handleLimitChange = async (newLimit: string) => {
             class="max-w-sm"
             placeholder="Buscar cliente por nombre, apellido o documento  "
             v-model="txtSearch"
-            @input="(e: any) => e.target.value.length >= 0 && handleFilterClientes()"
+            @input="(e: any) => e.target.value.length >= 0 && handleSearchClientes()"
           />
           <Select
             v-model="selectedLocalidadId"

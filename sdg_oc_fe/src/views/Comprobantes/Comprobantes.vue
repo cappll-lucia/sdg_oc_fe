@@ -61,25 +61,36 @@ const previousPage = ref<number | null>(null);
 
 const comprobantes = ref<Comprobante[]>([]);
 
-const handleFilterComprobantes = async () => {
-  loader.show();
-  const resp = await comprobantesApi.getAll({
-    nombreCliente: txtSearch.value,
-    fechaDesde: dateRange.value.start
+const handleSearchComprobantes = async () => {
+  try{
+    const resp = await comprobantesApi.getAll({
+      nombreCliente: txtSearch.value,
+      fechaDesde: dateRange.value.start
       ? formatDateValue(dateRange.value.start as CalendarDate | undefined)
       : "",
-    fechaHasta: dateRange.value.end
+      fechaHasta: dateRange.value.end
       ? formatDateValue(dateRange.value.end as CalendarDate | undefined)
       : "",
-    tipoComprobante: selectedTipoFactura.value,
-    offset: currentOffset.value,
-    limit: currentLimit.value,
-  });
-  comprobantes.value = resp.items;
-  nextPage.value = resp.nextPage;
-  previousPage.value = resp.previousPage;
-  loader.hide();
+      tipoComprobante: selectedTipoFactura.value,
+      offset: currentOffset.value,
+      limit: currentLimit.value,
+    });
+    comprobantes.value = resp.items;
+    nextPage.value = resp.nextPage;
+    previousPage.value = resp.previousPage;
+  }catch(err: any){
+    errorMessage.value = err.message as string;
+    showError.value = true;
+  }finally{
+    loader.hide();
+  }
 };
+
+const  handleFilterComprobantes = async()=> {
+  loader.show();
+  await handleSearchComprobantes();
+  loader.hide();
+}
 
 const formatDateValue = (dateValue: CalendarDate | undefined): string => {
   if (!dateValue) return "";
@@ -153,6 +164,7 @@ const handleDateRangeChange = async (newRange: DateRange) => {
             placeholder="Buscar cliente"
             v-model="txtSearch"
             @keyup.enter="handleFilterComprobantes"
+            @input="(e: any) => e.target.value.length >= 0 && handleSearchComprobantes()"
           />
           <Select
             v-model="selectedTipoFactura"

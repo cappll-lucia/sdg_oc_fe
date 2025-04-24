@@ -44,9 +44,8 @@ const cuentasCorrientes = ref<CuentaCorriente[]>([]);
 const showError = ref<boolean>(false);
 const errorMessage =ref<string>('');
 
-const handleFilterCtasCorrientes = async()=>{
+const handleSearchCtasCorrientes = async()=>{
     try{
-        loader.show();
         const res = await cuentaCorrienteApi.getAll({
             filtro: txtSearch.value,
             estado: selectedEstado.value,
@@ -56,13 +55,19 @@ const handleFilterCtasCorrientes = async()=>{
         cuentasCorrientes.value = res.items.filter(c=>c.cliente.id!=0);
         nextPage.value = res.nextPage;
         previousPage.value =res.previousPage;
-        loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
         showError.value = true;
+    }finally{
         loader.hide();
     }
 };
+const handleFilterCtasCorrientes = async()=>{
+    loader.show();
+    await handleSearchCtasCorrientes();
+    loader.hide();
+}
+
 
 const handlePageChange = async(offset: number) => {
     if(currentOffset.value==0 && offset<0) return
@@ -107,15 +112,16 @@ const clearFilters = async()=>{
                 <div class="search flex w-[65rem]  flex-row justify-start gap-x-6">
                     <Input class="max-w-sm " placeholder="Buscar cliente por nombre, apellido o documento  "
                         v-model="txtSearch" @keyup.enter="handleFilterCtasCorrientes"
+                        @input="(e: any) => e.target.value.length >= 0 && handleSearchCtasCorrientes()"
                     />
                     <Select v-model="selectedEstado" @update:model-value="handleFilterCtasCorrientes" >
                         <SelectTrigger class="w-[250px]">
                             <SelectValue  placeholder="Filtrar por Estado" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectGroup>
-                                <SelectItem  class="text-red-700" value="1">Con saldo negativo</SelectItem>
-                                <SelectItem class="text-green-700"  value="0">Con saldo a favor</SelectItem>
+                            <SelectGroup >
+                                <SelectItem  value="1">Con saldo negativo</SelectItem>
+                                <SelectItem  value="0">Con saldo a favor</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

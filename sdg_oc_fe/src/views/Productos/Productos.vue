@@ -82,9 +82,8 @@ onMounted(async () => {
 });
 
 
-const handleFilterProducts = async () => {
+const handleSearchProducts = async () => {
     try{
-        loader.show();
         const resp = await productosApi.getAll({
             proveedorId: selectedProveedorId.value,
             marcaId: selectedMarcaId.value,
@@ -96,13 +95,19 @@ const handleFilterProducts = async () => {
         productos.value = resp.items;
         nextPage.value = resp.nextPage;
         previousPage.value =resp.previousPage;
-        loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
         showError.value = true;
+    }finally{
         loader.hide();
     }
 };
+
+const handleFilterProducts = async()=>{
+    loader.show();
+    await handleSearchProducts();
+    loader.hide();
+}
 
 const handlePageChange = async(targetOffset: number | null) => {
     if (targetOffset == null) return;
@@ -171,7 +176,9 @@ const clearFilters = async()=>{
             <div class="flex flex-row justify-between items-center py-4">
                 <div class="search flex w-[65rem]  flex-row justify-start gap-x-4">
                     <Input class="max-w-sm " placeholder="Buscar Producto" v-model="txtSearch"
-                        @keyup.enter="handleFilterProducts" />
+                        @keyup.enter="handleFilterProducts"
+                        @input="(e: any) => e.target.value.length >= 0 && handleSearchProducts()"
+                         />
                     <Select v-model="selectedProveedorId" @update:model-value="handleFilterProducts">
                         <SelectTrigger class="w-[200px]">
                             <SelectValue placeholder="Filtrar por Proveedor" />
