@@ -6,7 +6,7 @@ import { ColumnDef } from "@tanstack/vue-table";
 import { h } from "vue";
 import DropdownAction from "./data-table-dropdown.vue";
 
-export const columns: ColumnDef<Venta>[] = [
+export const columns = (onRefetch: () => void): ColumnDef<Venta>[] => [
   {
     accessorKey: "fecha",
     header: () => h("div", "Fecha"),
@@ -31,15 +31,15 @@ export const columns: ColumnDef<Venta>[] = [
     cell: ({ row }) =>
       h(
         "div",
-
+        {class: 'flex flex-row flex-wrap gap-y-1'},
         row.original.mediosDePago.map((mp, i) =>
           h(
             "span",
             {
               class:
                 i === 0
-                  ? "mr-1 p-1 border rounded-lg  text-center"
-                  : "p-1 border rounded-lg  text-center",
+                  ? "   text-xs mr-1 p-1 border rounded-lg  text-center"
+                  : "   text-xs p-1 border rounded-lg  text-center",
             },
             TipoMedioDePagoEnum[
               mp.tipoMedioDePago as keyof typeof TipoMedioDePagoEnum
@@ -70,6 +70,7 @@ export const columns: ColumnDef<Venta>[] = [
         { class: "relative text-right right-10  " },
         h(DropdownAction, {
           venta: { ...venta, id: venta.id },
+          onRefetch,
         })
       );
     },

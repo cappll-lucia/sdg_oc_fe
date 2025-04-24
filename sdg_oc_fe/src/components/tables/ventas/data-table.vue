@@ -52,6 +52,7 @@ const table = useVueTable({
       <TableBody>
         <template v-if="table.getRowModel().rows?.length">
           <TableRow
+            class="h-[5rem]"
             v-for="row in table.getRowModel().rows"
             :key="row.id"
             :data-state="row.getIsSelected() ? 'selected' : undefined"

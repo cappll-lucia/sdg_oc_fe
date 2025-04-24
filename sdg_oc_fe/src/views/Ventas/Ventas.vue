@@ -275,7 +275,7 @@ const handleFacturarPendientes = async () => {
           Emitir facturas pendientes</Button
         >
       </div>
-      <DataTable :columns="columns" :data="ventas" />
+      <DataTable :columns="columns(handleFilterVentas)" :data="ventas" />
     </div>
     <div class="mt-4 flex w-full justify-center">
       <div class="flex items-center gap-1 text-gray-500">
