@@ -10,40 +10,14 @@
 
 
 <template>
-  <div v-if="visible" class="absolute  inset-0 top-[64px] h-[150vh] flex flex-col items-start justify-center bg-white  ">
+  <div v-if="visible" class="absolute w-screen  inset-0 h-screen flex flex-col items-start justify-center bg-white  ">
   <div class="absolute  inset-0 h-[40rem] flex flex-col items-center justify-center bg-white  ">
-    <div class="dots-loader">
-      <span v-for="n in 5" :key="n" :style="{ animationDelay: `${(n - 1) * 0.1}s` }" />
-    </div>
-    <span class=" font-bold text-lg">Cargando ...</span>
+  <div class="flex items-center justify-center h-full flex-col w-full">
+    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+    <span class=" mt-4  text-gray-500 font-extralight fon  text-lg ">Cargando ...</span>
+  </div>
   </div>
   </div>
 </template>
 
 
-<style scoped>
-.dots-loader {
-  display: flex;
-  gap: 8px;
-  height: 2.5rem;
-}
-
-.dots-loader span {
-  width: 10px;
-  height: 10px;
-  background-color: #000;
-  border-radius: 50%;
-  animation: bounce 1.1s infinite ease-in-out;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-30px);
-    width: 15px;
-    height: 15px;
-  }
-} 
-</style>

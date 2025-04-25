@@ -1145,10 +1145,10 @@ const abrirCajaDiaria = async () => {
                       "
                     ></Switch>
                   </div>
-                  <div v-if="dto" class="flex flex-row items-center">
+                  <div v-if="dto" class="flex flex-row items-center mt-2">
                     <Label class="w-[5.5rem]">Porcentaje: </Label>
                     <Input
-                      class="w-14 mr-2 text-center"
+                      class="w-14 mr-2 h-6 text-center"
                       :model-value="porcDto"
                       @update:model-value="
                         (value) => {
@@ -1258,6 +1258,8 @@ const abrirCajaDiaria = async () => {
                 @update:modelValue="(value) => {
                                     if (mediosDePago[index]) {
                                         mediosDePago[index].tipoMedioDePago = value as TipoMedioDePagoEnum;
+                                        mediosDePago[index].entidadBancaria=undefined;
+                                        mediosDePago[index].redDePago=undefined;
                                     }
                                 }"
               >
