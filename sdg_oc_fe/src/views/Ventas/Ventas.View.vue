@@ -321,7 +321,7 @@ const tipoFactura = (condicionIva: CondicionIva) => {
             <div
               class="w-[68%] rounded-lg border p-4 flex flex-col justify-start items-start"
             >
-              <div class="rounded-lg w-[30rem] min-h-[4rem]">
+              <div class="rounded-lg w-[40rem] min-h-[3rem]">
                 <h3 class="text-md font-bold">Obras Sociales</h3>
                 <span
                   v-if="currentVenta.ventaObraSocial.length == 0"
@@ -331,7 +331,7 @@ const tipoFactura = (condicionIva: CondicionIva) => {
                 <div
                   v-else
                   v-for="vos in currentVenta.ventaObraSocial"
-                  class="w-full flex flex-row justify-start my-2 items-center"
+                  class="w-full flex flex-row justify-start mb-2 mt-1 items-center"
                 >
                   <span class="text-sm w-[12rem]">{{
                     vos.obraSocial.nombre
@@ -339,12 +339,12 @@ const tipoFactura = (condicionIva: CondicionIva) => {
                   <span class="text-sm w-[7rem]"
                     >$ {{ vos.importe.toFixed(2) }}</span
                   >
-                  <span class="text-sm">{{
+                  <span class="text-sm w-max">{{
                     condicionIvaDisplay(vos.condicionIva)
                   }}</span>
                 </div>
               </div>
-              <div class="rounded-lg w-full min-h-[3rem]">
+              <div class="rounded-lg w-full min-h-[3.1rem] mt-6">
                 <h3 class="text-md font-bold">Descuento</h3>
                 <span v-if="!currentVenta.descuentoPorcentaje" class="text-sm"
                   >No aplica</span
@@ -356,7 +356,7 @@ const tipoFactura = (condicionIva: CondicionIva) => {
             </div>
             <div
               v-if="currentVenta"
-              class="w-[30%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center"
+              class="w-[30%] h-[10.2rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center"
             >
               <div
                 v-if="
