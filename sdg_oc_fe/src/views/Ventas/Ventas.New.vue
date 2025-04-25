@@ -71,7 +71,6 @@ import { AlertCircleIcon, AsteriskIcon, PlusCircleIcon } from "lucide-vue-next";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
-
 const route = useRoute();
 const cajaStore = useCajaStore();
 const loader = useLoaderStore();
@@ -123,7 +122,7 @@ const observaciones = ref<string>("");
 
 const fechaVenta = ref<Date>(new Date());
 
-const condicionIvaVenta = ref<CondicionIva>(CondicionIva.CONSUMIDOR_FINAL);
+const condicionIvaVenta = ref<CondicionIva | undefined>();
 const availableCondicionIva = ref<CondicionIva[]>([
   CondicionIva.CONSUMIDOR_FINAL,
 ]);
@@ -165,7 +164,7 @@ const isValidMediosPago = ref<
 const isValidImporteMedios = ref<boolean>(true);
 const isValidImporteObrasSociales = ref<boolean>(true);
 
-const addLineaVenta = () => {
+const addLineaVenta = async () => {
   lineasDeVenta.value.push({
     producto: { id: undefined, descripcion: "", codProv: "" },
     cantidad: 1,
@@ -176,6 +175,7 @@ const addLineaVenta = () => {
     cantidad: true,
     precioIndividual: true,
   });
+  await nextTick();
 };
 
 const addMedioPago = async () => {
@@ -243,10 +243,13 @@ const onSubmit = async () => {
       descuentoPorcentaje: porcDto.value && dto.value ? porcDto.value : 0,
       mediosDePago: mediosDePago.value,
       lineasDeVenta: lineasDeVenta.value,
-      ventaObraSocial: ventaObrasSociales.value && obrasSociales.value ? ventaObrasSociales.value : [],
+      ventaObraSocial:
+        ventaObrasSociales.value && obrasSociales.value
+          ? ventaObrasSociales.value
+          : [],
       observaciones: observaciones.value,
     };
-    console.log(newVenta)
+    console.log(newVenta);
     const createdVenta = await ventasApi.create(newVenta);
     loader.hide();
     router.push(`/ventas/view/${createdVenta.venta.id}`);
@@ -342,7 +345,7 @@ const middleValidate = async () => {
     if (
       !resultVentasOS.success &&
       ventaObrasSociales.value.length == 1 &&
-      !ventaObrasSociales.value[1]?.obraSocial
+      !ventaObrasSociales.value[0]?.obraSocial.id
     ) {
       ventaObrasSociales.value = [];
       resultVentasOS.success = true;
@@ -370,19 +373,19 @@ onMounted(async () => {
   loader.show();
   addLineaVenta();
   const cierre = await cajaStore.isCajaClosedToday();
-  console.log(cierre, 'c')
+  console.log(cierre, "c");
   openDialogClosedCaja.value = cierre;
-  if(cierre){
-    openDialogClosedCaja.value=true;
+  if (cierre) {
+    openDialogClosedCaja.value = true;
     loader.hide();
     return;
   }
   const cajaOpened = await cajaStore.isCajaOpenedToday();
   openDialogOpenCaja.value = !cajaOpened;
-  const query = route.query
-  if(query.cliente){
-    const foundCliente = await clientesApi.getOne(Number(query.cliente))
-      if(foundCliente) handleSelectCliente(foundCliente)
+  const query = route.query;
+  if (query.cliente) {
+    const foundCliente = await clientesApi.getOne(Number(query.cliente));
+    if (foundCliente) handleSelectCliente(foundCliente);
   }
   loader.hide();
 });
@@ -393,10 +396,10 @@ const handleSelectCliente = async (cliente: Cliente) => {
   availableCondicionIva.value = [CondicionIva.CONSUMIDOR_FINAL];
   if (cliente.categoriaFiscal != CondicionIva.CONSUMIDOR_FINAL) {
     availableCondicionIva.value.push(cliente.categoriaFiscal as CondicionIva);
-    condicionIvaVenta.value = cliente.categoriaFiscal;
   }
   selectedCliente.value = cliente;
   searchClienteOpen.value = false;
+  condicionIvaVenta.value = CondicionIva.CONSUMIDOR_FINAL;
   if (cliente.id == 0) {
     mediosDePago.value.forEach((mp) => {
       if (
@@ -466,15 +469,15 @@ const montoDto = computed(() => {
 });
 
 const totalVentaFinal = computed(() => {
-  if(obrasSociales.value){
+  if (obrasSociales.value) {
     return totalVentaBruto.value - montoObrasSociales.value;
-  }else{
-    return totalVentaBruto.value
+  } else {
+    return totalVentaBruto.value;
   }
 });
 
 const caluclateImportePago = computed(() => {
-  if(dto.value && montoDto.value){
+  if (dto.value && montoDto.value) {
     return totalVentaFinal.value - montoDto.value;
   }
   return totalVentaFinal.value;
@@ -525,8 +528,8 @@ const handleShowNewObraSocialCliente = async (index: number) => {
   openSelectOSIndex.value = index;
   newOsIndex.value = index;
   openNewClienteOS.value = true;
-  if(!ventaObrasSociales.value.length){
-    addVentaObraSocial()
+  if (!ventaObrasSociales.value.length) {
+    addVentaObraSocial();
   }
 };
 
@@ -599,7 +602,7 @@ const abrirCajaDiaria = async () => {
     <div class="pt-2">
       <form
         @submit.prevent="validateAndSubmit"
-        class="flex  flex-row justify-center items-center py-4"
+        class="flex flex-row justify-center items-center py-4"
       >
         <div
           class="rounded-[0.5rem] w-full h-auto flex flex-col justify-start items-center"
@@ -651,8 +654,12 @@ const abrirCajaDiaria = async () => {
                     >Condición Fiscal</Label
                   >
                   <Select
-                    :model-value="condicionIvaVenta.toString()"
-                    @update:model-value="(value) => condicionIvaVenta = value as unknown as CondicionIva"
+                    :model-value="condicionIvaVenta?.toString()"
+                    @update:model-value="(value) => {
+                      if(value) {
+                        condicionIvaVenta = value as unknown as CondicionIva
+                      }
+                    }"
                   >
                     <SelectTrigger class="text-black w-[20rem]">
                       <SelectValue />
@@ -866,8 +873,8 @@ const abrirCajaDiaria = async () => {
               class="mt-4"
               :disabled="isLastLineaEmpty"
               @click="
-                () => {
-                  addLineaVenta();
+                async () => {
+                  await addLineaVenta();
                   searchProductoOpen = true;
                 }
               "
@@ -1075,7 +1082,6 @@ const abrirCajaDiaria = async () => {
                           <Button
                             variant="ghost"
                             type="button"
-                            class="text-destructive"
                             @click="removeVentaObraSocial(index)"
                             ><Cross2Icon
                           /></Button>
@@ -1088,7 +1094,10 @@ const abrirCajaDiaria = async () => {
                           sociales no puede ser superior al importe total
                         </p>
                         <Button
-                          :disabled="!ventaObrasSociales[ventaObrasSociales.length-1]?.obraSocial.id"
+                          :disabled="
+                            !ventaObrasSociales[ventaObrasSociales.length - 1]
+                              ?.obraSocial.id
+                          "
                           variant="outline"
                           type="button"
                           class="mt-8"
@@ -1178,7 +1187,10 @@ const abrirCajaDiaria = async () => {
                 class="w-[27%] h-[9rem] rounded-lg bg-secondary px-4 flex flex-col items-center justify-center"
               >
                 <div
-                  v-if="(obrasSociales && montoObrasSociales > 0) || (porcDto && dto)"
+                  v-if="
+                    (obrasSociales && montoObrasSociales > 0) ||
+                    (porcDto && dto)
+                  "
                   class="flex justify-center my-2"
                 >
                   <Label class="w-[9rem] text-right mr-4"
@@ -1522,17 +1534,27 @@ const abrirCajaDiaria = async () => {
         </div>
       </DialogContent>
     </Dialog>
-      <Dialog v-model:open="openDialogClosedCaja" @update:open="router.push('/')"  >
-        <DialogContent class="max-w-[530px] min-h-[15rem] flex justify-center items-center flex-col text-center">
-          <DialogHeader>
-            <DialogTitle class="text-destructive" >Caja cerrada</DialogTitle>
-          </DialogHeader>
-          <DialogDescription class="text-destructive mb-4">
-            No se puede registrar una nueva venta porque la caja del día ya fue cerrada.
-          </DialogDescription>
-          <Button @click="router.push('/'); openDialogClosedCaja=false;" type="button">Volver al inicio</Button>
-        </DialogContent>
-      </Dialog>
+    <Dialog v-model:open="openDialogClosedCaja" @update:open="router.push('/')">
+      <DialogContent
+        class="max-w-[530px] min-h-[15rem] flex justify-center items-center flex-col text-center"
+      >
+        <DialogHeader>
+          <DialogTitle class="text-destructive">Caja cerrada</DialogTitle>
+        </DialogHeader>
+        <DialogDescription class="text-destructive mb-4">
+          No se puede registrar una nueva venta porque la caja del día ya fue
+          cerrada.
+        </DialogDescription>
+        <Button
+          @click="
+            router.push('/');
+            openDialogClosedCaja = false;
+          "
+          type="button"
+          >Volver al inicio</Button
+        >
+      </DialogContent>
+    </Dialog>
     <AlertError
       v-model="showError"
       title="Error"
