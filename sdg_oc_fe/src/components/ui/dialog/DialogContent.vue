@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useDialogOptions } from "@/lib/dialogConfig";
 import { cn } from "@/lib/utils.recetas";
 import { X } from "lucide-vue-next";
 import {
@@ -11,25 +10,12 @@ import {
   DialogPortal,
   useForwardPropsEmits,
 } from "radix-vue";
-import {
-  computed,
-  type HTMLAttributes,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from "vue";
+import { computed, type HTMLAttributes } from "vue";
 
 const props = defineProps<
   DialogContentProps & { class?: HTMLAttributes["class"] }
 >();
 const emits = defineEmits<DialogContentEmits>();
-
-// Obtener opciones predeterminadas
-const dialogOptions = useDialogOptions();
-
-// Control para restaurar el foco
-const previousActiveElement = ref<HTMLElement | null>(null);
-const dialogContentRef = ref<HTMLElement | null>(null);
 
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props;
@@ -38,38 +24,6 @@ const delegatedProps = computed(() => {
 });
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
-
-onMounted(() => {
-  // Guardar el elemento activo actual
-  if (dialogOptions.restoreFocus) {
-    previousActiveElement.value = document.activeElement as HTMLElement;
-  }
-
-  // Aplicar autoFocus
-  if (dialogOptions.autoFocus) {
-    setTimeout(() => {
-      if (dialogContentRef.value) {
-        if (dialogOptions.autoFocus === "dialog") {
-          dialogContentRef.value.focus();
-        } else if (typeof dialogOptions.autoFocus === "string") {
-          const focusElement = dialogContentRef.value.querySelector(
-            dialogOptions.autoFocus as string
-          ) as HTMLElement;
-          if (focusElement) {
-            focusElement.focus();
-          }
-        }
-      }
-    }, 0);
-  }
-});
-
-onBeforeUnmount(() => {
-  // Restaurar el foco al elemento anterior
-  if (dialogOptions.restoreFocus && previousActiveElement.value) {
-    previousActiveElement.value.focus();
-  }
-});
 </script>
 
 <template>
@@ -78,7 +32,6 @@ onBeforeUnmount(() => {
       class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
     />
     <DialogContent
-      ref="dialogContentRef"
       v-bind="forwarded"
       :class="
         cn(
@@ -86,7 +39,6 @@ onBeforeUnmount(() => {
           props.class
         )
       "
-      tabindex="-1"
     >
       <slot />
 

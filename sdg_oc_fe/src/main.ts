@@ -2,17 +2,10 @@ import { createPinia } from "pinia";
 import { createApp } from "vue";
 import App from "./App.vue";
 import "./assets/index.css";
-import { provideDialogOptions } from "./lib/dialogConfig";
 import { router } from "./router/index";
 
 const pinia = createPinia();
 const app = createApp(App);
-
-// Configurar opciones predeterminadas para diálogos
-provideDialogOptions({
-  autoFocus: "dialog",
-  restoreFocus: true,
-});
 
 app.use(pinia);
 app.use(router);
