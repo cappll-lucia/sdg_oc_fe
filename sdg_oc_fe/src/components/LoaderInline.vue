@@ -8,7 +8,7 @@
 <template>
   <div class="flex flex-col items-center justify-center bg-white  ">
     <div class="dots-loader flex items-center justify-center">
-      <span v-for="n in 5" :key="n" :style="{ animationDelay: `${(n - 1) * 0.1}s` }" />
+       <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-gray-500"></div>
     </div>
   </div>
 </template>

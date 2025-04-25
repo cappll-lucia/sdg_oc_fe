@@ -102,7 +102,7 @@ const loadData = async()=>{
 }
 
 onMounted(async () => {
-    loader.show();
+    loader.show(); 
     loading.value=true;
     const today = new Date();
     todayDate.value=new CalendarDate(today.getFullYear(), today.getMonth()+1, today.getDate());
@@ -539,7 +539,7 @@ const totalEgresosToday = computed(() =>
                             <LoaderForm />
                         </div>
                         <div v-else>
-                            <div class="flex flex-row justify-between items-center bg-secondary h-[3rem] rounded-t-lg text-xs px-4 ">
+                            <div  v-if="dateMovements.length" class="flex flex-row justify-between items-center bg-secondary h-[3rem] rounded-t-lg text-xs px-4 ">
                                 <Label class="w-[4rem]" >HORA</Label>
                                 <Label class="w-[7rem] text-center" >TIPO MOVIMIENTO</Label>
                                 <Label class="w-[7rem]" >DETALLE</Label>

@@ -179,6 +179,7 @@ const handleFacturarPendientes = async () => {
     showError.value = true;
   } finally {
     loader.hide();
+    selectedTipoFactura.value=''
   }
 };
 </script>
